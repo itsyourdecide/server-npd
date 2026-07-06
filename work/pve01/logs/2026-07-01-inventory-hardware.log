@@ -1,0 +1,1065 @@
+=== dmidecode system/baseboard/bios ===
+# dmidecode 3.6
+Getting SMBIOS data from sysfs.
+SMBIOS 3.0 present.
+
+Handle 0x0000, DMI type 0, 24 bytes
+BIOS Information
+	Vendor: American Megatrends Inc.
+	Version: 3.0a
+	Release Date: 02/06/2018
+	Address: 0xF0000
+	Runtime Size: 64 kB
+	ROM Size: 8 MB
+	Characteristics:
+		PCI is supported
+		BIOS is upgradeable
+		BIOS shadowing is allowed
+		Boot from CD is supported
+		Selectable boot is supported
+		BIOS ROM is socketed
+		EDD is supported
+		5.25"/1.2 MB floppy services are supported (int 13h)
+		3.5"/720 kB floppy services are supported (int 13h)
+		3.5"/2.88 MB floppy services are supported (int 13h)
+		Print screen service is supported (int 5h)
+		8042 keyboard services are supported (int 9h)
+		Serial services are supported (int 14h)
+		Printer services are supported (int 17h)
+		ACPI is supported
+		USB legacy is supported
+		BIOS boot specification is supported
+		Targeted content distribution is supported
+		UEFI is supported
+	BIOS Revision: 5.11
+
+Handle 0x0001, DMI type 1, 27 bytes
+System Information
+	Manufacturer: Supermicro
+	Product Name: X10DRi
+	Version: 123456789
+	Serial Number: 123456789
+	UUID: 00000000-0000-0000-0000-ac1f6b4cd742
+	Wake-up Type: Power Switch
+	SKU Number: 072815D9
+	Family: SMC X10
+
+Handle 0x0002, DMI type 2, 15 bytes
+Base Board Information
+	Manufacturer: Supermicro
+	Product Name: X10DRI-T
+	Version: 1.02B
+	Serial Number: NM187S004964
+	Asset Tag: Default string
+	Features:
+		Board is a hosting board
+		Board is replaceable
+	Location In Chassis: Default string
+	Chassis Handle: 0x0003
+	Type: Motherboard
+	Contained Object Handles: 0
+
+Handle 0x0022, DMI type 10, 8 bytes
+On Board Device 1 Information
+	Type: Video
+	Status: Enabled
+	Description:    Onboard Aspeed Video
+On Board Device 2 Information
+	Type: Ethernet
+	Status: Enabled
+	Description:  Onboard Intel Lan
+
+Handle 0x0024, DMI type 12, 5 bytes
+System Configuration Options
+	Option 1: Default string
+
+Handle 0x0025, DMI type 32, 20 bytes
+System Boot Information
+	Status: No errors detected
+
+Handle 0x0055, DMI type 41, 11 bytes
+Onboard Device
+	Reference Designation:  Onboard IGD
+	Type: Video
+	Status: Enabled
+	Type Instance: 1
+	Bus Address: 0000:00:02.0
+
+Handle 0x0056, DMI type 41, 11 bytes
+Onboard Device
+	Reference Designation:  Onboard LAN
+	Type: Ethernet
+	Status: Enabled
+	Type Instance: 1
+	Bus Address: 0000:00:19.0
+
+Handle 0x0057, DMI type 41, 11 bytes
+Onboard Device
+	Reference Designation:  Onboard 1394
+	Type: Other
+	Status: Enabled
+	Type Instance: 1
+	Bus Address: 0000:03:1c.2
+
+Handle 0x005D, DMI type 15, 81 bytes
+System Event Log
+	Area Length: 65535 bytes
+	Header Start Offset: 0x0000
+	Header Length: 16 bytes
+	Data Start Offset: 0x0010
+	Access Method: Memory-mapped physical 32-bit address
+	Access Address: 0xFF890000
+	Status: Valid, Not Full
+	Change Token: 0x00000001
+	Header Format: Type 1
+	Supported Log Type Descriptors: 29
+	Descriptor 1: Single-bit ECC memory error
+	Data Format 1: Multiple-event handle
+	Descriptor 2: Multi-bit ECC memory error
+	Data Format 2: Multiple-event handle
+	Descriptor 3: Parity memory error
+	Data Format 3: None
+	Descriptor 4: Bus timeout
+	Data Format 4: None
+	Descriptor 5: I/O channel block
+	Data Format 5: None
+	Descriptor 6: Software NMI
+	Data Format 6: None
+	Descriptor 7: POST memory resize
+	Data Format 7: None
+	Descriptor 8: POST error
+	Data Format 8: POST results bitmap
+	Descriptor 9: PCI parity error
+	Data Format 9: Multiple-event handle
+	Descriptor 10: PCI system error
+	Data Format 10: Multiple-event handle
+	Descriptor 11: CPU failure
+	Data Format 11: None
+	Descriptor 12: EISA failsafe timer timeout
+	Data Format 12: None
+	Descriptor 13: Correctable memory log disabled
+	Data Format 13: None
+	Descriptor 14: Logging disabled
+	Data Format 14: None
+	Descriptor 15: System limit exceeded
+	Data Format 15: None
+	Descriptor 16: Asynchronous hardware timer expired
+	Data Format 16: None
+	Descriptor 17: System configuration information
+	Data Format 17: None
+	Descriptor 18: Hard disk information
+	Data Format 18: None
+	Descriptor 19: System reconfigured
+	Data Format 19: None
+	Descriptor 20: Uncorrectable CPU-complex error
+	Data Format 20: None
+	Descriptor 21: Log area reset/cleared
+	Data Format 21: None
+	Descriptor 22: System boot
+	Data Format 22: None
+	Descriptor 23: End of log
+	Data Format 23: None
+	Descriptor 24: OEM-specific
+	Data Format 24: OEM-specific
+	Descriptor 25: OEM-specific
+	Data Format 25: OEM-specific
+	Descriptor 26: OEM-specific
+	Data Format 26: Multiple-event handle
+	Descriptor 27: OEM-specific
+	Data Format 27: Multiple-event handle
+	Descriptor 28: OEM-specific
+	Data Format 28: Multiple-event handle
+	Descriptor 29: OEM-specific
+	Data Format 29: Multiple-event handle
+
+Handle 0x008C, DMI type 13, 22 bytes
+BIOS Language Information
+	Language Description Format: Long
+	Installable Languages: 1
+		en|US|iso8859-1
+	Currently Installed Language: en|US|iso8859-1
+
+
+=== lscpu ===
+Architecture:                            x86_64
+CPU op-mode(s):                          32-bit, 64-bit
+Address sizes:                           46 bits physical, 48 bits virtual
+Byte Order:                              Little Endian
+CPU(s):                                  32
+On-line CPU(s) list:                     0-31
+Vendor ID:                               GenuineIntel
+Model name:                              Intel(R) Xeon(R) CPU E5-2620 v4 @ 2.10GHz
+CPU family:                              6
+Model:                                   79
+Thread(s) per core:                      2
+Core(s) per socket:                      8
+Socket(s):                               2
+Stepping:                                1
+CPU(s) scaling MHz:                      87%
+CPU max MHz:                             3000.0000
+CPU min MHz:                             1200.0000
+BogoMIPS:                                4199.99
+Flags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 cdp_l3 pti intel_ppin ssbd ibrs ibpb stibp tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm rdt_a rdseed adx smap intel_pt xsaveopt cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts vnmi md_clear flush_l1d
+Virtualization:                          VT-x
+L1d cache:                               512 KiB (16 instances)
+L1i cache:                               512 KiB (16 instances)
+L2 cache:                                4 MiB (16 instances)
+L3 cache:                                40 MiB (2 instances)
+NUMA node(s):                            2
+NUMA node0 CPU(s):                       0-7,16-23
+NUMA node1 CPU(s):                       8-15,24-31
+Vulnerability Gather data sampling:      Not affected
+Vulnerability Ghostwrite:                Not affected
+Vulnerability Indirect target selection: Not affected
+Vulnerability Itlb multihit:             KVM: Mitigation: Split huge pages
+Vulnerability L1tf:                      Mitigation; PTE Inversion; VMX conditional cache flushes, SMT vulnerable
+Vulnerability Mds:                       Mitigation; Clear CPU buffers; SMT vulnerable
+Vulnerability Meltdown:                  Mitigation; PTI
+Vulnerability Mmio stale data:           Mitigation; Clear CPU buffers; SMT vulnerable
+Vulnerability Old microcode:             Not affected
+Vulnerability Reg file data sampling:    Not affected
+Vulnerability Retbleed:                  Not affected
+Vulnerability Spec rstack overflow:      Not affected
+Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl
+Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+Vulnerability Spectre v2:                Mitigation; Retpolines; IBPB conditional; IBRS_FW; STIBP conditional; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected
+Vulnerability Srbds:                     Not affected
+Vulnerability Tsa:                       Not affected
+Vulnerability Tsx async abort:           Mitigation; Clear CPU buffers; SMT vulnerable
+Vulnerability Vmscape:                   Mitigation; IBPB before exit to userspace
+
+=== free -h ===
+               total        used        free      shared  buff/cache   available
+Mem:           503Gi       6.2Gi       494Gi        48Mi       6.4Gi       497Gi
+Swap:          8.0Gi          0B       8.0Gi
+
+=== dmidecode memory ===
+# dmidecode 3.6
+Getting SMBIOS data from sysfs.
+SMBIOS 3.0 present.
+
+Handle 0x005E, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 512 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 8
+
+Handle 0x0060, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x005E
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMA1
+	Bank Locator: P0_Node0_Channel0_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA22FA
+	Asset Tag: P1_DIMMA1_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0062, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x005E
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMA2
+	Bank Locator: P0_Node0_Channel0_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA228A
+	Asset Tag: P1_DIMMA2_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0064, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x005E
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMB1
+	Bank Locator: P0_Node0_Channel1_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA2288
+	Asset Tag: P1_DIMMB1_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0066, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x005E
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMB2
+	Bank Locator: P0_Node0_Channel1_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA2280
+	Asset Tag: P1_DIMMB2_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0068, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x005E
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMC1
+	Bank Locator: P0_Node0_Channel2_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA225D
+	Asset Tag: P1_DIMMC1_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x006A, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x005E
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMC2
+	Bank Locator: P0_Node0_Channel2_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA2268
+	Asset Tag: P1_DIMMC2_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x006C, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x005E
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMD1
+	Bank Locator: P0_Node0_Channel3_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA228E
+	Asset Tag: P1_DIMMD1_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x006E, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x005E
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMD2
+	Bank Locator: P0_Node0_Channel3_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA227E
+	Asset Tag: P1_DIMMD2_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0070, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 512 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 8
+
+Handle 0x0072, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0070
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMME1
+	Bank Locator: P1_Node1_Channel0_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA220D
+	Asset Tag: P2_DIMME1_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0074, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0070
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMME2
+	Bank Locator: P1_Node1_Channel0_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA22B0
+	Asset Tag: P2_DIMME2_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0076, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0070
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMMF1
+	Bank Locator: P1_Node1_Channel1_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA225E
+	Asset Tag: P2_DIMMF1_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0078, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0070
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMMF2
+	Bank Locator: P1_Node1_Channel1_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA226A
+	Asset Tag: P2_DIMMF2_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x007A, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0070
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMMG1
+	Bank Locator: P1_Node1_Channel2_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA2286
+	Asset Tag: P2_DIMMG1_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x007C, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0070
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMMG2
+	Bank Locator: P1_Node1_Channel2_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA21CF
+	Asset Tag: P2_DIMMG2_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x007E, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0070
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMMH1
+	Bank Locator: P1_Node1_Channel3_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA227C
+	Asset Tag: P2_DIMMH1_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0080, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0070
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMMH2
+	Bank Locator: P1_Node1_Channel3_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA22F7
+	Asset Tag: P2_DIMMH2_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+
+=== lsblk ===
+NAME                 SIZE MODEL                     SERIAL       ROTA TYPE FSTYPE      MOUNTPOINTS
+sda                894.3G Micron_5200_MTFDDAK960TDD 18031DBC5C7D    0 disk             
+├─sda1              1007K                                           0 part             
+├─sda2                 1G                                           0 part vfat        
+└─sda3             893.3G                                           0 part LVM2_member 
+  ├─pve-swap           8G                                           0 lvm  swap        [SWAP]
+  ├─pve-root          96G                                           0 lvm  ext4        /
+  ├─pve-data_tmeta   7.7G                                           0 lvm              
+  │ └─pve-data     757.8G                                           0 lvm              
+  └─pve-data_tdata 757.8G                                           0 lvm              
+    └─pve-data     757.8G                                           0 lvm              
+sdb                894.3G Micron_5200_MTFDDAK960TDD 18031DBC5C7C    0 disk             
+└─sdb1             894.3G                                           0 part ext4        
+
+=== lspci -nnk ===
+00:00.0 Host bridge [0600]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DMI2 [8086:6f00] (rev 01)
+	Subsystem: Super Micro Computer Inc Device [15d9:0728]
+00:01.0 PCI bridge [0604]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D PCI Express Root Port 1 [8086:6f02] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: pcieport
+	Kernel modules: shpchp
+00:03.0 PCI bridge [0604]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D PCI Express Root Port 3 [8086:6f08] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: pcieport
+	Kernel modules: shpchp
+00:03.2 PCI bridge [0604]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D PCI Express Root Port 3 [8086:6f0a] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: pcieport
+	Kernel modules: shpchp
+00:04.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 0 [8086:6f20] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: ioatdma
+	Kernel modules: ioatdma
+00:04.1 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 1 [8086:6f21] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: ioatdma
+	Kernel modules: ioatdma
+00:04.2 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 2 [8086:6f22] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: ioatdma
+	Kernel modules: ioatdma
+00:04.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 3 [8086:6f23] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: ioatdma
+	Kernel modules: ioatdma
+00:04.4 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 4 [8086:6f24] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: ioatdma
+	Kernel modules: ioatdma
+00:04.5 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 5 [8086:6f25] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: ioatdma
+	Kernel modules: ioatdma
+00:04.6 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 6 [8086:6f26] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: ioatdma
+	Kernel modules: ioatdma
+00:04.7 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 7 [8086:6f27] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: ioatdma
+	Kernel modules: ioatdma
+00:05.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Map/VTd_Misc/System Management [8086:6f28] (rev 01)
+00:05.1 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO Hot Plug [8086:6f29] (rev 01)
+00:05.2 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO RAS/Control Status/Global Errors [8086:6f2a] (rev 01)
+00:05.4 PIC [0800]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D I/O APIC [8086:6f2c] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+00:11.0 Unassigned class [ff00]: Intel Corporation C610/X99 series chipset SPSR [8086:8d7c] (rev 05)
+	Subsystem: Intel Corporation Device [8086:7270]
+00:14.0 USB controller [0c03]: Intel Corporation C610/X99 series chipset USB xHCI Host Controller [8086:8d31] (rev 05)
+	Subsystem: Intel Corporation Device [8086:7270]
+	Kernel driver in use: xhci_hcd
+	Kernel modules: xhci_pci
+00:16.0 Communication controller [0780]: Intel Corporation C610/X99 series chipset MEI Controller #1 [8086:8d3a] (rev 05)
+	Subsystem: Intel Corporation Device [8086:7270]
+	Kernel modules: mei_me
+00:16.1 Communication controller [0780]: Intel Corporation C610/X99 series chipset MEI Controller #2 [8086:8d3b] (rev 05)
+	Subsystem: Intel Corporation Device [8086:7270]
+00:1a.0 USB controller [0c03]: Intel Corporation C610/X99 series chipset USB Enhanced Host Controller #2 [8086:8d2d] (rev 05)
+	Subsystem: Intel Corporation Device [8086:7270]
+	Kernel driver in use: ehci-pci
+	Kernel modules: ehci_pci
+00:1c.0 PCI bridge [0604]: Intel Corporation C610/X99 series chipset PCI Express Root Port #1 [8086:8d10] (rev d5)
+	Subsystem: Intel Corporation Device [8086:7270]
+	Kernel driver in use: pcieport
+	Kernel modules: shpchp
+00:1c.4 PCI bridge [0604]: Intel Corporation C610/X99 series chipset PCI Express Root Port #5 [8086:8d18] (rev d5)
+	Subsystem: Intel Corporation Device [8086:7270]
+	Kernel driver in use: pcieport
+	Kernel modules: shpchp
+00:1d.0 USB controller [0c03]: Intel Corporation C610/X99 series chipset USB Enhanced Host Controller #1 [8086:8d26] (rev 05)
+	Subsystem: Intel Corporation Device [8086:7270]
+	Kernel driver in use: ehci-pci
+	Kernel modules: ehci_pci
+00:1f.0 ISA bridge [0601]: Intel Corporation C610/X99 series chipset LPC Controller [8086:8d44] (rev 05)
+	Subsystem: Intel Corporation Device [8086:7270]
+	Kernel driver in use: lpc_ich
+	Kernel modules: lpc_ich
+00:1f.3 SMBus [0c05]: Intel Corporation C610/X99 series chipset SMBus Controller [8086:8d22] (rev 05)
+	Subsystem: Intel Corporation Device [8086:7270]
+	Kernel driver in use: i801_smbus
+	Kernel modules: i2c_i801
+02:00.0 Serial Attached SCSI controller [0107]: Broadcom / LSI SAS3224 PCI-Express Fusion-MPT SAS-3 [1000:00c4] (rev 01)
+	Subsystem: Broadcom / LSI SAS9305-16i [1000:3190]
+	Kernel driver in use: mpt3sas
+	Kernel modules: mpt3sas
+03:00.0 Ethernet controller [0200]: Intel Corporation Ethernet Controller 10-Gigabit X540-AT2 [8086:1528] (rev 01)
+	Subsystem: Super Micro Computer Inc Device [15d9:1528]
+	Kernel driver in use: ixgbe
+	Kernel modules: ixgbe
+03:00.1 Ethernet controller [0200]: Intel Corporation Ethernet Controller 10-Gigabit X540-AT2 [8086:1528] (rev 01)
+	Subsystem: Super Micro Computer Inc Device [15d9:1528]
+	Kernel driver in use: ixgbe
+	Kernel modules: ixgbe
+06:00.0 PCI bridge [0604]: ASPEED Technology, Inc. AST1150 PCI-to-PCI Bridge [1a03:1150] (rev 03)
+	Subsystem: ASPEED Technology, Inc. AST1150 PCI-to-PCI Bridge [1a03:1150]
+	Kernel modules: shpchp
+07:00.0 VGA compatible controller [0300]: ASPEED Technology, Inc. ASPEED Graphics Family [1a03:2000] (rev 30)
+	Subsystem: Super Micro Computer Inc Device [15d9:0728]
+	Kernel driver in use: ast
+	Kernel modules: ast
+7f:08.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0 [8086:6f80] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0 [8086:6f80]
+7f:08.2 Performance counters [1101]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0 [8086:6f32] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0 [8086:6f32]
+	Kernel driver in use: bdx_uncore
+7f:08.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0 [8086:6f83] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0 [8086:6f83]
+7f:09.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 1 [8086:6f90] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 1 [8086:6f90]
+7f:09.2 Performance counters [1101]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 1 [8086:6f33] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 1 [8086:6f33]
+	Kernel driver in use: bdx_uncore
+7f:09.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 1 [8086:6f93] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 1 [8086:6f93]
+7f:0b.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 0/1 [8086:6f81] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 0/1 [8086:6f81]
+7f:0b.1 Performance counters [1101]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 0/1 [8086:6f36] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 0/1 [8086:6f36]
+	Kernel driver in use: bdx_uncore
+7f:0b.2 Performance counters [1101]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 0/1 [8086:6f37] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 0/1 [8086:6f37]
+	Kernel driver in use: bdx_uncore
+7f:0b.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link Debug [8086:6f76] (rev 01)
+7f:0c.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe0] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe0]
+7f:0c.1 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe1] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe1]
+7f:0c.2 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe2] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe2]
+7f:0c.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe3] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe3]
+7f:0c.4 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe4] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe4]
+7f:0c.5 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe5] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe5]
+7f:0c.6 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe6] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe6]
+7f:0c.7 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe7] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe7]
+7f:0f.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6ff8] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6ff8]
+7f:0f.1 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6ff9] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6ff9]
+7f:0f.4 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6ffc] (rev 01)
+	Subsystem: Intel Corporation Device [8086:6fe0]
+7f:0f.5 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6ffd] (rev 01)
+	Subsystem: Intel Corporation Device [8086:6fe0]
+7f:0f.6 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6ffe] (rev 01)
+	Subsystem: Intel Corporation Device [8086:6fe0]
+7f:10.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R2PCIe Agent [8086:6f1d] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R2PCIe Agent [8086:6f1d]
+7f:10.1 Performance counters [1101]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R2PCIe Agent [8086:6f34] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R2PCIe Agent [8086:6f34]
+	Kernel driver in use: bdx_uncore
+7f:10.5 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Ubox [8086:6f1e] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Ubox [8086:6f1e]
+7f:10.6 Performance counters [1101]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Ubox [8086:6f7d] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Ubox [8086:6f7d]
+7f:10.7 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Ubox [8086:6f1f] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Ubox [8086:6f1f]
+7f:12.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Home Agent 0 [8086:6fa0] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Home Agent 0 [8086:6fa0]
+7f:12.1 Performance counters [1101]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Home Agent 0 [8086:6f30] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Home Agent 0 [8086:6f30]
+	Kernel driver in use: bdx_uncore
+7f:13.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Target Address/Thermal/RAS [8086:6fa8] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Target Address/Thermal/RAS [8086:6fa8]
+7f:13.1 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Target Address/Thermal/RAS [8086:6f71] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Target Address/Thermal/RAS [8086:6f71]
+7f:13.2 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder [8086:6faa] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder [8086:6faa]
+7f:13.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder [8086:6fab] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder [8086:6fab]
+7f:13.4 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder [8086:6fac] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder [8086:6fac]
+7f:13.5 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder [8086:6fad] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder [8086:6fad]
+7f:13.6 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 0/1 Broadcast [8086:6fae] (rev 01)
+7f:13.7 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Global Broadcast [8086:6faf] (rev 01)
+7f:14.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 0 Thermal Control [8086:6fb0] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 0 Thermal Control [8086:6fb0]
+	Kernel driver in use: bdx_uncore
+7f:14.1 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 1 Thermal Control [8086:6fb1] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 1 Thermal Control [8086:6fb1]
+	Kernel driver in use: bdx_uncore
+7f:14.2 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 0 Error [8086:6fb2] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 0 Error [8086:6fb2]
+7f:14.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 1 Error [8086:6fb3] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 1 Error [8086:6fb3]
+7f:14.4 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 0/1 Interface [8086:6fbc] (rev 01)
+7f:14.5 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 0/1 Interface [8086:6fbd] (rev 01)
+7f:14.6 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 0/1 Interface [8086:6fbe] (rev 01)
+7f:14.7 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 0/1 Interface [8086:6fbf] (rev 01)
+7f:15.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 2 Thermal Control [8086:6fb4] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 2 Thermal Control [8086:6fb4]
+	Kernel driver in use: bdx_uncore
+7f:15.1 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 3 Thermal Control [8086:6fb5] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 3 Thermal Control [8086:6fb5]
+	Kernel driver in use: bdx_uncore
+7f:15.2 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 2 Error [8086:6fb6] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 2 Error [8086:6fb6]
+7f:15.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 3 Error [8086:6fb7] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 3 Error [8086:6fb7]
+7f:16.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Target Address/Thermal/RAS [8086:6f68] (rev 01)
+7f:16.6 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 2/3 Broadcast [8086:6f6e] (rev 01)
+7f:16.7 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Global Broadcast [8086:6f6f] (rev 01)
+7f:17.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 1 - Channel 0 Thermal Control [8086:6fd0] (rev 01)
+	Kernel driver in use: bdx_uncore
+7f:17.4 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 2/3 Interface [8086:6fb8] (rev 01)
+7f:17.5 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 2/3 Interface [8086:6fb9] (rev 01)
+7f:17.6 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 2/3 Interface [8086:6fba] (rev 01)
+7f:17.7 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 2/3 Interface [8086:6fbb] (rev 01)
+7f:1e.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f98] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f98]
+7f:1e.1 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f99] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f99]
+7f:1e.2 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f9a] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f9a]
+7f:1e.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6fc0] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6fc0]
+7f:1e.4 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f9c] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f9c]
+7f:1f.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f88] (rev 01)
+7f:1f.2 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f8a] (rev 01)
+80:01.0 PCI bridge [0604]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D PCI Express Root Port 1 [8086:6f02] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: pcieport
+	Kernel modules: shpchp
+80:04.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 0 [8086:6f20] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: ioatdma
+	Kernel modules: ioatdma
+80:04.1 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 1 [8086:6f21] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: ioatdma
+	Kernel modules: ioatdma
+80:04.2 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 2 [8086:6f22] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: ioatdma
+	Kernel modules: ioatdma
+80:04.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 3 [8086:6f23] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: ioatdma
+	Kernel modules: ioatdma
+80:04.4 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 4 [8086:6f24] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: ioatdma
+	Kernel modules: ioatdma
+80:04.5 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 5 [8086:6f25] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: ioatdma
+	Kernel modules: ioatdma
+80:04.6 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 6 [8086:6f26] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: ioatdma
+	Kernel modules: ioatdma
+80:04.7 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 7 [8086:6f27] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+	Kernel driver in use: ioatdma
+	Kernel modules: ioatdma
+80:05.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Map/VTd_Misc/System Management [8086:6f28] (rev 01)
+80:05.1 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO Hot Plug [8086:6f29] (rev 01)
+80:05.2 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO RAS/Control Status/Global Errors [8086:6f2a] (rev 01)
+80:05.4 PIC [0800]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D I/O APIC [8086:6f2c] (rev 01)
+	Subsystem: Intel Corporation Device [8086:0000]
+81:00.0 Serial Attached SCSI controller [0107]: Broadcom / LSI SAS3216 PCI-Express Fusion-MPT SAS-3 [1000:00c9] (rev 01)
+	Subsystem: Broadcom / LSI SAS9305-16e [1000:3180]
+	Kernel driver in use: mpt3sas
+	Kernel modules: mpt3sas
+ff:08.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0 [8086:6f80] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0 [8086:6f80]
+ff:08.2 Performance counters [1101]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0 [8086:6f32] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0 [8086:6f32]
+	Kernel driver in use: bdx_uncore
+ff:08.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0 [8086:6f83] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0 [8086:6f83]
+ff:09.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 1 [8086:6f90] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 1 [8086:6f90]
+ff:09.2 Performance counters [1101]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 1 [8086:6f33] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 1 [8086:6f33]
+	Kernel driver in use: bdx_uncore
+ff:09.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 1 [8086:6f93] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 1 [8086:6f93]
+ff:0b.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 0/1 [8086:6f81] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 0/1 [8086:6f81]
+ff:0b.1 Performance counters [1101]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 0/1 [8086:6f36] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 0/1 [8086:6f36]
+	Kernel driver in use: bdx_uncore
+ff:0b.2 Performance counters [1101]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 0/1 [8086:6f37] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 0/1 [8086:6f37]
+	Kernel driver in use: bdx_uncore
+ff:0b.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link Debug [8086:6f76] (rev 01)
+ff:0c.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe0] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe0]
+ff:0c.1 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe1] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe1]
+ff:0c.2 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe2] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe2]
+ff:0c.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe3] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe3]
+ff:0c.4 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe4] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe4]
+ff:0c.5 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe5] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe5]
+ff:0c.6 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe6] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe6]
+ff:0c.7 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe7] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6fe7]
+ff:0f.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6ff8] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6ff8]
+ff:0f.1 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6ff9] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6ff9]
+ff:0f.4 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6ffc] (rev 01)
+	Subsystem: Intel Corporation Device [8086:6fe0]
+ff:0f.5 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6ffd] (rev 01)
+	Subsystem: Intel Corporation Device [8086:6fe0]
+ff:0f.6 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent [8086:6ffe] (rev 01)
+	Subsystem: Intel Corporation Device [8086:6fe0]
+ff:10.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R2PCIe Agent [8086:6f1d] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R2PCIe Agent [8086:6f1d]
+ff:10.1 Performance counters [1101]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R2PCIe Agent [8086:6f34] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R2PCIe Agent [8086:6f34]
+	Kernel driver in use: bdx_uncore
+ff:10.5 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Ubox [8086:6f1e] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Ubox [8086:6f1e]
+ff:10.6 Performance counters [1101]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Ubox [8086:6f7d] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Ubox [8086:6f7d]
+ff:10.7 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Ubox [8086:6f1f] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Ubox [8086:6f1f]
+ff:12.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Home Agent 0 [8086:6fa0] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Home Agent 0 [8086:6fa0]
+ff:12.1 Performance counters [1101]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Home Agent 0 [8086:6f30] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Home Agent 0 [8086:6f30]
+	Kernel driver in use: bdx_uncore
+ff:13.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Target Address/Thermal/RAS [8086:6fa8] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Target Address/Thermal/RAS [8086:6fa8]
+ff:13.1 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Target Address/Thermal/RAS [8086:6f71] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Target Address/Thermal/RAS [8086:6f71]
+ff:13.2 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder [8086:6faa] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder [8086:6faa]
+ff:13.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder [8086:6fab] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder [8086:6fab]
+ff:13.4 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder [8086:6fac] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder [8086:6fac]
+ff:13.5 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder [8086:6fad] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder [8086:6fad]
+ff:13.6 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 0/1 Broadcast [8086:6fae] (rev 01)
+ff:13.7 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Global Broadcast [8086:6faf] (rev 01)
+ff:14.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 0 Thermal Control [8086:6fb0] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 0 Thermal Control [8086:6fb0]
+	Kernel driver in use: bdx_uncore
+ff:14.1 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 1 Thermal Control [8086:6fb1] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 1 Thermal Control [8086:6fb1]
+	Kernel driver in use: bdx_uncore
+ff:14.2 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 0 Error [8086:6fb2] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 0 Error [8086:6fb2]
+ff:14.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 1 Error [8086:6fb3] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 1 Error [8086:6fb3]
+ff:14.4 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 0/1 Interface [8086:6fbc] (rev 01)
+ff:14.5 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 0/1 Interface [8086:6fbd] (rev 01)
+ff:14.6 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 0/1 Interface [8086:6fbe] (rev 01)
+ff:14.7 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 0/1 Interface [8086:6fbf] (rev 01)
+ff:15.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 2 Thermal Control [8086:6fb4] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 2 Thermal Control [8086:6fb4]
+	Kernel driver in use: bdx_uncore
+ff:15.1 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 3 Thermal Control [8086:6fb5] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 3 Thermal Control [8086:6fb5]
+	Kernel driver in use: bdx_uncore
+ff:15.2 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 2 Error [8086:6fb6] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 2 Error [8086:6fb6]
+ff:15.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 3 Error [8086:6fb7] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 3 Error [8086:6fb7]
+ff:16.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Target Address/Thermal/RAS [8086:6f68] (rev 01)
+ff:16.6 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 2/3 Broadcast [8086:6f6e] (rev 01)
+ff:16.7 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Global Broadcast [8086:6f6f] (rev 01)
+ff:17.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 1 - Channel 0 Thermal Control [8086:6fd0] (rev 01)
+	Kernel driver in use: bdx_uncore
+ff:17.4 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 2/3 Interface [8086:6fb8] (rev 01)
+ff:17.5 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 2/3 Interface [8086:6fb9] (rev 01)
+ff:17.6 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 2/3 Interface [8086:6fba] (rev 01)
+ff:17.7 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 2/3 Interface [8086:6fbb] (rev 01)
+ff:1e.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f98] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f98]
+ff:1e.1 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f99] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f99]
+ff:1e.2 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f9a] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f9a]
+ff:1e.3 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6fc0] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6fc0]
+ff:1e.4 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f9c] (rev 01)
+	Subsystem: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f9c]
+ff:1f.0 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f88] (rev 01)
+ff:1f.2 System peripheral [0880]: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit [8086:6f8a] (rev 01)
+
+=== ip -br link ===
+lo               UNKNOWN        00:00:00:00:00:00 <LOOPBACK,UP,LOWER_UP> 
+nic0             UP             ac:1f:6b:4c:d7:42 <BROADCAST,MULTICAST,UP,LOWER_UP> 
+nic1             DOWN           ac:1f:6b:4c:d7:43 <BROADCAST,MULTICAST> 
+vmbr0            UP             ac:1f:6b:4c:d7:42 <BROADCAST,MULTICAST,UP,LOWER_UP> 
+tailscale0       UNKNOWN        <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> 
+vmbr1            UNKNOWN        b6:73:b4:db:db:d1 <BROADCAST,MULTICAST,UP,LOWER_UP> 

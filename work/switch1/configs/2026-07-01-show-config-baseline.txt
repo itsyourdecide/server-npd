@@ -1,0 +1,98 @@
+HP-3500yl-48G# show config
+
+Startup configuration: 9
+
+; J8693A Configuration Editor; Created on release #K.15.10.0003
+; Ver #03:03.1f.ef:f0
+hostname "HP-3500yl-48G"
+module 1 type j86yya
+module 2 type j86xxa
+snmp-server community "public" unrestricted
+vlan 1
+   name "DEFAULT_VLAN"
+   no untagged 1-48
+   ip address dhcp-bootp
+   exit
+vlan 10
+   name "PXE"
+   untagged 1-48
+   ip address 10.10.0.254 255.255.255.0
+   exit
+
+HP-3500yl-48G# show version
+Image stamp:
+ /ws/swbuildm/rel_irvine_qaoff/code/build/btm(swbuildm_rel_irvine_qaoff_rel_irvi
+ne)
+                Aug 24 2012 09:30:03
+                K.15.10.0003
+                49
+Boot Image:     Primary
+HP-3500yl-48G# show vlan
+
+ Status and Counters - VLAN Information
+
+  Maximum VLANs to support : 256
+  Primary VLAN : DEFAULT_VLAN
+  Management VLAN :
+
+  VLAN ID Name                             | Status     Voice Jumbo
+  ------- -------------------------------- + ---------- ----- -----
+  1       DEFAULT_VLAN                     | Port-based No    No
+  10      PXE                              | Port-based No    No
+
+
+HP-3500yl-48G# show interfaces brief
+
+ Status and Counters - Port Status
+
+                   | Intrusion                           MDI  Flow Bcast
+  Port   Type      | Alert     Enabled Status Mode       Mode Ctrl Limit
+  ------ --------- + --------- ------- ------ ---------- ---- ---- -----
+  1      100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  2      100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  3      100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  4      100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  5      100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  6      100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  7      100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  8      100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  9      100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  10     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  11     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  12     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  13     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  14     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  15     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  16     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  17     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  18     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  19     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  20     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  21     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  22     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  23     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  24     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  25     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  26     100/1000T | No        Yes     Up     1000FDx    MDI  off  0
+  27     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  28     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  29     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  30     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  31     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  32     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  33     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  34     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  35     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  36     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  37     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  38     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  39     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  40     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  41     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  42     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  43     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  44     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  45     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  46     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  47     100/1000T | No        Yes     Down   1000FDx    Auto off  0
+  48     100/1000T | No        Yes     Down   1000FDx    Auto off  0

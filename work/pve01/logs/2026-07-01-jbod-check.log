@@ -1,0 +1,162 @@
+=== dmesg tail (sas/scsi/enclosure/error) ===
+[Thu Jul  2 14:37:38 2026] scsi 1:0:22:0: enclosure level(0x0000), connector name(     )
+[Thu Jul  2 14:37:38 2026] scsi 1:0:22:0: atapi(n), ncq(y), asyn_notify(n), smart(y), fua(y), sw_preserve(y)
+[Thu Jul  2 14:37:38 2026] scsi 1:0:22:0: qdepth(32), tagged(1), scsi_level(7), cmd_que(1)
+[Thu Jul  2 14:37:38 2026]  end_device-1:0:22: add: handle(0x0043), sas_addr(0x50001555fe256216)
+[Thu Jul  2 14:37:38 2026] mpt3sas_cm1: detecting: handle(0x0044),
+                           sas_address(0x50001555fe256217), phy(23)
+[Thu Jul  2 14:37:38 2026] mpt3sas_cm1: REPORT_LUNS: handle(0x0044),
+[Thu Jul  2 14:37:38 2026] mpt3sas_cm1: handle(0x44) sas_address(0x50001555fe256217) port_type(0x1)
+[Thu Jul  2 14:37:38 2026] scsi 1:0:23:0: Direct-Access     ATA      TOSHIBA MG04ACA6 FS3B PQ: 0 ANSI: 6
+[Thu Jul  2 14:37:38 2026] scsi 1:0:23:0: SATA: handle(0x0044), sas_addr(0x50001555fe256217), phy(23), device_name(0x50000398ab783477)
+[Thu Jul  2 14:37:38 2026] scsi 1:0:23:0: enclosure logical id (0x50001555fe256000), slot(23) 
+[Thu Jul  2 14:37:38 2026] scsi 1:0:23:0: enclosure level(0x0000), connector name(     )
+[Thu Jul  2 14:37:38 2026] scsi 1:0:23:0: atapi(n), ncq(y), asyn_notify(n), smart(y), fua(y), sw_preserve(y)
+[Thu Jul  2 14:37:38 2026] scsi 1:0:23:0: qdepth(32), tagged(1), scsi_level(7), cmd_que(1)
+[Thu Jul  2 14:37:38 2026]  end_device-1:0:23: add: handle(0x0044), sas_addr(0x50001555fe256217)
+[Thu Jul  2 14:37:38 2026] mpt3sas_cm1: detecting: handle(0x0046),
+                           sas_address(0x50001555fe25623d), phy(40)
+[Thu Jul  2 14:37:38 2026] mpt3sas_cm1: REPORT_LUNS: handle(0x0046),
+[Thu Jul  2 14:37:38 2026] mpt3sas_cm1: port enable: SUCCESS
+[Thu Jul  2 14:37:38 2026] sd 1:0:0:0: Attached scsi generic sg2 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:1:0: Attached scsi generic sg3 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:2:0: Attached scsi generic sg4 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:3:0: Attached scsi generic sg5 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:4:0: Attached scsi generic sg6 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:5:0: Attached scsi generic sg7 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:6:0: Attached scsi generic sg8 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:7:0: Attached scsi generic sg9 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:8:0: Attached scsi generic sg10 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:9:0: Attached scsi generic sg11 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:10:0: Attached scsi generic sg12 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:11:0: Attached scsi generic sg13 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:12:0: Attached scsi generic sg14 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:13:0: Attached scsi generic sg15 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:14:0: Attached scsi generic sg16 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:15:0: Attached scsi generic sg17 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:16:0: Attached scsi generic sg18 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:17:0: Attached scsi generic sg19 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:18:0: Attached scsi generic sg20 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:19:0: Attached scsi generic sg21 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:20:0: Attached scsi generic sg22 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:21:0: Attached scsi generic sg23 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:22:0: Attached scsi generic sg24 type 0
+[Thu Jul  2 14:37:38 2026] scsi 1:0:23:0: Attached scsi generic sg25 type 0
+[Thu Jul  2 14:37:39 2026] sd 1:0:3:0: [sdf] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:11:0: [sdn] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:8:0: [sdk] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:7:0: [sdj] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:12:0: [sdo] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:4:0: [sdg] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:1:0: [sdd] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:0:0: [sdc] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:23:0: [sdz] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:14:0: [sdq] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:5:0: [sdh] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:17:0: [sdt] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:10:0: [sdm] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:22:0: [sdy] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:15:0: [sdr] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:13:0: [sdp] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:18:0: [sdu] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:6:0: [sdi] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:2:0: [sde] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:16:0: [sds] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:9:0: [sdl] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:21:0: [sdx] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:19:0: [sdv] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] sd 1:0:20:0: [sdw] Attached SCSI disk
+[Thu Jul  2 14:37:39 2026] mpt3sas_cm1: detecting: handle(0x0046),
+                           sas_address(0x50001555fe25623d), phy(40)
+[Thu Jul  2 14:37:39 2026] mpt3sas_cm1: REPORT_LUNS: handle(0x0046),
+[Thu Jul  2 14:37:39 2026] mpt3sas_cm1: handle(0x46) sas_address(0x50001555fe25623d) port_type(0x1)
+[Thu Jul  2 14:37:39 2026] scsi 1:0:24:0: Enclosure         Promise  4U-SAS-24-12G BP 0101 PQ: 0 ANSI: 6
+[Thu Jul  2 14:37:39 2026] scsi 1:0:24:0: set ignore_delay_remove for handle(0x0046)
+[Thu Jul  2 14:37:39 2026] scsi 1:0:24:0: SES: handle(0x0046), sas_addr(0x50001555fe25623d), phy(40), device_name(0x50001555fe25623d)
+[Thu Jul  2 14:37:39 2026] scsi 1:0:24:0: enclosure logical id (0x50001555fe256000), slot(24) 
+[Thu Jul  2 14:37:39 2026] scsi 1:0:24:0: enclosure level(0x0000), connector name(     )
+[Thu Jul  2 14:37:39 2026] scsi 1:0:24:0: qdepth(254), tagged(1), scsi_level(7), cmd_que(1)
+[Thu Jul  2 14:37:39 2026] scsi 1:0:24:0: Attached scsi generic sg26 type 13
+[Thu Jul  2 14:37:39 2026]  end_device-1:0:24: add: handle(0x0046), sas_addr(0x50001555fe25623d)
+[Thu Jul  2 14:37:42 2026] ses 1:0:24:0: Attached Enclosure device
+
+=== lsblk -S ===
+NAME HCTL       TRAN VENDOR   MODEL                         REV SERIAL         SIZE
+sda  0:0:0:0    sas  ATA      Micron_5200_MTFDDAK960TDD D1MU020 18031DBC5C7D 894.3G
+sdb  0:0:1:0    sas  ATA      Micron_5200_MTFDDAK960TDD D1MU020 18031DBC5C7C 894.3G
+sdc  1:0:0:0    sas  ATA      TOSHIBA MG04ACA600E          FS3B 68B7Y0M7FTMB   5.5T
+sdd  1:0:1:0    sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P2KRT6FTMB   5.5T
+sde  1:0:2:0    sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P2KRT4FTMB   5.5T
+sdf  1:0:3:0    sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P2KRT2FTMB   5.5T
+sdg  1:0:4:0    sas  ATA      TOSHIBA MG04ACA600E          FS3B 68B8Y0BVFTMB   5.5T
+sdh  1:0:5:0    sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P2KRT5FTMB   5.5T
+sdi  1:0:6:0    sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P2KRSZFTMB   5.5T
+sdj  1:0:7:0    sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P1KWNNFTMB   5.5T
+sdk  1:0:8:0    sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P2KRT7FTMB   5.5T
+sdl  1:0:9:0    sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P1KWN8FTMB   5.5T
+sdm  1:0:10:0   sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P1KWN9FTMB   5.5T
+sdn  1:0:11:0   sas  ATA      TOSHIBA MG04ACA600E          FS2B 75N6K0YTFTMB   5.5T
+sdo  1:0:12:0   sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P2KRT3FTMB   5.5T
+sdp  1:0:13:0   sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P1KWNAFTMB   5.5T
+sdq  1:0:14:0   sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P2KRT0FTMB   5.5T
+sdr  1:0:15:0   sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P2KRTAFTMB   5.5T
+sds  1:0:16:0   sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P2KRT8FTMB   5.5T
+sdt  1:0:17:0   sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P1KWNMFTMB   5.5T
+sdu  1:0:18:0   sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P2KRSYFTMB   5.5T
+sdv  1:0:19:0   sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P2KRT1FTMB   5.5T
+sdw  1:0:20:0   sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P2KRT9FTMB   5.5T
+sdx  1:0:21:0   sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P2KRTBFTMB   5.5T
+sdy  1:0:22:0   sas  ATA      TOSHIBA MG04ACA600E          FS3B 68CXK83BFTMB   5.5T
+sdz  1:0:23:0   sas  ATA      TOSHIBA MG04ACA600E          FS3B 78P2KRTCFTMB   5.5T
+
+=== lsblk full ===
+NAME                           SIZE MODEL                     SERIAL       ROTA TYPE FSTYPE      MOUNTPOINTS
+sda                          894.3G Micron_5200_MTFDDAK960TDD 18031DBC5C7D    0 disk             
+├─sda1                        1007K                                           0 part             
+├─sda2                           1G                                           0 part vfat        
+└─sda3                       893.3G                                           0 part LVM2_member 
+  ├─pve-swap                     8G                                           0 lvm  swap        [SWAP]
+  ├─pve-root                    96G                                           0 lvm  ext4        /
+  ├─pve-data_tmeta             7.7G                                           0 lvm              
+  │ └─pve-data-tpool         757.8G                                           0 lvm              
+  │   ├─pve-data             757.8G                                           0 lvm              
+  │   └─pve-vm--100--disk--0    32G                                           0 lvm              
+  └─pve-data_tdata           757.8G                                           0 lvm              
+    └─pve-data-tpool         757.8G                                           0 lvm              
+      ├─pve-data             757.8G                                           0 lvm              
+      └─pve-vm--100--disk--0    32G                                           0 lvm              
+sdb                          894.3G Micron_5200_MTFDDAK960TDD 18031DBC5C7C    0 disk             
+└─sdb1                       894.3G                                           0 part ext4        
+sdc                            5.5T TOSHIBA MG04ACA600E       68B7Y0M7FTMB    1 disk             
+sdd                            5.5T TOSHIBA MG04ACA600E       78P2KRT6FTMB    1 disk             
+sde                            5.5T TOSHIBA MG04ACA600E       78P2KRT4FTMB    1 disk             
+sdf                            5.5T TOSHIBA MG04ACA600E       78P2KRT2FTMB    1 disk             
+sdg                            5.5T TOSHIBA MG04ACA600E       68B8Y0BVFTMB    1 disk             
+sdh                            5.5T TOSHIBA MG04ACA600E       78P2KRT5FTMB    1 disk             
+sdi                            5.5T TOSHIBA MG04ACA600E       78P2KRSZFTMB    1 disk             
+sdj                            5.5T TOSHIBA MG04ACA600E       78P1KWNNFTMB    1 disk             
+sdk                            5.5T TOSHIBA MG04ACA600E       78P2KRT7FTMB    1 disk             
+sdl                            5.5T TOSHIBA MG04ACA600E       78P1KWN8FTMB    1 disk             
+sdm                            5.5T TOSHIBA MG04ACA600E       78P1KWN9FTMB    1 disk             
+sdn                            5.5T TOSHIBA MG04ACA600E       75N6K0YTFTMB    1 disk             
+sdo                            5.5T TOSHIBA MG04ACA600E       78P2KRT3FTMB    1 disk             
+sdp                            5.5T TOSHIBA MG04ACA600E       78P1KWNAFTMB    1 disk             
+sdq                            5.5T TOSHIBA MG04ACA600E       78P2KRT0FTMB    1 disk             
+sdr                            5.5T TOSHIBA MG04ACA600E       78P2KRTAFTMB    1 disk             
+sds                            5.5T TOSHIBA MG04ACA600E       78P2KRT8FTMB    1 disk             
+sdt                            5.5T TOSHIBA MG04ACA600E       78P1KWNMFTMB    1 disk             
+sdu                            5.5T TOSHIBA MG04ACA600E       78P2KRSYFTMB    1 disk             
+sdv                            5.5T TOSHIBA MG04ACA600E       78P2KRT1FTMB    1 disk             
+sdw                            5.5T TOSHIBA MG04ACA600E       78P2KRT9FTMB    1 disk             
+sdx                            5.5T TOSHIBA MG04ACA600E       78P2KRTBFTMB    1 disk             
+sdy                            5.5T TOSHIBA MG04ACA600E       68CXK83BFTMB    1 disk             
+sdz                            5.5T TOSHIBA MG04ACA600E       78P2KRTCFTMB    1 disk             
+
+=== lsscsi -g ===
+/bin/bash: line 25: lsscsi: command not found
+
+=== sg_map -i ===
+/bin/bash: line 27: sg_map: command not found
+
+=== multipath -ll ===
+/bin/bash: line 29: multipath: command not found

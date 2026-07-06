@@ -1,0 +1,90 @@
+=== date ===
+Wed Jul  1 03:15:53 PM EEST 2026
+=== tailscale status ===
+100.110.23.10  pve01                                        itsyourdecide@  linux    -                                                           
+100.105.80.15  desktop-4md6f5p                              itsyourdecide@  windows  active; direct 192.168.31.14:41641, tx 9876052 rx 32185124  
+100.91.221.42  tykhon-victus-by-hp-gaming-laptop-15-fa1xxx  kurkintihon@    linux    offline, last seen 6h ago                                   
+=== hostnamectl ===
+ Static hostname: pve01
+       Icon name: computer-server
+         Chassis: server 🖳
+      Machine ID: d5c2c023e71e4bfebf7e645c25e75c1b
+         Boot ID: d3939b9cbf1748b69c411b5be855cbf4
+    Product UUID: 00000000-0000-0000-0000-ac1f6b4cd742
+Operating System: Debian GNU/Linux 13 (trixie)
+          Kernel: Linux 7.0.2-6-pve
+    Architecture: x86-64
+ Hardware Vendor: Supermicro
+  Hardware Model: X10DRi
+ Hardware Serial: 123456789
+Firmware Version: 3.0a
+   Firmware Date: Tue 2018-02-06
+    Firmware Age: 8y 4month 3w 2d
+=== timedatectl ===
+               Local time: Wed 2026-07-01 15:15:53 EEST
+           Universal time: Wed 2026-07-01 12:15:53 UTC
+                 RTC time: Wed 2026-07-01 12:15:53
+                Time zone: Europe/Kyiv (EEST, +0300)
+System clock synchronized: yes
+              NTP service: active
+          RTC in local TZ: no
+=== pveproxy service ===
+● pveproxy.service - PVE API Proxy Server
+     Loaded: loaded (/usr/lib/systemd/system/pveproxy.service; enabled; preset: enabled)
+     Active: active (running) since Wed 2026-07-01 14:00:32 EEST; 1h 15min ago
+ Invocation: 71c95ecf77f9460da9aad6a4bc63fc9d
+    Process: 23312 ExecReload=/usr/bin/pveproxy restart (code=exited, status=0/SUCCESS)
+   Main PID: 2672 (pveproxy)
+      Tasks: 4 (limit: 578715)
+     Memory: 180.1M (peak: 414.6M)
+        CPU: 7.630s
+     CGroup: /system.slice/pveproxy.service
+             ├─ 2672 pveproxy
+             ├─23365 "pveproxy worker"
+             ├─23366 "pveproxy worker"
+             └─23367 "pveproxy worker"
+
+Jul 01 15:05:28 pve01 pveproxy[2672]: starting 3 worker(s)
+Jul 01 15:05:28 pve01 pveproxy[2672]: worker 23365 started
+Jul 01 15:05:28 pve01 pveproxy[2672]: worker 23366 started
+Jul 01 15:05:28 pve01 pveproxy[2672]: worker 23367 started
+Jul 01 15:05:33 pve01 pveproxy[2673]: worker exit
+Jul 01 15:05:33 pve01 pveproxy[2675]: worker exit
+Jul 01 15:05:33 pve01 pveproxy[2672]: worker 2674 finished
+Jul 01 15:05:33 pve01 pveproxy[2672]: worker 2673 finished
+Jul 01 15:05:33 pve01 pveproxy[2672]: worker 2675 finished
+Jul 01 15:05:34 pve01 pveproxy[23404]: worker exit
+=== ssh service ===
+● ssh.service - OpenBSD Secure Shell server
+     Loaded: loaded (/usr/lib/systemd/system/ssh.service; enabled; preset: enabled)
+     Active: active (running) since Wed 2026-07-01 13:58:55 EEST; 1h 16min ago
+ Invocation: ef8490251cb74e91926ff21b2fd0bdd5
+       Docs: man:sshd(8)
+             man:sshd_config(5)
+   Main PID: 1312 (sshd)
+      Tasks: 1 (limit: 578715)
+     Memory: 13.5M (peak: 31.2M)
+        CPU: 1.387s
+     CGroup: /system.slice/ssh.service
+             └─1312 "sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups"
+
+Jul 01 15:10:54 pve01 sshd-session[30431]: pam_unix(sshd:session): session opened for user root(uid=0) by root(uid=0)
+Jul 01 15:10:54 pve01 sshd-session[30431]: pam_unix(sshd:session): session closed for user root
+Jul 01 15:15:04 pve01 sshd-session[31379]: Accepted publickey for root from 100.110.23.10 port 59450 ssh2: RSA SHA256:ljZb60Q1HTub6d/s+bn25RXMJmNGoGjVyb4bjHOrpzQ
+Jul 01 15:15:04 pve01 sshd-session[31379]: pam_unix(sshd:session): session opened for user root(uid=0) by root(uid=0)
+Jul 01 15:15:05 pve01 sshd-session[31379]: pam_unix(sshd:session): session closed for user root
+Jul 01 15:15:05 pve01 sshd-session[31391]: Invalid user ultron from 100.110.23.10 port 59456
+Jul 01 15:15:05 pve01 sshd-session[31391]: Connection closed by invalid user ultron 100.110.23.10 port 59456 [preauth]
+Jul 01 15:15:34 pve01 sshd-session[31492]: Accepted publickey for root from 100.105.80.15 port 54425 ssh2: ED25519 SHA256:9quFT0WkM2naJrjA3BCD25lybfzHRAsOEsO3iNeFyP8
+Jul 01 15:15:34 pve01 sshd-session[31492]: pam_unix(sshd:session): session opened for user root(uid=0) by root(uid=0)
+Jul 01 15:15:34 pve01 sshd-session[31492]: pam_unix(sshd:session): session closed for user root
+=== pveversion ===
+pve-manager/9.2.3/d0fde103346cf89a (running kernel: 7.0.2-6-pve)
+=== ip -br addr ===
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+nic0             UP             
+nic1             DOWN           
+vmbr0            UP             192.168.31.50/24 fe80::ae1f:6bff:fe4c:d742/64 
+tailscale0       UNKNOWN        100.110.23.10/32 fd7a:115c:a1e0::ee3b:170b/128 fe80::6127:eee6:1b71:d41c/64 
+=== pvecm status ===
+Error: Corosync config '/etc/pve/corosync.conf' does not exist - is this node part of a cluster?

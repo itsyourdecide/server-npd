@@ -1,0 +1,205 @@
+=== nic0/nic1 -> PCI mapping ===
+--nic0--
+/sys/devices/pci0000:00/0000:00:03.2/0000:03:00.0
+--nic1--
+/sys/devices/pci0000:00/0000:00:03.2/0000:03:00.1
+
+=== ethtool nic0 ===
+Settings for nic0:
+	Supported ports: [ TP ]
+	Supported link modes:   100baseT/Full
+	                        1000baseT/Full
+	                        10000baseT/Full
+	Supported pause frame use: Symmetric
+	Supports auto-negotiation: Yes
+	Supported FEC modes: Not reported
+	Advertised link modes:  100baseT/Full
+	                        1000baseT/Full
+	                        10000baseT/Full
+	Advertised pause frame use: Symmetric
+	Advertised auto-negotiation: Yes
+	Advertised FEC modes: Not reported
+	Speed: 100Mb/s
+	Duplex: Full
+	Auto-negotiation: on
+	Port: Twisted Pair
+	PHYAD: 0
+	Transceiver: internal
+	MDI-X: Unknown
+	Supports Wake-on: umbg
+	Wake-on: g
+        Current message level: 0x00000007 (7)
+                               drv probe link
+	Link detected: yes
+
+=== ethtool nic1 ===
+Settings for nic1:
+	Supported ports: [ TP ]
+	Supported link modes:   100baseT/Full
+	                        1000baseT/Full
+	                        10000baseT/Full
+	Supported pause frame use: Symmetric
+	Supports auto-negotiation: Yes
+	Supported FEC modes: Not reported
+	Advertised link modes:  100baseT/Full
+	                        1000baseT/Full
+	                        10000baseT/Full
+	Advertised pause frame use: Symmetric
+	Advertised auto-negotiation: Yes
+	Advertised FEC modes: Not reported
+	Speed: Unknown!
+	Duplex: Unknown! (255)
+	Auto-negotiation: on
+	Port: Twisted Pair
+	PHYAD: 0
+	Transceiver: internal
+	MDI-X: Unknown
+	Supports Wake-on: umbg
+	Wake-on: g
+        Current message level: 0x00000007 (7)
+                               drv probe link
+	Link detected: no
+
+=== lspci ethernet grep ===
+03:00.0 Ethernet controller [0200]: Intel Corporation Ethernet Controller 10-Gigabit X540-AT2 [8086:1528] (rev 01)
+03:00.1 Ethernet controller [0200]: Intel Corporation Ethernet Controller 10-Gigabit X540-AT2 [8086:1528] (rev 01)
+
+=== lspci SAS/HBA grep ===
+02:00.0 Serial Attached SCSI controller [0107]: Broadcom / LSI SAS3224 PCI-Express Fusion-MPT SAS-3 [1000:00c4] (rev 01)
+81:00.0 Serial Attached SCSI controller [0107]: Broadcom / LSI SAS3216 PCI-Express Fusion-MPT SAS-3 [1000:00c9] (rev 01)
+
+=== smartctl sda ===
+smartctl 7.5 2025-04-30 r5714 [x86_64-linux-7.0.2-6-pve] (local build)
+Copyright (C) 2002-25, Bruce Allen, Christian Franke, www.smartmontools.org
+
+=== START OF INFORMATION SECTION ===
+Model Family:     Micron 5100 / 52x0 / 5300 / 5400 SSDs
+Device Model:     Micron_5200_MTFDDAK960TDD
+Serial Number:    18031DBC5C7D
+LU WWN Device Id: 5 00a075 11dbc5c7d
+Firmware Version: D1MU020
+User Capacity:    960,197,124,096 bytes [960 GB]
+Sector Sizes:     512 bytes logical, 4096 bytes physical
+Rotation Rate:    Solid State Device
+Form Factor:      2.5 inches
+TRIM Command:     Available, deterministic, zeroed
+Device is:        In smartctl database 7.5/5706
+ATA Version is:   ACS-3 T13/2161-D revision 5
+SATA Version is:  SATA 3.2, 6.0 Gb/s (current: 6.0 Gb/s)
+Local Time is:    Wed Jul  1 16:06:36 2026 EEST
+SMART support is: Available - device has SMART capability.
+SMART support is: Enabled
+AAM feature is:   Unavailable
+APM level is:     254 (maximum performance)
+Rd look-ahead is: Enabled
+Write cache is:   Enabled
+DSN feature is:   Unavailable
+ATA Security is:  Disabled, NOT FROZEN [SEC1]
+
+=== START OF READ SMART DATA SECTION ===
+SMART overall-health self-assessment test result: PASSED
+
+General SMART Values:
+Offline data collection status:  (0x00)	Offline data collection activity
+					was never started.
+					Auto Offline Data Collection: Disabled.
+Self-test execution status:      (   0)	The previous self-test routine completed
+					without error or no self-test has ever 
+					been run.
+Total time to complete Offline 
+data collection: 		( 3348) seconds.
+Offline data collection
+capabilities: 			 (0x7b) SMART execute Offline immediate.
+					Auto Offline data collection on/off support.
+					Suspend Offline collection upon new
+					command.
+					Offline surface scan supported.
+					Self-test supported.
+					Conveyance Self-test supported.
+					Selective Self-test supported.
+SMART capabilities:            (0x0003)	Saves SMART data before entering
+					power-saving mode.
+					Supports SMART auto save timer.
+Error logging capability:        (0x01)	Error logging supported.
+					General Purpose Logging supported.
+Short self-test routine 
+recommended polling time: 	 (   2) minutes.
+Extended self-test routine
+recommended polling time: 	 (   8) minutes.
+Conveyance self-test routine
+recommended polling time: 	 (   3) minutes.
+SCT capabilities: 	       (0x0035)	SCT Status supported.
+
+=== smartctl sdb ===
+smartctl 7.5 2025-04-30 r5714 [x86_64-linux-7.0.2-6-pve] (local build)
+Copyright (C) 2002-25, Bruce Allen, Christian Franke, www.smartmontools.org
+
+=== START OF INFORMATION SECTION ===
+Model Family:     Micron 5100 / 52x0 / 5300 / 5400 SSDs
+Device Model:     Micron_5200_MTFDDAK960TDD
+Serial Number:    18031DBC5C7C
+LU WWN Device Id: 5 00a075 11dbc5c7c
+Firmware Version: D1MU020
+User Capacity:    960,197,124,096 bytes [960 GB]
+Sector Sizes:     512 bytes logical, 4096 bytes physical
+Rotation Rate:    Solid State Device
+Form Factor:      2.5 inches
+TRIM Command:     Available, deterministic, zeroed
+Device is:        In smartctl database 7.5/5706
+ATA Version is:   ACS-3 T13/2161-D revision 5
+SATA Version is:  SATA 3.2, 6.0 Gb/s (current: 6.0 Gb/s)
+Local Time is:    Wed Jul  1 16:06:36 2026 EEST
+SMART support is: Available - device has SMART capability.
+SMART support is: Enabled
+AAM feature is:   Unavailable
+APM level is:     254 (maximum performance)
+Rd look-ahead is: Enabled
+Write cache is:   Enabled
+DSN feature is:   Unavailable
+ATA Security is:  Disabled, NOT FROZEN [SEC1]
+
+=== START OF READ SMART DATA SECTION ===
+SMART overall-health self-assessment test result: PASSED
+
+General SMART Values:
+Offline data collection status:  (0x00)	Offline data collection activity
+					was never started.
+					Auto Offline Data Collection: Disabled.
+Self-test execution status:      (   0)	The previous self-test routine completed
+					without error or no self-test has ever 
+					been run.
+Total time to complete Offline 
+data collection: 		( 3348) seconds.
+Offline data collection
+capabilities: 			 (0x7b) SMART execute Offline immediate.
+					Auto Offline data collection on/off support.
+					Suspend Offline collection upon new
+					command.
+					Offline surface scan supported.
+					Self-test supported.
+					Conveyance Self-test supported.
+					Selective Self-test supported.
+SMART capabilities:            (0x0003)	Saves SMART data before entering
+					power-saving mode.
+					Supports SMART auto save timer.
+Error logging capability:        (0x01)	Error logging supported.
+					General Purpose Logging supported.
+Short self-test routine 
+recommended polling time: 	 (   2) minutes.
+Extended self-test routine
+recommended polling time: 	 (   8) minutes.
+Conveyance self-test routine
+recommended polling time: 	 (   3) minutes.
+SCT capabilities: 	       (0x0035)	SCT Status supported.
+
+=== ipmitool mc info ===
+/bin/bash: line 26: ipmitool: command not found
+
+=== ipmitool lan print 1 ===
+/bin/bash: line 27: ipmitool: command not found
+
+=== ipmitool sensor list ===
+/bin/bash: line 28: ipmitool: command not found
+
+=== ipmitool sel elist (last 40) ===
+/bin/bash: line 29: ipmitool: command not found

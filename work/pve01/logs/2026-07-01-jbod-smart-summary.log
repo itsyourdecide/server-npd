@@ -1,0 +1,26 @@
+=== SMART summary for all JBOD disks (sdc-sdz) ===
+DEV    HEALTH       HOURS    REALLOC    PENDING    UNCORR     WEAR/CRC  
+sdc    PASSED       50339    0          0          0          0         
+sdd    PASSED       50340    0          0          0          0         
+sde    PASSED       50340    0          0          0          0         
+sdf    PASSED       50341    0          0          0          0         
+sdg    PASSED       50341    0          0          0          0         
+sdh    PASSED       50259    0          0          0          0         
+sdi    PASSED       50341    0          0          0          0         
+sdj    PASSED       50341    0          0          0          0         
+sdk    PASSED       50339    0          0          0          0         
+sdl    PASSED       50340    0          0          0          0         
+sdm    PASSED       50341    0          0          0          0         
+sdn    PASSED       48799    0          0          0          0         
+sdo    PASSED       50339    0          0          0          0         
+sdp    PASSED       50339    0          0          0          0         
+sdq    PASSED       50339    0          0          0          0         
+sdr    PASSED       50339    0          0          0          0         
+sds    PASSED       50338    0          0          0          0         
+sdt    PASSED       50339    0          0          0          0         
+sdu    PASSED       49810    0          0          0          0         
+sdv    PASSED       50339    0          0          0          0         
+sdw    PASSED       50339    0          0          0          0         
+sdx    PASSED       50339    0          0          0          0         
+sdy    PASSED       50250    0          0          0          0         
+sdz    PASSED       50340    0          0          0          0         
