@@ -1,0 +1,9 @@
+no such logical volume pve/data
+Name             Type     Status     Total (KiB)      Used (KiB) Available (KiB)        %
+local             dir     active       827693056         1249920       826443136    0.15%
+local-lvm     lvmthin   inactive               0               0               0    0.00%
+local-zfs     zfspool     active       898797704        72354464       826443240    8.05%
+JobID      Enabled    Target                           LastSync             NextSync   Duration  FailCount State
+100-0      Yes        local/pve03           2026-07-10_14:45:00  2026-07-10_15:00:00   2.896974          0 OK
+100-1      Yes        local/pve01           2026-07-10_14:45:03  2026-07-10_15:00:00   2.902378          0 OK
+101-0      Yes        local/pve03           2026-07-10_14:45:06  2026-07-10_15:00:00   2.740936          0 OK

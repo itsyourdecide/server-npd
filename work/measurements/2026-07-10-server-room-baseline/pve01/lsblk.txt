@@ -1,0 +1,45 @@
+NAME                 MODEL                     SERIAL         SIZE TYPE ROTA TRAN HCTL       MOUNTPOINTS
+sda                  Micron_5200_MTFDDAK960TDD 18031DBC5C7D 894.3G disk    0 sas  1:0:0:0    
+├─sda1                                                       1007K part    0                 
+├─sda2                                                          1G part    0                 
+└─sda3                                                      893.3G part    0                 
+  ├─pve-swap                                                    8G lvm     0                 [SWAP]
+  ├─pve-root                                                   96G lvm     0                 /
+  ├─pve-data_tmeta                                            7.7G lvm     0                 
+  │ └─pve-data-tpool                                        757.8G lvm     0                 
+  │   └─pve-data                                            757.8G lvm     0                 
+  └─pve-data_tdata                                          757.8G lvm     0                 
+    └─pve-data-tpool                                        757.8G lvm     0                 
+      └─pve-data                                            757.8G lvm     0                 
+sdb                  Micron_5200_MTFDDAK960TDD 18031DBC5C7C 894.3G disk    0 sas  1:0:1:0    
+├─sdb1                                                      894.2G part    0                 
+└─sdb9                                                          8M part    0                 
+sdc                  TOSHIBA MG04ACA600E       78P1KWN9FTMB   5.5T disk    1 sas  0:0:1:0    
+sdd                  TOSHIBA MG04ACA600E       75N6K0YTFTMB   5.5T disk    1 sas  0:0:2:0    
+sde                  TOSHIBA MG04ACA600E       78P2KRT0FTMB   5.5T disk    1 sas  0:0:3:0    
+sdf                  TOSHIBA MG04ACA600E       78P2KRTAFTMB   5.5T disk    1 sas  0:0:4:0    
+sdg                  TOSHIBA MG04ACA600E       78P1KWN8FTMB   5.5T disk    1 sas  0:0:5:0    
+sdh                  TOSHIBA MG04ACA600E       78P1KWNAFTMB   5.5T disk    1 sas  0:0:6:0    
+sdi                  TOSHIBA MG04ACA600E       78P1KWNMFTMB   5.5T disk    1 sas  0:0:7:0    
+sdj                  TOSHIBA MG04ACA600E       78P2KRSYFTMB   5.5T disk    1 sas  0:0:8:0    
+sdk                  TOSHIBA MG04ACA600E       78P2KRT1FTMB   5.5T disk    1 sas  0:0:9:0    
+sdl                  TOSHIBA MG04ACA600E       78P2KRTBFTMB   5.5T disk    1 sas  0:0:10:0   
+sdm                  TOSHIBA MG04ACA600E       68CXK83BFTMB   5.5T disk    1 sas  0:0:11:0   
+sdn                  TOSHIBA MG04ACA600E       78P2KRTCFTMB   5.5T disk    1 sas  0:0:12:0   
+sdo                  TOSHIBA MG04ACA600E       68B7Y0M7FTMB   5.5T disk    1 sas  0:0:13:0   
+sdp                  TOSHIBA MG04ACA600E       78P2KRT6FTMB   5.5T disk    1 sas  0:0:14:0   
+sdq                  TOSHIBA MG04ACA600E       68B8Y0BVFTMB   5.5T disk    1 sas  0:0:15:0   
+sdr                  TOSHIBA MG04ACA600E       78P2KRT5FTMB   5.5T disk    1 sas  0:0:16:0   
+sds                  TOSHIBA MG04ACA600E       78P2KRT7FTMB   5.5T disk    1 sas  0:0:17:0   
+sdt                  TOSHIBA MG04ACA600E       78P2KRT3FTMB   5.5T disk    1 sas  0:0:18:0   
+sdu                  TOSHIBA MG04ACA600E       78P2KRT8FTMB   5.5T disk    1 sas  0:0:19:0   
+sdv                  TOSHIBA MG04ACA600E       78P2KRT9FTMB   5.5T disk    1 sas  0:0:20:0   
+sdw                  TOSHIBA MG04ACA600E       78P2KRT4FTMB   5.5T disk    1 sas  0:0:21:0   
+sdx                  TOSHIBA MG04ACA600E       78P2KRT2FTMB   5.5T disk    1 sas  0:0:22:0   
+sdy                  TOSHIBA MG04ACA600E       78P2KRSZFTMB   5.5T disk    1 sas  0:0:23:0   
+sdz                  TOSHIBA MG04ACA600E       78P1KWNNFTMB   5.5T disk    1 sas  0:0:24:0   
+zd0                                                            32G disk    0                 
+├─zd0p1                                                       260M part    0                 
+├─zd0p2                                                       512K part    0                 
+├─zd0p3                                                         8G part    0                 
+└─zd0p4                                                      23.7G part    0                 

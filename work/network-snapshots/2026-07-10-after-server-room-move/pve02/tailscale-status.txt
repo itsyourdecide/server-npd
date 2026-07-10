@@ -1,0 +1,8 @@
+100.100.173.60  pve02                                        itsyourdecide@  linux    -                           
+100.105.80.15   desktop-4md6f5p                              itsyourdecide@  windows  -                           
+100.110.23.10   pve01                                        itsyourdecide@  linux    -                           
+100.86.225.123  pve03                                        itsyourdecide@  linux    -                           
+100.91.221.42   tykhon-victus-by-hp-gaming-laptop-15-fa1xxx  kurkintihon@    linux    offline, last seen 24m ago  
+
+# Health check:
+#     - Some peers are advertising routes but --accept-routes is false

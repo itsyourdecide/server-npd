@@ -1,0 +1,2 @@
+2: nic0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master vmbr0 state forwarding priority 32 cost 5 
+3: nic1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master vmbr2 state forwarding priority 32 cost 5 

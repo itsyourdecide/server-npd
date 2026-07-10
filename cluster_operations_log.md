@@ -607,3 +607,473 @@ LINK ID 0 udp, addr = 10.10.20.11, все nodeid connected
 - **`hp3500`:** LACP/VLAN сохранены `write memory` в момент настройки. Хостнейм (`hp3500`) и SSH (`crypto key`/`ip ssh`) настраивались **позже**, без явного подтверждения повторного сохранения — пользователь попрошен перепроверить и пересохранить (`write memory`) на всякий случай. Заодно найден старый хвост `snmp-server community "public" unrestricted` (ещё с Дня 1, помечен на удаление перед production, не тронут в моменте).
 
 Итог: не полагаться на "должно быть ок" при инфраструктурных изменениях — правило на будущее: после любой правки конфига свитча/сети явно спрашивать/проверять факт сохранения, а не считать это самоочевидным.
+
+### 2026-07-03 — VM `fw01`/`test40` перенесены на `pve02` (ZFS), настроена репликация pve02→pve03
+
+**Цель:** включить ZFS-репликацию для отказоустойчивости VM. Обнаружено препятствие: **`pve01` стоит на LVM-thin (`local-lvm`), а не на ZFS** — установлен в День 1 без явного выбора ZFS в инсталляторе; `pve02`/`pve03` (ставились сегодня) — на ZFS RAID1. Встроенная репликация Proxmox работает **только между ZFS-хранилищами**. Решение (согласовано с пользователем): перенести все VM с `pve01` на `pve02`, освободив `pve01` (переустановка на ZFS — отдельная будущая задача).
+
+**Регистрация ZFS-хранилища:** пул `rpool` физически был, но не зарегистрирован в Proxmox вообще. Добавлено: `pvesm add zfspool local-zfs --pool rpool/data --content images,rootdir --nodes pve02,pve03` (ограничено этими двумя узлами — у `pve01` пула нет, там показывает `disabled`, это норма).
+
+**Грабли миграции — `lvmthin` → `zfspool` напрямую невозможно:** `qm migrate --targetstorage` и `pct migrate` падают с `cannot migrate from storage type 'lvmthin' to 'zfspool'` (несовместимые механизмы экспорта тома). Обход — через **backup/restore**:
+- `bastion01` (102) — пустой (установка не начиналась), просто удалён (пересоздадим на ZFS позже).
+- `test40` (101, LXC) — `vzdump --mode stop` → `scp` архива на pve02 → `pct destroy` на pve01 (освободить VMID) → `pct restore ... --storage local-zfs`.
+- `fw01` (100, роутер) — так же через `vzdump`/`qmrestore` (реальный простой ~22 сек на снятие снапшота бэкапа; на время cutover — выключен/восстановлен). ISO OPNsense пришлось отцепить (`--ide2 none` — образ жил на per-node `local` хранилище pve01, на pve02 его нет).
+- **Важно:** классификатор дважды заблокировал `qm/pct destroy` источника (необратимо, не было явного подтверждения удачной копии) — правильно; удаление делал пользователь вручную после подтверждения, что бэкап на pve02 цел.
+- После restore на каждой VM/CT — правка сетевых мостов: у pve01 транк-мост зовётся `vmbr2`, у pve02 — `vmbr0`; исправлено `qm set --netN ...bridge=vmbr0` / `pct set --net0 ...bridge=vmbr0`.
+
+**СЕРЬЁЗНЫЙ сетевой инцидент по ходу (разобран, устранён):** после запуска `fw01` на pve02 его MGMT (VLAN10) не работал. Причина — **фундаментальный VLAN-gotcha для узлов с одним физическим линком** (pve02/pve03, в отличие от pve01 с отдельным `nic0`+`nic1`): порт Force10 отдаёт VLAN10 **untagged (native)**, а VLAN-aware мост без `bridge-pvid 10` на `nic0` гоняет VLAN10 **tagged** → несовпадение. Попытка добавить `bridge-pvid 10` привела к **потере доступа к самому хосту pve02**: `bridge-pvid` на стойке моста `vmbr0` НЕ переносит надёжно сам мост (где висел IP хоста) в VLAN10 в ifupdown2 — хост остался на внутренней VLAN1, `nic0` ушёл на PVID10 → рассогласование → хост изолирован (IPMI при этом жив — отдельный физический порт). `ifreload -a` на аплинк-порту оборвал и SSH-сессию (таймаут команды).
+
+**Правильное решение (проверенный паттерн pve01):** IP хоста НЕ на голом мосту, а на VLAN-подинтерфейсе — `vmbr0.10` (`10.10.10.12/24` + gw), сам `vmbr0` без IP (`inet manual`), `nic0` с `bridge-pvid 10`, `vmbr0.20` (Corosync) остаётся. Итоговая раскладка `nic0`: `PVID 10 untagged` + tagged `20,30,40,50,80,99` — точно совпадает с портом свитча.
+- Восстановление доступа: пользователь на консоли (out-of-band) откатил `bridge-pvid` (`sed -i '/bridge-pvid 10/d'` — вернулся к рабочему состоянию хоста), затем полный фикс сделан **по SSH с автооткатом** (`nohup` фоном: применить → ждать 90с флага `/tmp/net-commit` → если не пришёл, вернуть бэкап и `ifreload`). Так лечится риск lockout при правках сети по SSH.
+- Тот же фикс применён к pve03 (он не был тронут ранее — цикл оборвался на pve02; хост работал, но с той же скрытой проблемой, критичной для будущего failover `fw01` туда).
+
+**Настройка репликации:** `pvesr create-local-job 100-0 pve03 --schedule '*/15'` (fw01) и `101-0` (test40) — pve02→pve03, каждые 15 минут. Первая полная синхронизация запущена вручную (`pvesr run`): fw01 (32ГБ) — 227с, test40 — 3с, обе `State OK`, `FailCount 0`. Тома подтверждены на pve03 (`rpool/data/vm-100-disk-0` zvol; test40 rootfs — ZFS-subvol).
+
+**Итоговая сверка:** кластер `Quorate` (3/3, Corosync на VLAN20), IPMI всех трёх узлов OK, `fw01` running на pve02, `test40` интернет OK, MGMT `fw01`/хостов на всех узлах OK.
+
+Открыто:
+- **Автоматический HA-failover (`ha-manager`) — НЕ включён**, отдельное решение: при отказе pve02 `fw01`/`test40` не переедут на pve03 сами (только ручной старт из реплики, потеря ≤15 мин данных). HA с fencing может вызывать неожиданные ребуты узлов при потере кворума во время сетевых работ — рискованно включать, пока идёт активная hands-on настройка. Обсудить отдельно.
+- ~~**`pve01` на LVM, не ZFS**~~ — решено без переустановки, см. следующую запись.
+- `bastion01` пересоздать на ZFS (pve02/pve03) при возврате к его установке.
+
+### 2026-07-03 — pve01 подключён к репликации через ZFS на свободном диске (без переустановки)
+
+Пользователь спросил, что важного на `pve01` перед переустановкой. Инвентаризация показала, что **переустановка не нужна и была бы вредна** — `pve01` это операторский хаб, не пустой узел:
+- **Tailscale subnet router** (advertised `10.10.10.0/24`, `10.10.40.0/24`) — единственный путь ноутбука пользователя к внутренним VLAN/GUI.
+- **Окружение Claude Code / cursor-server / codex / rustup** (~1.5ГБ+ в `/root`) — рабочая среда, из которой ведётся вся работа.
+- Член кластера (nodeid 1), git-репозиторий документации (`/root/server-npd`), SSH-ключи (`id_rsa` → доступ к pve02/03/свитчам), git-токен (`/root/git.env`), прямой кабель `nic0`→роутер (независимый резервный доступ).
+
+**Ключевая находка:** у `pve01` два SSD — `sda` (система, LVM) и **`sdb` (894G Micron 5200, пустой** — только `lost+found`, не в fstab, не примонтирован). Репликации Proxmox нужен ZFS только для **дисков VM**, не для корневой ФС хоста. Значит достаточно поднять ZFS на `sdb`:
+```
+wipefs -a /dev/sdb
+zpool create -f -o ashift=12 rpool /dev/disk/by-id/ata-Micron_5200_MTFDDAK960TDD_18031DBC5C7C
+zfs create rpool/data
+```
+Пул назван **`rpool`** намеренно (как boot-пул на pve02/03) — хранилище `local-zfs` в Proxmox задаётся одним путём `rpool/data` на весь кластер, для работы репликации путь должен существовать одинаково на всех узлах. У pve01 корень на LVM (`sda`), так что `rpool` на `sdb` — чисто data-пул, с загрузкой не конфликтует. Затем `pvesm set local-zfs --nodes pve01,pve02,pve03` — хранилище стало `active` на всех трёх (раньше на pve01 было `disabled`).
+
+**Компромисс (осознанный):** VM-хранилище на pve01 — single-disk (без локального зеркала, в отличие от pve02/03 RAID1). Приемлемо: VM всё равно реплицируются на зеркальный pve02/03, при отказе sdb — restore из реплики.
+
+**Важно про модель управления репликацией** (ответ на вопрос пользователя «могу ли сам выбирать что куда копируется»): да, полный granular-контроль — репликация пообъектная и opt-in. По умолчанию не копируется ничего. Каждое задание = одна VM → один целевой узел → свой график; можно на несколько узлов (несколько заданий), можно пропускать отдельные диски VM (галка «Skip replication»). Единственное условие — у целевого узла должно быть ZFS-хранилище с тем же ID (`local-zfs`), что теперь выполнено на всех трёх.
+
+Итог: все три узла — полноценные peer'ы репликации. Текущие задания (fw01, test40 → pve03) работают инкрементально. Открыто: решить топологию репликации критичных VM (напр. fw01 на ОБА других узла для failover на любой) — за пользователем.
+
+### 2026-07-08 — контрольная точка после паузы: кластер жив, репликация `fw01` уже на два запасных узла
+
+После возврата к работе выполнен read-only аудит с `pve01` (операторский узел). Цель — понять точную точку остановки, не трогая сеть, VM placement, Corosync и HA.
+
+**Проверка кластера (`pvecm status`):**
+```
+Name: npd
+Nodes: 3
+Quorate: Yes
+Total votes: 3
+Quorum: 2
+Membership:
+  10.10.20.11 (pve01, local)
+  10.10.20.12 (pve02)
+  10.10.20.13 (pve03)
+```
+Corosync по-прежнему использует выделенную VLAN20 (`10.10.20.x`), config version `4`.
+
+**Текущий workload:** `fw01` (VM 100) и `test40` (CT 101) запущены на `pve02`. HA auto-failover не включён: `ha-manager status` показывает `quorum OK`, `fencing standby`, HA-ресурсов нет.
+
+**Репликация (`pvesr status` на `pve02`):**
+```
+100-0  pve02 -> pve03  schedule */15  State OK  FailCount 0
+100-1  pve02 -> pve01                State OK  FailCount 0
+101-0  pve02 -> pve03  schedule */15  State OK  FailCount 0
+```
+Важное уточнение к предыдущему открытому пункту: для `fw01` топология уже расширена до двух запасных узлов (`pve03` и `pve01`). `test40` пока реплицируется только на `pve03`.
+
+**Storage:** на `pve01` ZFS-пул `rpool` на отдельном Micron SSD online, ошибок нет; `local-zfs` active. В `/etc/pve/storage.cfg` всё ещё есть общий `local-lvm`, из-за чего на `pve02`/`pve03` `pvesm status` печатает `no such logical volume pve/data` (у них ZFS-инсталляция, LVM-thin нет). Это не блокирует работу `local-zfs` и репликации, но стоит отдельно подчистить, чтобы GUI/CLI не шумели.
+
+**Следующие безопасные шаги:**
+- выполнить контролируемый ручной failover-test `fw01` на узел с репликой, но только после отдельного согласования сценария, потому что это затрагивает роутинг;
+- решить, нужна ли репликация `test40` также на `pve01`;
+- пересоздать `bastion01` на `local-zfs`;
+- не включать HA/fencing для `fw01` до завершения активных сетевых работ и отдельного обсуждения риска неожиданных перезапусков.
+
+Подготовлен отдельный черновик runbook для согласования: `fw01_manual_failover_runbook.md`. Важное правило из него: после запуска `fw01` на `pve03` диск на `pve03` становится актуальным, поэтому возврат на `pve02` должен идти миграцией/копированием актуального диска, а не простым переносом VM config обратно.
+
+### 2026-07-08 — выполнен planned migration test `fw01`: `pve02` → `pve03` → `pve02`
+
+По явному согласию пользователя выполнен только безопасный Вариант A из `fw01_manual_failover_runbook.md`: online migration живой VM `fw01` между узлами и возврат обратно. HA/fencing не включались, replica-failover с ручным переносом config не выполнялся.
+
+**Preflight:** `pvecm status` — `Quorate: Yes`, 3/3 узла; `fw01` running на `pve02`; реплика `rpool/data/vm-100-disk-0` на `pve03` есть; config VM 100 на `pve03` отсутствовал (как и должен до миграции); шлюзы `10.10.10.1` и `10.10.40.1` отвечали.
+
+**Найденный нюанс:** первая попытка
+```
+qm migrate 100 pve03 --online --targetstorage 1
+```
+остановилась безопасно на pre-check:
+```
+can't live migrate attached local disks without with-local-disks option
+```
+VM не была затронута, осталась running на `pve02`. Правильная команда для текущей схемы local ZFS + replicated disk:
+```
+qm migrate 100 pve03 --online --targetstorage 1 --with-local-disks
+```
+
+**Результат `pve02` → `pve03`:** миграция успешна, длительность задачи ~3:30, в логе Proxmox downtime `131 ms`, VM-state передано ~2.1 GiB. После миграции `fw01` running на `pve03`, config VM 100 на `pve02` отсутствовал, quorum 3/3. Проверки: `10.10.10.1`, `10.10.30.1`, `10.10.40.1` отвечали; `test40` из VLAN40 пинговал `1.1.1.1` без потерь.
+
+**Наблюдение:** `10.10.80.1` не отвечал на ping (100% loss) во время проверки после миграции. Это не сломало текущий тест (основной MGMT/IPMI/Private routing был жив), но VLAN80/HTCondor gateway стоит отдельно проверить перед PXE/HTCondor работами.
+
+**Возврат `pve03` → `pve02`:** выполнен той же командой с `--with-local-disks`, успешно, длительность задачи ~3:18, downtime `189 ms`, VM-state передано ~1.9 GiB. После возврата `fw01` снова running на `pve02`, config VM 100 на `pve03` отсутствует, quorum 3/3, `10.10.10.1`/`10.10.40.1` отвечают, `test40` пингует `1.1.1.1`.
+
+**Финализация:** вручную запущены `pvesr run --id 100-0` и `pvesr run --id 100-1`; обе реплики свежие и `State OK`, `FailCount 0`:
+```
+100-0  pve02 -> pve03  LastSync 2026-07-08_15:43:22  OK
+100-1  pve02 -> pve01  LastSync 2026-07-08_15:43:26  OK
+```
+
+Итог: planned migration `fw01` между `pve02` и `pve03` проверена успешно на текущей ZFS-replication схеме. Это подтверждает переносимость VM при живом исходном узле, но ещё не заменяет отдельный test настоящего replica failover при отказе исходного узла.
+
+### 2026-07-08 — pve01: исправлен доступ к VLAN80 gateway (`10.10.80.1`)
+
+После planned migration test было замечено, что `10.10.80.1` не отвечает на ping с `pve01`, хотя с `pve02`/`pve03` отвечает. Проверка показала:
+```
+pve02 -> 10.10.80.1: OK
+pve03 -> 10.10.80.1: OK
+pve01 -> 10.10.80.1: fail
+ip route get 10.10.80.1 на pve01 -> via 192.168.31.1 dev vmbr0
+```
+
+Причина: это не firewall `fw01` и не VLAN80 как таковой, а отсутствие маршрута на `pve01`. У `pve01` default route всё ещё ведёт в лабораторный роутер (`192.168.31.1`) по независимому прямому кабелю, поэтому внутренние VLAN за `fw01` должны быть добавлены явно. Ранее так уже был закреплён маршрут к IPMI (`10.10.30.0/24`), но для HTCondor/PXE VLAN80 маршрута не было.
+
+Сделано:
+```
+ip route add 10.10.80.0/24 via 10.10.10.1 dev vmbr2.10   # runtime check
+```
+После этого `ping 10.10.80.1` с `pve01` — 0% loss. Затем маршрут закреплён в `/etc/network/interfaces` в блоке `vmbr2.10`; существующий IPMI route заменён с `ip route add` на `ip route replace`, чтобы future `ifreload` был idempotent:
+```
+up ip route replace 10.10.30.0/24 via 10.10.10.1 dev vmbr2.10
+up ip route replace 10.10.80.0/24 via 10.10.10.1 dev vmbr2.10
+```
+
+Проверено:
+```
+ip route get 10.10.80.1 -> via 10.10.10.1 dev vmbr2.10 src 10.10.10.11
+ping -c 3 10.10.80.1 -> 0% loss
+ifquery --check vmbr2.10 -> pass
+```
+
+Итог: gateway VLAN80 жив; проблема была локальной маршрутизацией `pve01` из-за его особой роли с независимым default route через внешний роутер.
+
+### 2026-07-08 — создан `pxe01` LXC в VLAN80, подняты HTTP/TFTP основы PXE
+
+Пользователь создал и запустил LXC `pxe01` на `pve02`. Предварительно на `pve02` был скачан Debian LXC template:
+```
+local:vztmpl/debian-12-standard_12.12-1_amd64.tar.zst
+```
+Первое скачивание упёрлось в timeout внешней SSH-команды, но сам download был медленным (~410 KB/s), повторный запуск `pveam download` завершился успешно, checksum verified.
+
+**Конфигурация контейнера:**
+```
+VMID: 110
+hostname: pxe01
+node: pve02
+rootfs: local-zfs:subvol-110-disk-0,size=16G
+net0: eth0, bridge=vmbr0, tag=80, ip=10.10.80.10/24, gw=10.10.80.1
+nameserver: 10.10.80.1
+```
+Сначала DNS внутри контейнера был унаследован как `10.10.10.1` и `apt update` не резолвил Debian mirrors. Исправлено через `pct set 110 --nameserver 10.10.80.1 --searchdomain internal` и перезапуск контейнера; после этого `apt update` прошёл.
+
+**Установлено внутри `pxe01`:**
+```
+nginx
+tftpd-hpa
+ipxe
+curl
+```
+Назначение:
+- `nginx` — HTTP-раздача больших файлов/меню (`http://10.10.80.10/`);
+- `tftpd-hpa` — TFTP-раздача первого маленького PXE/iPXE загрузчика (`/srv/tftp`);
+- `ipxe` — готовые binary-файлы `ipxe.efi`, `snponly.efi`, `undionly.kpxe`.
+
+**Текущие файлы:**
+```
+/srv/tftp/ipxe.efi
+/srv/tftp/snponly.efi
+/srv/tftp/undionly.kpxe
+/srv/tftp/undionly.kkpxe
+/srv/pxe/http/boot.ipxe
+/srv/pxe/http/index.html
+/srv/pxe/http/ipxe/*
+```
+`boot.ipxe` пока минимальный: показывает меню "NPD PXE boot menu" и умеет boot local disk / drop to iPXE shell. Автоустановки Ubuntu/Proxmox ещё не добавлены.
+
+**Проверки:**
+```
+ping 10.10.80.10 с pve01 -> OK
+pxe01 -> 10.10.80.1 -> OK
+pxe01 -> 1.1.1.1 -> OK
+curl http://10.10.80.10/boot.ipxe -> OK
+nginx active
+tftpd-hpa active
+curl tftp://127.0.0.1/ipxe.efi внутри pxe01 -> OK
+```
+TFTP-проверка с `pve02`/`pve01` через `tftp://10.10.80.10/ipxe.efi` timeout'ится из-за routed test path из VLAN10 в VLAN80 и особенностей обратного UDP-порта TFTP; tcpdump показывает, что `tftpd` отвечает. Это не финальный критерий: настоящий PXE-клиент будет находиться в той же VLAN80, и его нужно проверить физической нодой.
+
+**Открыто для первого настоящего PXE-теста:** настроить DHCP/PXE options на `fw01` для VLAN80:
+```
+next-server: 10.10.80.10
+UEFI boot file: ipxe.efi или snponly.efi
+Legacy BIOS boot file: undionly.kpxe
+после chainload iPXE: boot script http://10.10.80.10/boot.ipxe
+```
+Если OPNsense позволяет условие по user-class `iPXE`, лучше сделать двухшаговую схему: обычный PXE получает `ipxe.efi`/`undionly.kpxe`, а уже iPXE-клиент получает `http://10.10.80.10/boot.ipxe`, чтобы не уйти в chainload loop.
+
+### 2026-07-08 — pxe01/fw01 — DHCP/PXE boot подтвержден, добавлено iPXE-меню AlmaLinux 9
+
+После настройки OPNsense Dnsmasq на интерфейс `HTCONDOR` DHCP в VLAN80 подтвержден тестовым клиентом из netns на `pve02`:
+```
+DHCP server: 10.10.80.1
+leased IP: 10.10.80.164/24
+router: 10.10.80.1
+dns: 10.10.80.1
+domain: internal
+boot server / next-server: 10.10.80.10
+boot file: ipxe.efi
+```
+В tcpdump видны PXE-поля:
+```
+Server-IP 10.10.80.10
+sname "10.10.80.10"
+file "ipxe.efi"
+```
+
+На `pxe01` обновлен HTTP iPXE entrypoint:
+```
+/srv/pxe/http/boot.ipxe
+/srv/pxe/http/menu.ipxe
+/srv/pxe/http/profiles/alma9-manual.ipxe
+/srv/pxe/http/profiles/alma9-condor-sm-execute.ipxe
+/srv/pxe/http/profiles/alma9-asus-execute.ipxe
+```
+Старый минимальный `boot.ipxe` сохранен в:
+```
+/srv/pxe/http/backups/boot.ipxe.20260708-175702
+```
+
+Текущий режим безопасный: меню запускает AlmaLinux 9 installer в manual mode без Kickstart/wipe. Пункты:
+```
+AlmaLinux 9 installer - manual
+Supermicro execute VM - AlmaLinux 9 manual install
+ASUS execute node - AlmaLinux 9 manual install
+Boot from local disk
+iPXE shell
+```
+AlmaLinux netboot тянется по HTTP, чтобы избежать проблем iPXE с HTTPS/CA:
+```
+http://repo.almalinux.org/almalinux/9/BaseOS/x86_64/os/images/pxeboot/vmlinuz
+http://repo.almalinux.org/almalinux/9/BaseOS/x86_64/os/images/pxeboot/initrd.img
+```
+
+Проверено из тестового клиента в VLAN80:
+```
+curl http://10.10.80.10/boot.ipxe -> OK
+curl http://10.10.80.10/menu.ipxe -> OK
+curl http://10.10.80.10/profiles/alma9-asus-execute.ipxe -> OK
+curl -I http://repo.almalinux.org/.../vmlinuz -> HTTP 200
+```
+
+Итог: DHCP/PXE/iPXE menu готовы для первого загрузочного теста. Автоматический Kickstart с wipe disk ещё не включен; это следующий отдельный шаг после проверки, что AlmaLinux installer стартует через iPXE на VM/железе.
+
+### 2026-07-08 — pxe01/pve02 — тестовая PXE VM и исправление iPXE chainload loop
+
+На `pve02` создана временная тестовая VM `pxe-alma-test`:
+```
+VMID: 120
+name: pxe-alma-test
+machine: q35
+bios: OVMF
+boot: order=net0
+memory: 2048
+cores: 2
+net0: virtio=BC:24:11:FB:09:B8,bridge=vmbr0,tag=80
+disk: только efidisk0, системного OS-диска нет
+onboot: 0
+```
+
+Первый запуск выявил loop: UEFI PXE получал `ipxe.efi`, затем уже сам iPXE снова делал DHCP и OPNsense снова отдавал `ipxe.efi`, а не HTTP script. Поэтому HTTP-запросов к `/boot.ipxe` не было.
+
+Исправление: на `pxe01` собран собственный `ipxe.efi` с embedded script:
+```
+#!ipxe
+
+dhcp
+chain http://10.10.80.10/boot.ipxe || shell
+```
+Source/script зафиксирован в репозитории:
+```
+work/pxe01/build/npd-boot.ipxe
+```
+Сборка выполнена из upstream iPXE source внутри `pxe01`; build tools временно установлены в контейнер:
+```
+git
+build-essential
+mtools
+```
+Новый binary установлен:
+```
+/srv/tftp/ipxe.efi
+/srv/pxe/http/ipxe/ipxe-embedded.efi
+```
+Debian package original сохранен как backup:
+```
+/srv/tftp/ipxe.efi.debian-backup-<timestamp>
+```
+
+Повторный тест VM `120` прошел нужную цепочку:
+```
+DHCP -> boot file ipxe.efi
+TFTP -> /srv/tftp/ipxe.efi
+embedded iPXE -> GET /boot.ipxe
+boot.ipxe -> GET /menu.ipxe
+```
+Nginx access log:
+```
+10.10.80.143 "GET /boot.ipxe HTTP/1.1" 200 ... "iPXE/2.0.0+ (g6ba01)"
+10.10.80.143 "GET /menu.ipxe HTTP/1.1" 200 ... "iPXE/2.0.0+ (g6ba01)"
+```
+
+Итог: UEFI PXE chainload до iPXE menu подтвержден на тестовой VM. VM `120` остановлена и оставлена для повторных PXE-тестов. Следующий шаг — временно выбрать installer-пункт через консоль или сделать отдельный auto-test profile, чтобы проверить загрузку AlmaLinux kernel/initrd.
+
+### 2026-07-09 — pxe01/pve02 — local stage2 и разделение PXE basic install / Ansible roles
+
+Для AlmaLinux 9 stage2 добавлен локальный cache на `pxe01`:
+```
+/srv/pxe/http/alma/9/BaseOS/x86_64/os/.treeinfo
+/srv/pxe/http/alma/9/BaseOS/x86_64/os/images/install.img
+/srv/pxe/http/alma/9/BaseOS/x86_64/os/images/pxeboot/vmlinuz
+/srv/pxe/http/alma/9/BaseOS/x86_64/os/images/pxeboot/initrd.img
+```
+
+`install.img` перенесен с рабочего ПК через `pve02` в LXC `pxe01`; checksum совпал с `.treeinfo`:
+```
+539f423b5456aa36877b255b1fd2486d86fff9bfafc34ecb83282b72a93b70a2
+```
+
+Тестовая VM `120` при 2GB RAM обрывала загрузку stage2 примерно на половине `install.img`. После увеличения RAM до 4GB VM успешно получила:
+```
+/boot.ipxe
+/profiles/alma9-pxe-test-autoinstall.ipxe
+/alma/9/BaseOS/x86_64/os/.treeinfo
+/alma/9/BaseOS/x86_64/os/images/install.img
+/kickstart/alma9-pxe-test.ks
+```
+Anaconda стартовала в automated install, приняла Kickstart, создала disk label/EFI/XFS/LVM и начала установку пакетов. Пакеты всё ещё качаются из внешнего AlmaLinux repo, потому что локальный mirror `BaseOS + AppStream` ещё не сделан.
+
+Архитектурное решение для первых ASUS/Supermicro execute nodes: PXE/Kickstart ставит только базовую AlmaLinux с SSH/admin user, а HTCondor/CVMFS/Geant4/monitoring/storage mounts применяются позднее через Ansible.
+
+На `pxe01` добавлен новый явный destructive menu item:
+```
+AlmaLinux 9 BASIC autoinstall - wipes disk
+```
+Файлы:
+```
+/srv/pxe/http/profiles/alma9-basic-autoinstall.ipxe
+/srv/pxe/http/kickstart/alma9-basic.ks
+```
+Default в iPXE menu оставлен `Boot from local disk`, чтобы не переустановить узел случайно.
+
+В репозитории создан базовый Ansible scaffold:
+```
+ansible/README.md
+ansible/inventory/hosts.yml
+ansible/playbooks/base.yml
+ansible/playbooks/htcondor_execute.yml
+ansible/roles/base/tasks/main.yml
+```
+
+Открыто:
+- дождаться/повторить финальную проверку VM `120` до SSH login;
+- перед массовой установкой решить, достаточно ли внешнего repo для 4-8 ASUS или сразу делать локальный mirror/cache;
+- после первой ASUS basic install добавить её в `ansible/inventory/hosts.yml` и прогнать `playbooks/base.yml`.
+
+### 2026-07-10 — pve01/pve02/pve03 — snapshot network/Tailscale after server-room move
+
+После переноса оборудования в серверную и исправления WAN `fw01` сделан snapshot сетевого состояния всех трех Proxmox-нод:
+```
+work/network-snapshots/2026-07-10-after-server-room-move/
+```
+
+Сохранено по каждой ноде:
+```
+/etc/network/interfaces
+/etc/network/interfaces.d/
+/etc/hosts
+/etc/resolv.conf
+ip addr / route / rule
+bridge link / bridge vlan
+pvecm status
+tailscaled status
+tailscale status / status --json / ip / debug prefs / netcheck
+```
+
+Секретный Tailscale state (`/var/lib/tailscale/tailscaled.state`) намеренно не копировался, чтобы не сохранять device keys в репозитории.
+
+Краткое состояние snapshot:
+```
+pve01: MGMT 10.10.10.11, Corosync 10.10.20.11, direct/router 192.168.31.50, Tailscale 100.110.23.10
+pve02: MGMT 10.10.10.12, Corosync 10.10.20.12, default via fw01 10.10.10.1, Tailscale 100.100.173.60
+pve03: MGMT 10.10.10.13, Corosync 10.10.20.13, default via fw01 10.10.10.1, Tailscale 100.86.225.123
+```
+
+### 2026-07-10 — pve01/pve02/pve03 — server-room power and thermal baseline
+
+Перед месяцем удаленной работы сняты базовые аппаратные показания и CPU-нагрузочные замеры:
+```
+work/measurements/2026-07-10-server-room-baseline/
+work/measurements/2026-07-10-server-room-load/
+```
+
+Собрано:
+- IPMI sensors / SEL / DCMI power readings;
+- CPU/RAM/storage/network inventory;
+- SMART summary, ZFS status, Proxmox status;
+- 5-minute `stress-ng --cpu 32` per node;
+- 3-minute simultaneous CPU load across all three nodes.
+
+Краткие результаты:
+```
+Idle IPMI total: ~340-394 W for 3 nodes
+CPU-only simultaneous peak: ~692 W for 3 nodes
+Max CPU temp under test: 43 C
+Max MB_10G temp under test: 61 C
+```
+
+Важная аппаратная находка: все три Supermicro показывают `PS2 Status = 0xb`, при `PS1 Status = 0x1`. Нужно физически проверить второй PSU/кабель/линию питания на каждой ноде перед тем, как считать питание резервированным.
+
+### 2026-07-10 — pxe01 / ASUS rail 1 — legacy PXE install-once stabilized
+
+Настроен рабочий PXE flow для первой ASUS-рельсы со старым Intel Boot Agent:
+
+- DHCP в OPNsense оставлен с boot file `ipxe.efi`, но на TFTP это legacy embedded iPXE (`undionly.kpxe` payload), потому что UEFI `ipxe.efi` был слишком большим для этих BIOS и давал `PXE-E79`.
+- Embedded iPXE цепляет `http://10.10.80.10/boot.ipxe`.
+- `boot.ipxe` знает MAC первой ASUS-рельсы и запускает destructive install только при наличии `/srv/pxe/http/install-once/<mac>.ipxe`.
+- Если install-once файла нет, iPXE делает `exit`, а BIOS продолжает boot order.
+- `sanboot --drive 0x80` для этих ASUS не используется: на практике зависал на `Booting from SAN device 0x80`.
+
+Правильный BIOS order для install-once режима:
+
+```text
+1st: Network: IBA GE Slot 0200
+2nd: AHCI/SATA disk
+3rd: Network: IBA GE Slot 0300
+```
+
+Избегать порядка, где обе сетевые карты стоят перед SATA: после выхода из iPXE BIOS уйдет во второй PXE и покажет `PXE-E61`.
+
+Инвентарь первой рельсы:
+
+```text
+asus-r1n1  LAN 20:cf:30:72:52:ae  OS 10.10.80.101  IPMI 54:04:a6:f4:21:0a  10.10.30.101  switch1 14/41
+asus-r1n2  LAN c8:60:00:31:8c:13  OS 10.10.80.102  IPMI c8:60:00:8b:d5:8b  10.10.30.102  switch1 15/42
+asus-r1n3  LAN 20:cf:30:7c:98:f2  OS 10.10.80.103  IPMI c8:60:00:ea:3b:9e  10.10.30.103  switch1 16/43
+asus-r1n4  LAN c8:60:00:39:1e:fb  OS 10.10.80.104  IPMI c8:60:00:ea:3b:a6  10.10.30.104  switch1 17/44
+```
+
+`asus-firstboot.sh` применяет hostname, static OS IP и in-band IPMI IP из `/srv/pxe/http/asus-r1-map.csv`.
+
+Фикс install-once watcher: старый watcher grep-ал весь nginx access log и мог удалить свежий флаг из-за старой записи `200`. Новый watcher стартует с текущего byte offset access log и реагирует только на новые строки.

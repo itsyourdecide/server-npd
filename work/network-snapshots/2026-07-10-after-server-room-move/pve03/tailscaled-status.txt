@@ -1,0 +1,23 @@
+● tailscaled.service - Tailscale node agent
+     Loaded: loaded (/usr/lib/systemd/system/tailscaled.service; enabled; preset: enabled)
+     Active: active (running) since Fri 2026-07-10 14:07:02 EEST; 22min ago
+ Invocation: 8c88133bdfdd4478ba28c9817f809f0e
+       Docs: https://tailscale.com/docs/
+   Main PID: 1385 (tailscaled)
+     Status: "Connected; itsyourdecide@github; 100.86.225.123 fd7a:115c:a1e0::7b3b:e17d"
+      Tasks: 25 (limit: 578718)
+     Memory: 76.9M (peak: 78.9M)
+        CPU: 3.194s
+     CGroup: /system.slice/tailscaled.service
+             └─1385 /usr/sbin/tailscaled --state=/var/lib/tailscale/tailscaled.state --socket=/run/tailscale/tailscaled.sock --port=41641
+
+Jul 10 14:28:19 pve03 tailscaled[1385]: magicsock: adding connection to derp-22 for home-keep-alive
+Jul 10 14:28:19 pve03 tailscaled[1385]: health(warnable=no-derp-home): ok
+Jul 10 14:28:19 pve03 tailscaled[1385]: magicsock: 1 active derp conns: derp-22=cr0s,wr0s
+Jul 10 14:28:19 pve03 tailscaled[1385]: writing netmap to disk cache
+Jul 10 14:28:19 pve03 tailscaled[1385]: derphttp.Client.Connect: connecting to derp-22 (waw)
+Jul 10 14:28:19 pve03 tailscaled[1385]: magicsock: endpoints changed: 91.202.128.23:48231 (stun), 91.202.128.23:41641 (stun4localport), 10.10.10.13:41641 (local), 10.10.20.13:41641 (local)
+Jul 10 14:28:19 pve03 tailscaled[1385]: control: NetInfo: NetInfo{varies=true ipv6=false ipv6os=true udp=true icmpv4=false derp=#22 portmap= link="" firewallmode="ipt-default"}
+Jul 10 14:28:19 pve03 tailscaled[1385]: Switching ipn state Starting -> Running (WantRunning=true, nm=true)
+Jul 10 14:28:19 pve03 tailscaled[1385]: magicsock: derp-22 connected; connGen=1
+Jul 10 14:28:19 pve03 tailscaled[1385]: health(warnable=no-derp-connection): ok

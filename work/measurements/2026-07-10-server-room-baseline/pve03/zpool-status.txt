@@ -1,0 +1,21 @@
+  pool: rpool
+ state: ONLINE
+config:
+
+	NAME                                                  STATE     READ WRITE CKSUM
+	rpool                                                 ONLINE       0     0     0
+	  mirror-0                                            ONLINE       0     0     0
+	    ata-Micron_5200_MTFDDAK960TDD_17501DBDA8FB-part3  ONLINE       0     0     0
+	    ata-Micron_5200_MTFDDAK960TDD_17501DBDA917-part3  ONLINE       0     0     0
+
+errors: No known data errors
+NAME    SIZE  ALLOC   FREE  CKPOINT  EXPANDSZ   FRAG    CAP  DEDUP    HEALTH  ALTROOT
+rpool   888G  4.00G   884G        -         -     0%     0%  1.00x    ONLINE  -
+NAME                           USED  AVAIL  REFER  MOUNTPOINT
+rpool                         36.5G   824G   104K  /rpool
+rpool/ROOT                    2.17G   824G    96K  /rpool/ROOT
+rpool/ROOT/pve-1              2.17G   824G  2.17G  /
+rpool/data                    34.4G   824G    96K  /rpool/data
+rpool/data/subvol-101-disk-0  10.6M   100G  10.6M  /rpool/data/subvol-101-disk-0
+rpool/data/vm-100-disk-0      34.3G   857G  1.83G  -
+rpool/var-lib-vz               112K   824G   112K  /var/lib/vz

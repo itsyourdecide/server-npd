@@ -1,0 +1,7 @@
+#!ipxe
+
+echo Starting AlmaLinux 9 manual installer
+echo Repo: ${alma_repo}
+kernel ${alma_kernel} initrd=initrd.img ip=dhcp inst.repo=${alma_repo} inst.text
+initrd ${alma_initrd}
+boot

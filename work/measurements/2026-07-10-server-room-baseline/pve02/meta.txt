@@ -1,0 +1,4 @@
+hostname=pve02.localdomain
+2026-07-10T14:50:17+03:00
+ 14:50:17 up 43 min,  2 users,  load average: 0.01, 0.08, 0.13
+Linux pve02 7.0.2-6-pve #1 SMP PREEMPT_DYNAMIC PMX 7.0.2-6 (2026-05-20T08:55Z) x86_64 GNU/Linux

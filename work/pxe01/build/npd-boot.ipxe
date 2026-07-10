@@ -1,0 +1,4 @@
+#!ipxe
+
+dhcp
+chain http://10.10.80.10/boot.ipxe || shell

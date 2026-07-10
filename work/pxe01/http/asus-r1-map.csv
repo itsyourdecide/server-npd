@@ -1,0 +1,6 @@
+hostname,os_ip,ipmi_ip,lan_mac,ipmi_mac,switch_port_lan,switch_port_ipmi
+# rear/ports-side numbering: n1 bottom-left, n2 top-left, n3 bottom-right, n4 top-right
+asus-r1n1,10.10.80.101,10.10.30.101,20:cf:30:72:52:ae,54:04:a6:f4:21:0a,14,41
+asus-r1n2,10.10.80.102,10.10.30.102,c8:60:00:31:8c:13,c8:60:00:8b:d5:8b,15,42
+asus-r1n3,10.10.80.103,10.10.30.103,20:cf:30:7c:98:f2,c8:60:00:ea:3b:9e,16,43
+asus-r1n4,10.10.80.104,10.10.30.104,c8:60:00:39:1e:fb,c8:60:00:ea:3b:a6,17,44

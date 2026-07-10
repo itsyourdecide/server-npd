@@ -1,0 +1,22 @@
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+nic0             UP             
+nic1             DOWN           
+tailscale0       UNKNOWN        100.86.225.123/32 fd7a:115c:a1e0::7b3b:e17d/128 fe80::9e9c:3d07:c11e:a19a/64 
+vmbr0            UP             fe80::ae1f:6bff:fe41:9286/64 
+vmbr0.10@vmbr0   UP             10.10.10.13/24 fe80::ae1f:6bff:fe41:9286/64 
+vmbr0.20@vmbr0   UP             10.10.20.13/24 fe80::ae1f:6bff:fe41:9286/64 
+default via 10.10.10.1 dev vmbr0.10 proto kernel onlink 
+10.10.10.0/24 dev vmbr0.10 proto kernel scope link src 10.10.10.13 
+10.10.20.0/24 dev vmbr0.20 proto kernel scope link src 10.10.20.13 
+port              vlan-id  
+nic0              10 PVID Egress Untagged
+                  20
+                  30
+                  40
+                  50
+                  80
+                  99
+vmbr0             1 PVID Egress Untagged
+                  10
+                  20
+2: nic0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master vmbr0 state forwarding priority 32 cost 5 

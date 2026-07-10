@@ -1,0 +1,34 @@
+100.86.225.123 dev tailscale0 table 52 
+100.91.221.42 dev tailscale0 table 52 
+100.100.100.100 dev tailscale0 table 52 
+100.105.80.15 dev tailscale0 table 52 
+100.110.23.10 dev tailscale0 table 52 
+default via 10.10.10.1 dev vmbr0.10 proto kernel onlink 
+10.10.10.0/24 dev vmbr0.10 proto kernel scope link src 10.10.10.12 
+10.10.20.0/24 dev vmbr0.20 proto kernel scope link src 10.10.20.12 
+local 10.10.10.12 dev vmbr0.10 table local proto kernel scope host src 10.10.10.12 
+broadcast 10.10.10.255 dev vmbr0.10 table local proto kernel scope link src 10.10.10.12 
+local 10.10.20.12 dev vmbr0.20 table local proto kernel scope host src 10.10.20.12 
+broadcast 10.10.20.255 dev vmbr0.20 table local proto kernel scope link src 10.10.20.12 
+local 100.100.173.60 dev tailscale0 table local proto kernel scope host src 100.100.173.60 
+local 127.0.0.0/8 dev lo table local proto kernel scope host src 127.0.0.1 
+local 127.0.0.1 dev lo table local proto kernel scope host src 127.0.0.1 
+broadcast 127.255.255.255 dev lo table local proto kernel scope link src 127.0.0.1 
+fd7a:115c:a1e0::53 dev tailscale0 table 52 metric 1024 pref medium
+fd7a:115c:a1e0::/48 dev tailscale0 table 52 metric 1024 pref medium
+fd7a:115c:a1e0::db3b:ad3d dev tailscale0 proto kernel metric 256 pref medium
+fe80::/64 dev tailscale0 proto kernel metric 256 pref medium
+fe80::/64 dev vmbr0 proto kernel metric 256 pref medium
+fe80::/64 dev vmbr0.10 proto kernel metric 256 pref medium
+fe80::/64 dev vmbr0.20 proto kernel metric 256 pref medium
+local ::1 dev lo table local proto kernel metric 0 pref medium
+local fd7a:115c:a1e0::db3b:ad3d dev tailscale0 table local proto kernel metric 0 pref medium
+anycast fe80:: dev vmbr0 table local proto kernel metric 0 pref medium
+local fe80::5f37:2198:8fee:e327 dev tailscale0 table local proto kernel metric 0 pref medium
+local fe80::ae1f:6bff:fe41:93a4 dev vmbr0.10 table local proto kernel metric 0 pref medium
+local fe80::ae1f:6bff:fe41:93a4 dev vmbr0.20 table local proto kernel metric 0 pref medium
+local fe80::ae1f:6bff:fe41:93a4 dev vmbr0 table local proto kernel metric 0 pref medium
+multicast ff00::/8 dev tailscale0 table local proto kernel metric 256 pref medium
+multicast ff00::/8 dev vmbr0 table local proto kernel metric 256 pref medium
+multicast ff00::/8 dev vmbr0.10 table local proto kernel metric 256 pref medium
+multicast ff00::/8 dev vmbr0.20 table local proto kernel metric 256 pref medium

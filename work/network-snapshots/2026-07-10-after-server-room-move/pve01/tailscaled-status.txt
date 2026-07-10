@@ -1,0 +1,23 @@
+● tailscaled.service - Tailscale node agent
+     Loaded: loaded (/usr/lib/systemd/system/tailscaled.service; enabled; preset: enabled)
+     Active: active (running) since Fri 2026-07-10 14:06:17 EEST; 23min ago
+ Invocation: 9f84ee9d7df8478a8af31690a487c41b
+       Docs: https://tailscale.com/docs/
+   Main PID: 1385 (tailscaled)
+     Status: "Connected; itsyourdecide@github; 100.110.23.10 fd7a:115c:a1e0::ee3b:170b"
+      Tasks: 37 (limit: 578714)
+     Memory: 107.5M (peak: 120.5M)
+        CPU: 12.691s
+     CGroup: /system.slice/tailscaled.service
+             └─1385 /usr/sbin/tailscaled --state=/var/lib/tailscale/tailscaled.state --socket=/run/tailscale/tailscaled.sock --port=41641
+
+Jul 10 14:28:18 pve01 tailscaled[1385]: netmap: suggested exit node:  ()
+Jul 10 14:28:18 pve01 tailscaled[1385]: wgengine: Reconfig: configuring userspace WireGuard config (with 4 peers)
+Jul 10 14:28:18 pve01 tailscaled[1385]: wgengine: Reconfig: configuring router
+Jul 10 14:28:18 pve01 tailscaled[1385]: wgengine: Reconfig: user dialer
+Jul 10 14:28:18 pve01 tailscaled[1385]: tsdial: bart table size: 7
+Jul 10 14:28:18 pve01 tailscaled[1385]: wgengine: Reconfig: configuring DNS
+Jul 10 14:28:18 pve01 tailscaled[1385]: dns: Set: {DefaultResolvers:[] Routes:{taile43d6d.ts.net.:[] ts.net.:[199.247.155.53 2620:111:8007::53]}+65arpa SearchDomains:[taile43d6d.ts.net.] Hosts:5}
+Jul 10 14:28:18 pve01 tailscaled[1385]: dns: Resolvercfg: {Routes:{.:[1.1.1.1] ts.net.:[199.247.155.53 2620:111:8007::53]} Hosts:5 LocalDomains:[taile43d6d.ts.net.]+65arpa}
+Jul 10 14:28:18 pve01 tailscaled[1385]: dns: OScfg: {Nameservers:[100.100.100.100 fd7a:115c:a1e0::53] SearchDomains:[taile43d6d.ts.net.] }
+Jul 10 14:28:19 pve01 tailscaled[1385]: netmap: suggested exit node:  ()

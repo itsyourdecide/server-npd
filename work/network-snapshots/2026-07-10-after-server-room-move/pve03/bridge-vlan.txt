@@ -1,0 +1,11 @@
+port              vlan-id  
+nic0              10 PVID Egress Untagged
+                  20
+                  30
+                  40
+                  50
+                  80
+                  99
+vmbr0             1 PVID Egress Untagged
+                  10
+                  20

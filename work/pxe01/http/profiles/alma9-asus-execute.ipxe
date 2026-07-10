@@ -1,0 +1,8 @@
+#!ipxe
+
+echo Starting AlmaLinux 9 installer for ASUS HTCondor execute node
+echo Current mode: manual installer, no unattended wipe kickstart yet.
+echo Planned role: asus-rXnY bare-metal execute node
+kernel ${alma_kernel} initrd=initrd.img ip=dhcp inst.repo=${alma_repo} inst.text
+initrd ${alma_initrd}
+boot

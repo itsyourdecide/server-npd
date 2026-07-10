@@ -1,0 +1,20 @@
+#!ipxe
+
+set server http://10.10.80.10
+set mac ${net0/mac}
+
+isset ${net0/mac} && iseq ${net0/mac} bc:24:11:fb:09:b8 && chain ${server}/profiles/alma9-pxe-test-autoinstall.ipxe ||
+isset ${net0/mac} && iseq ${net0/mac} 20:cf:30:72:52:ae && goto asus_known ||
+isset ${net0/mac} && iseq ${net0/mac} c8:60:00:31:8c:13 && goto asus_known ||
+isset ${net0/mac} && iseq ${net0/mac} 20:cf:30:7c:98:f2 && goto asus_known ||
+isset ${net0/mac} && iseq ${net0/mac} c8:60:00:39:1e:fb && goto asus_known ||
+chain ${server}/menu.ipxe || shell
+
+:asus_known
+echo Known ASUS node ${mac}
+echo Trying install-once flag first, then local disk.
+chain ${server}/install-once/${mac}.ipxe || goto local
+
+:local
+echo Exiting iPXE to continue BIOS boot order...
+exit

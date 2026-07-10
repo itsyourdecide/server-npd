@@ -1,0 +1,6 @@
+---
+- name: Configure baseline AlmaLinux nodes
+  hosts: alma_basic:asus_nodes:supermicro_execute_vms
+  gather_facts: true
+  roles:
+    - base

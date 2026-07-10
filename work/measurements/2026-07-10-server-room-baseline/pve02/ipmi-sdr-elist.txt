@@ -1,0 +1,60 @@
+CPU1 Temp        | 01h | ok  |  3.1 | 29 degrees C
+CPU2 Temp        | 02h | ok  |  3.2 | 30 degrees C
+PCH Temp         | 0Ah | ok  |  7.3 | 30 degrees C
+System Temp      | 0Bh | ok  |  7.1 | 24 degrees C
+Peripheral Temp  | 0Ch | ok  |  7.2 | 40 degrees C
+MB_10G Temp      | 0Dh | ok  |  7.4 | 56 degrees C
+Vcpu1VRM Temp    | 10h | ok  |  8.1 | 31 degrees C
+Vcpu2VRM Temp    | 11h | ok  |  8.2 | 40 degrees C
+VmemABVRM Temp   | 12h | ok  |  8.3 | 29 degrees C
+VmemCDVRM Temp   | 13h | ok  |  8.4 | 30 degrees C
+VmemEFVRM Temp   | 14h | ok  |  8.5 | 37 degrees C
+VmemGHVRM Temp   | 15h | ok  |  8.6 | 31 degrees C
+P1-DIMMA1 Temp   | B0h | ok  | 32.64 | 27 degrees C
+P1-DIMMA2 Temp   | B1h | ok  | 32.65 | 26 degrees C
+P1-DIMMB1 Temp   | B4h | ok  | 32.68 | 26 degrees C
+P1-DIMMB2 Temp   | B5h | ok  | 32.69 | 27 degrees C
+P1-DIMMC1 Temp   | B8h | ok  | 32.72 | 30 degrees C
+P1-DIMMC2 Temp   | B9h | ok  | 32.73 | 30 degrees C
+P1-DIMMD1 Temp   | BCh | ok  | 32.76 | 29 degrees C
+P1-DIMMD2 Temp   | BDh | ok  | 32.77 | 27 degrees C
+P2-DIMME1 Temp   | D0h | ok  | 32.80 | 36 degrees C
+P2-DIMME2 Temp   | D1h | ok  | 32.81 | 36 degrees C
+P2-DIMMF1 Temp   | D4h | ok  | 32.84 | 34 degrees C
+P2-DIMMF2 Temp   | D5h | ok  | 32.85 | 33 degrees C
+P2-DIMMG1 Temp   | D8h | ok  | 32.88 | 28 degrees C
+P2-DIMMG2 Temp   | D9h | ok  | 32.89 | 29 degrees C
+P2-DIMMH1 Temp   | DCh | ok  | 32.92 | 29 degrees C
+P2-DIMMH2 Temp   | DDh | ok  | 32.93 | 29 degrees C
+FAN1             | 41h | ok  | 29.1 | 3400 RPM
+FAN2             | 42h | ok  | 29.2 | 3400 RPM
+FAN3             | 43h | ns  | 29.3 | No Reading
+FAN4             | 44h | ns  | 29.4 | No Reading
+FAN5             | 45h | ns  | 29.5 | No Reading
+FAN6             | 46h | ns  | 29.6 | No Reading
+FANA             | 47h | ok  | 29.7 | 3400 RPM
+FANB             | 48h | ns  | 29.8 | No Reading
+12V              | 30h | ok  |  7.17 | 11.87 Volts
+5VCC             | 31h | ok  |  7.33 | 4.95 Volts
+3.3VCC           | 32h | ok  |  7.32 | 3.32 Volts
+VBAT             | 33h | ok  |  7.18 | 2.76 Volts
+Vcpu1            | 34h | ok  |  3.3 | 1.80 Volts
+Vcpu2            | 36h | ok  |  3.4 | 1.81 Volts
+VDIMMAB          | 35h | ok  | 32.1 | 1.21 Volts
+VDIMMCD          | 37h | ok  | 32.2 | 1.20 Volts
+VDIMMEF          | 3Ah | ok  | 32.3 | 1.20 Volts
+VDIMMGH          | 3Bh | ok  | 32.4 | 1.20 Volts
+5VSB             | 38h | ok  |  7.15 | 4.95 Volts
+3.3VSB           | 39h | ok  |  7.19 | 3.30 Volts
+1.5V PCH         | 3Ch | ok  |  7.20 | 1.49 Volts
+1.2V BMC         | 3Dh | ok  |  7.21 | 1.21 Volts
+1.05V PCH        | 3Eh | ok  |  7.12 | 1.05 Volts
+Chassis Intru    | AAh | ok  | 23.1 | 
+BMC FRU          | 00h | ns  |  0.0 | Logical FRU @00h
+ATEN BMC         | 00h | ok  |  0.0 | Dynamic MC @ 20h
+NM exception     | 80h | ns  | 46.1 | Event-Only
+NM health        | 81h | ns  | 46.2 | Event-Only
+NM op cap        | 82h | ns  | 46.3 | Event-Only
+NM alert         | 83h | ns  | 46.4 | Event-Only
+PS1 Status       | C8h | ok  | 10.88 | Presence detected
+PS2 Status       | C9h | ok  | 10.87 | Presence detected, Failure detected, Power Supply AC lost

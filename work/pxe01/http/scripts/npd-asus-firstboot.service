@@ -1,0 +1,12 @@
+[Unit]
+Description=NPD ASUS first boot hostname, OS IP and IPMI configuration
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=!/var/lib/npd-asus-firstboot.done
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/asus-firstboot.sh
+
+[Install]
+WantedBy=multi-user.target

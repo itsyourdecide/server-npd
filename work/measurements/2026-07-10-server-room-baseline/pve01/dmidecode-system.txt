@@ -1,0 +1,685 @@
+# dmidecode 3.6
+Getting SMBIOS data from sysfs.
+SMBIOS 3.0.0 present.
+
+Handle 0x0001, DMI type 1, 27 bytes
+System Information
+	Manufacturer: Supermicro
+	Product Name: X10DRi
+	Version: 123456789
+	Serial Number: 123456789
+	UUID: 00000000-0000-0000-0000-ac1f6b4cd742
+	Wake-up Type: Power Switch
+	SKU Number: 072815D9
+	Family: SMC X10
+
+Handle 0x0002, DMI type 2, 15 bytes
+Base Board Information
+	Manufacturer: Supermicro
+	Product Name: X10DRI-T
+	Version: 1.02B
+	Serial Number: NM187S004964
+	Asset Tag: Default string
+	Features:
+		Board is a hosting board
+		Board is replaceable
+	Location In Chassis: Default string
+	Chassis Handle: 0x0003
+	Type: Motherboard
+	Contained Object Handles: 0
+
+Handle 0x0003, DMI type 3, 22 bytes
+Chassis Information
+	Manufacturer: Default string
+	Type: Rack Mount Chassis
+	Lock: Not Present
+	Version: Default string
+	Serial Number: C2130LH01N60057
+	Asset Tag: DL7336910
+	Boot-up State: Safe
+	Power Supply State: Safe
+	Thermal State: Safe
+	Security Status: None
+	OEM Information: 0x00000000
+	Height: Unspecified
+	Number Of Power Cords: 1
+	Contained Elements: 0
+	SKU Number: Default string
+
+Handle 0x0022, DMI type 10, 8 bytes
+On Board Device 1 Information
+	Type: Video
+	Status: Enabled
+	Description:    Onboard Aspeed Video
+On Board Device 2 Information
+	Type: Ethernet
+	Status: Enabled
+	Description:  Onboard Intel Lan
+
+Handle 0x0024, DMI type 12, 5 bytes
+System Configuration Options
+	Option 1: Default string
+
+Handle 0x0025, DMI type 32, 20 bytes
+System Boot Information
+	Status: No errors detected
+
+Handle 0x0055, DMI type 41, 11 bytes
+Onboard Device
+	Reference Designation:  Onboard IGD
+	Type: Video
+	Status: Enabled
+	Type Instance: 1
+	Bus Address: 0000:00:02.0
+
+Handle 0x0056, DMI type 41, 11 bytes
+Onboard Device
+	Reference Designation:  Onboard LAN
+	Type: Ethernet
+	Status: Enabled
+	Type Instance: 1
+	Bus Address: 0000:00:19.0
+
+Handle 0x0057, DMI type 41, 11 bytes
+Onboard Device
+	Reference Designation:  Onboard 1394
+	Type: Other
+	Status: Enabled
+	Type Instance: 1
+	Bus Address: 0000:03:1c.2
+
+Handle 0x005D, DMI type 15, 81 bytes
+System Event Log
+	Area Length: 65535 bytes
+	Header Start Offset: 0x0000
+	Header Length: 16 bytes
+	Data Start Offset: 0x0010
+	Access Method: Memory-mapped physical 32-bit address
+	Access Address: 0xFF890000
+	Status: Valid, Not Full
+	Change Token: 0x00000001
+	Header Format: Type 1
+	Supported Log Type Descriptors: 29
+	Descriptor 1: Single-bit ECC memory error
+	Data Format 1: Multiple-event handle
+	Descriptor 2: Multi-bit ECC memory error
+	Data Format 2: Multiple-event handle
+	Descriptor 3: Parity memory error
+	Data Format 3: None
+	Descriptor 4: Bus timeout
+	Data Format 4: None
+	Descriptor 5: I/O channel block
+	Data Format 5: None
+	Descriptor 6: Software NMI
+	Data Format 6: None
+	Descriptor 7: POST memory resize
+	Data Format 7: None
+	Descriptor 8: POST error
+	Data Format 8: POST results bitmap
+	Descriptor 9: PCI parity error
+	Data Format 9: Multiple-event handle
+	Descriptor 10: PCI system error
+	Data Format 10: Multiple-event handle
+	Descriptor 11: CPU failure
+	Data Format 11: None
+	Descriptor 12: EISA failsafe timer timeout
+	Data Format 12: None
+	Descriptor 13: Correctable memory log disabled
+	Data Format 13: None
+	Descriptor 14: Logging disabled
+	Data Format 14: None
+	Descriptor 15: System limit exceeded
+	Data Format 15: None
+	Descriptor 16: Asynchronous hardware timer expired
+	Data Format 16: None
+	Descriptor 17: System configuration information
+	Data Format 17: None
+	Descriptor 18: Hard disk information
+	Data Format 18: None
+	Descriptor 19: System reconfigured
+	Data Format 19: None
+	Descriptor 20: Uncorrectable CPU-complex error
+	Data Format 20: None
+	Descriptor 21: Log area reset/cleared
+	Data Format 21: None
+	Descriptor 22: System boot
+	Data Format 22: None
+	Descriptor 23: End of log
+	Data Format 23: None
+	Descriptor 24: OEM-specific
+	Data Format 24: OEM-specific
+	Descriptor 25: OEM-specific
+	Data Format 25: OEM-specific
+	Descriptor 26: OEM-specific
+	Data Format 26: Multiple-event handle
+	Descriptor 27: OEM-specific
+	Data Format 27: Multiple-event handle
+	Descriptor 28: OEM-specific
+	Data Format 28: Multiple-event handle
+	Descriptor 29: OEM-specific
+	Data Format 29: Multiple-event handle
+
+Handle 0x005E, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 512 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 8
+
+Handle 0x0060, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x005E
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMA1
+	Bank Locator: P0_Node0_Channel0_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA22FA
+	Asset Tag: P1_DIMMA1_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0062, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x005E
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMA2
+	Bank Locator: P0_Node0_Channel0_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA228A
+	Asset Tag: P1_DIMMA2_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0064, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x005E
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMB1
+	Bank Locator: P0_Node0_Channel1_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA2288
+	Asset Tag: P1_DIMMB1_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0066, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x005E
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMB2
+	Bank Locator: P0_Node0_Channel1_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA2280
+	Asset Tag: P1_DIMMB2_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0068, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x005E
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMC1
+	Bank Locator: P0_Node0_Channel2_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA225D
+	Asset Tag: P1_DIMMC1_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x006A, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x005E
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMC2
+	Bank Locator: P0_Node0_Channel2_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA2268
+	Asset Tag: P1_DIMMC2_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x006C, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x005E
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMD1
+	Bank Locator: P0_Node0_Channel3_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA228E
+	Asset Tag: P1_DIMMD1_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x006E, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x005E
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMD2
+	Bank Locator: P0_Node0_Channel3_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA227E
+	Asset Tag: P1_DIMMD2_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0070, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 512 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 8
+
+Handle 0x0072, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0070
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMME1
+	Bank Locator: P1_Node1_Channel0_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA220D
+	Asset Tag: P2_DIMME1_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0074, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0070
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMME2
+	Bank Locator: P1_Node1_Channel0_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA22B0
+	Asset Tag: P2_DIMME2_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0076, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0070
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMMF1
+	Bank Locator: P1_Node1_Channel1_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA225E
+	Asset Tag: P2_DIMMF1_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0078, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0070
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMMF2
+	Bank Locator: P1_Node1_Channel1_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA226A
+	Asset Tag: P2_DIMMF2_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x007A, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0070
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMMG1
+	Bank Locator: P1_Node1_Channel2_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA2286
+	Asset Tag: P2_DIMMG1_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x007C, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0070
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMMG2
+	Bank Locator: P1_Node1_Channel2_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA21CF
+	Asset Tag: P2_DIMMG2_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x007E, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0070
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMMH1
+	Bank Locator: P1_Node1_Channel3_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA227C
+	Asset Tag: P2_DIMMH1_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0080, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0070
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMMH2
+	Bank Locator: P1_Node1_Channel3_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Hynix Semiconductor
+	Serial Number: 2CAA22F7
+	Asset Tag: P2_DIMMH2_AssetTag (Date:18/26)
+	Part Number: HMA84GR7AFR4N-VK    
+	Rank: 2
+	Configured Memory Speed: 2133 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0087, DMI type 4, 48 bytes
+Processor Information
+	Socket Designation: SOCKET 0
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel
+	ID: F1 06 04 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 79, Stepping 1
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) CPU E5-2620 v4 @ 2.10GHz
+	Voltage: 0.0 V
+	External Clock: 100 MHz
+	Max Speed: 3600 MHz
+	Current Speed: 2100 MHz
+	Status: Populated, Enabled
+	Upgrade: Socket LGA2011-3
+	L1 Cache Handle: 0x0084
+	L2 Cache Handle: 0x0085
+	L3 Cache Handle: 0x0086
+	Serial Number: Not Specified
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Core Count: 8
+	Core Enabled: 8
+	Thread Count: 16
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control
+
+Handle 0x008B, DMI type 4, 48 bytes
+Processor Information
+	Socket Designation: SOCKET 1
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel
+	ID: F1 06 04 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 79, Stepping 1
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) CPU E5-2620 v4 @ 2.10GHz
+	Voltage: 0.0 V
+	External Clock: 100 MHz
+	Max Speed: 3600 MHz
+	Current Speed: 2100 MHz
+	Status: Populated, Enabled
+	Upgrade: Socket LGA2011-3
+	L1 Cache Handle: 0x0088
+	L2 Cache Handle: 0x0089
+	L3 Cache Handle: 0x008A
+	Serial Number: Not Specified
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Core Count: 8
+	Core Enabled: 8
+	Thread Count: 16
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control
+

@@ -1,0 +1,8 @@
+---
+- name: Configure HTCondor execute nodes
+  hosts: asus_nodes:supermicro_execute_vms
+  gather_facts: true
+  tasks:
+    - name: Placeholder for HTCondor execute role
+      ansible.builtin.debug:
+        msg: "HTCondor execute configuration will be added after the base PXE smoke test."

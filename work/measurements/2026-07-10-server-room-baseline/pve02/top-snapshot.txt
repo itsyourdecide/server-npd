@@ -1,0 +1,81 @@
+    PID    PPID COMMAND         %CPU %MEM   RSS
+   2065       1 kvm              9.4  0.7 4206280
+   1917       1 corosync         1.5  0.0 181884
+   1949       1 pvestatd         0.7  0.0 117800
+   1947       1 pve-firewall     0.2  0.0 109440
+   1405       1 tailscaled       0.2  0.0 75876
+  10659    2028 pveproxy worker  0.1  0.0 158876
+  10660    2028 pveproxy worker  0.1  0.0 158868
+  14111   14110 qm               0.1  0.0 139384
+   1749       1 pmxcfs           0.1  0.0 73264
+  10661    2028 pveproxy worker  0.1  0.0 158772
+   1977    1974 pvedaemon worke  0.0  0.0 157336
+      1       0 systemd          0.0  0.0 12116
+   1975    1974 pvedaemon worke  0.0  0.0 157120
+   1976    1974 pvedaemon worke  0.0  0.0 156920
+   2028       1 pveproxy         0.0  0.0 170208
+    733       2 txg_sync         0.0  0.0     0
+    395       2 kworker/0:2-cgr  0.0  0.0     0
+    872       1 systemd-journal  0.0  0.0 17396
+     15       2 rcu_preempt      0.0  0.0     0
+   7377       1 systemd          0.0  0.0 11216
+   2986       2 kvm-pit/2065     0.0  0.0     0
+  13564       2 kworker/u128:2-  0.0  0.0     0
+   2038       1 spiceproxy       0.0  0.0 63760
+   2046       1 pve-ha-lrm       0.0  0.0 123056
+    912       1 systemd-udevd    0.0  0.0  7076
+   1397       1 rrdcached        0.0  0.0  4780
+   1183       2 kipmi0           0.0  0.0     0
+    229       2 irq/9-acpi       0.0  0.0     0
+   1387       1 dbus-daemon      0.0  0.0  3576
+    652       2 dp_sync_taskq    0.0  0.0     0
+    653       2 dp_sync_taskq    0.0  0.0     0
+    655       2 dp_sync_taskq    0.0  0.0     0
+   2274    2204 systemd          0.0  0.0  8760
+  10647       1 pvefw-logger     0.0  0.0  1996
+    654       2 dp_sync_taskq    0.0  0.0     0
+   1404       1 systemd-logind   0.0  0.0  7312
+      9       2 kworker/0:0-cgr  0.0  0.0     0
+   3078       1 pvescheduler     0.0  0.0 125432
+   1919       1 proxmox-firewal  0.0  0.0  4272
+---
+    PID    PPID COMMAND         %CPU %MEM   RSS
+   2065       1 kvm              9.4  0.7 4206280
+   1917       1 corosync         1.5  0.0 181884
+   2028       1 pveproxy         0.0  0.0 170208
+  10659    2028 pveproxy worker  0.1  0.0 158876
+  10660    2028 pveproxy worker  0.1  0.0 158868
+  10661    2028 pveproxy worker  0.1  0.0 158772
+   1977    1974 pvedaemon worke  0.0  0.0 157336
+   1975    1974 pvedaemon worke  0.0  0.0 157120
+   1976    1974 pvedaemon worke  0.0  0.0 156920
+   1974       1 pvedaemon        0.0  0.0 152052
+  14111   14110 qm               0.1  0.0 139384
+   3078       1 pvescheduler     0.0  0.0 125432
+   2012       1 pve-ha-crm       0.0  0.0 124128
+   2046       1 pve-ha-lrm       0.0  0.0 123056
+   1949       1 pvestatd         0.7  0.0 117800
+   1947       1 pve-firewall     0.2  0.0 109440
+   1405       1 tailscaled       0.2  0.0 75876
+   1749       1 pmxcfs           0.1  0.0 73264
+   2038       1 spiceproxy       0.0  0.0 63760
+  10653    2038 spiceproxy work  0.0  0.0 55384
+    872       1 systemd-journal  0.0  0.0 17396
+      1       0 systemd          0.0  0.0 12116
+   7377       1 systemd          0.0  0.0 11216
+  14103    1755 sshd-session     0.0  0.0  9696
+  23546    1755 sshd-session     0.0  0.0  9692
+   2274    2204 systemd          0.0  0.0  8760
+   2740    2274 systemd-journal  0.0  0.0  7820
+   1404       1 systemd-logind   0.0  0.0  7312
+    912       1 systemd-udevd    0.0  0.0  7076
+  23553   23546 sshd-session     0.0  0.0  6320
+  14110   14103 sshd-session     0.0  0.0  6212
+   2791    2274 systemd-network  0.0  0.0  6188
+   2869    2274 sshd             0.0  0.0  5584
+   2801    2274 systemd-logind   0.0  0.0  5540
+   1415       1 zed              0.0  0.0  5456
+   1755       1 sshd             0.0  0.0  5224
+   1907    1905 qmgr             0.0  0.0  4928
+   1397       1 rrdcached        0.0  0.0  4780
+   1906    1905 pickup           0.0  0.0  4772

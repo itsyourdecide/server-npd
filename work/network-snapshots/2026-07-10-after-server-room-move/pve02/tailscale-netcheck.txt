@@ -1,0 +1,39 @@
+2026/07/10 14:29:58 portmap: monitor: gateway and self IP changed: gw=10.10.10.1 self=10.10.10.12
+
+Report:
+	* Time: 2026-07-10T11:29:58.26267118Z
+	* UDP: true
+	* IPv4: yes, 91.202.128.23:50558
+	* IPv6: no, but OS has support
+	* MappingVariesByDestIP: true
+	* PortMapping: 
+	* Nearest DERP: Warsaw
+	* DERP latency:
+		- waw: 18.4ms  (Warsaw)
+		- fra: 40.7ms  (Frankfurt)
+		- par: 41.1ms  (Paris)
+		- nue: 42.7ms  (Nuremberg)
+		- ams: 48.3ms  (Amsterdam)
+		- hel: 55.2ms  (Helsinki)
+		- mad: 58.6ms  (Madrid)
+		- lhr: 61.2ms  (London)
+		- nyc: 110.6ms (New York City)
+		- iad: 117ms   (Ashburn)
+		- tor: 120.7ms (Toronto)
+		- dbi: 128.4ms (Dubai)
+		- ord: 131.9ms (Chicago)
+		- mia: 142.2ms (Miami)
+		- dfw: 147.2ms (Dallas)
+		- den: 158.5ms (Denver)
+		- lax: 169.4ms (Los Angeles)
+		- blr: 169.5ms (Bengaluru)
+		- sea: 172.9ms (Seattle)
+		- sfo: 173.8ms (San Francisco)
+		- sin: 186.7ms (Singapore)
+		- nai: 196.9ms (Nairobi)
+		- jnb: 207.2ms (Johannesburg)
+		- hkg: 212.7ms (Hong Kong)
+		- hnl: 217.2ms (Honolulu)
+		- syd:         (Sydney)
+		- tok:         (Tokyo)
+		- sao:         (São Paulo)

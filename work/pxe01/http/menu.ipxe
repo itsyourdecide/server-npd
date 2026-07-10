@@ -1,0 +1,41 @@
+#!ipxe
+
+set menu-timeout 10000
+set server http://10.10.80.10
+set alma_repo http://repo.almalinux.org/almalinux/9/BaseOS/x86_64/os
+set alma_kernel ${alma_repo}/images/pxeboot/vmlinuz
+set alma_initrd ${alma_repo}/images/pxeboot/initrd.img
+
+:menu
+menu NPD PXE boot menu
+item --gap --           Installers
+item alma9_manual       AlmaLinux 9 installer - manual
+item alma9_basic        AlmaLinux 9 BASIC autoinstall - wipes disk
+item alma9_sm_execute   Supermicro execute VM - manual installer
+item alma9_asus_execute ASUS node - manual installer
+item --gap --           Tools
+item local              Boot from local disk
+item shell              Drop to iPXE shell
+choose --timeout ${menu-timeout} --default local selected || goto local
+goto ${selected}
+
+:alma9_manual
+chain ${server}/profiles/alma9-manual.ipxe || goto menu
+
+:alma9_basic
+chain ${server}/profiles/alma9-basic-autoinstall.ipxe || goto menu
+
+:alma9_sm_execute
+chain ${server}/profiles/alma9-condor-sm-execute.ipxe || goto menu
+
+:alma9_asus_execute
+chain ${server}/profiles/alma9-asus-execute.ipxe || goto menu
+
+:local
+echo Booting from local disk...
+sanboot --no-describe --drive 0x80 || exit
+
+:shell
+echo Type exit to return to the menu.
+shell
+goto menu

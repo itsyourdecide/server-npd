@@ -1,0 +1,43 @@
+               total        used        free      shared  buff/cache   available
+Mem:           503Gi       5.9Gi       499Gi        52Mi       277Mi       497Gi
+Swap:             0B          0B          0B
+MemTotal:       528243924 kB
+MemFree:        524071328 kB
+MemAvailable:   522064292 kB
+Buffers:            2736 kB
+Cached:           227220 kB
+SwapCached:            0 kB
+Active:          1233360 kB
+Inactive:           6424 kB
+Active(anon):    1073868 kB
+Inactive(anon):        0 kB
+Active(file):     159492 kB
+Inactive(file):     6424 kB
+Unevictable:      164204 kB
+Mlocked:          161132 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+Zswap:                 0 kB
+Zswapped:              0 kB
+Dirty:               688 kB
+Writeback:             0 kB
+AnonPages:       1174260 kB
+Mapped:           113800 kB
+Shmem:             53944 kB
+KReclaimable:      53804 kB
+Slab:             353572 kB
+SReclaimable:      53804 kB
+SUnreclaim:       299768 kB
+KernelStack:       10160 kB
+PageTables:        13620 kB
+SecPageTables:      4088 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:    264121960 kB
+Committed_AS:    2536548 kB
+VmallocTotal:   34359738367 kB
+VmallocUsed:     1505408 kB
+VmallocChunk:          0 kB
+Percpu:            55680 kB
+HardwareCorrupted:     0 kB

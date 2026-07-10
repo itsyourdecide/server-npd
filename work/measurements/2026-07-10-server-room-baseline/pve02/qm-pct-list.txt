@@ -1,0 +1,6 @@
+      VMID NAME                 STATUS     MEM(MB)    BOOTDISK(GB) PID       
+       100 fw01                 running    4096              32.00 2065      
+       120 pxe-alma-test        stopped    4096              32.00 0         
+VMID       Status     Lock         Name                
+101        running                 test40              
+110        running                 pxe01               

@@ -1,0 +1,700 @@
+===== 2026-07-10T15:05:16+03:00 =====
+
+    Instantaneous power reading:                   129 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                181 Watts
+    Average power reading over sample period:      127 Watts
+    IPMI timestamp:                           07/10/2026 03:05:15 PM EEST    Sampling period:                          00003704 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 30.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 30.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 56.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:05:28+03:00 =====
+
+    Instantaneous power reading:                   226 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                226 Watts
+    Average power reading over sample period:      128 Watts
+    IPMI timestamp:                           07/10/2026 03:05:27 PM EEST    Sampling period:                          00003716 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 35.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 35.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 56.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3300.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:05:40+03:00 =====
+
+    Instantaneous power reading:                   226 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                226 Watts
+    Average power reading over sample period:      128 Watts
+    IPMI timestamp:                           07/10/2026 03:05:40 PM EEST    Sampling period:                          00003729 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 36.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 36.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 56.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3300.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:05:52+03:00 =====
+
+    Instantaneous power reading:                   226 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                226 Watts
+    Average power reading over sample period:      128 Watts
+    IPMI timestamp:                           07/10/2026 03:05:52 PM EEST    Sampling period:                          00003741 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 37.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 37.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 56.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3300.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:06:04+03:00 =====
+
+    Instantaneous power reading:                   226 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                226 Watts
+    Average power reading over sample period:      129 Watts
+    IPMI timestamp:                           07/10/2026 03:06:04 PM EEST    Sampling period:                          00003753 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 38.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 37.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 57.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3300.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:06:16+03:00 =====
+
+    Instantaneous power reading:                   226 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      129 Watts
+    IPMI timestamp:                           07/10/2026 03:06:16 PM EEST    Sampling period:                          00003765 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 38.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 38.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 57.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3300.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3300.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:06:28+03:00 =====
+
+    Instantaneous power reading:                   226 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      129 Watts
+    IPMI timestamp:                           07/10/2026 03:06:28 PM EEST    Sampling period:                          00003777 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 39.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 39.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 57.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3300.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:06:40+03:00 =====
+
+    Instantaneous power reading:                   226 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      130 Watts
+    IPMI timestamp:                           07/10/2026 03:06:40 PM EEST    Sampling period:                          00003789 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 40.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 39.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 40.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 57.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3300.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:06:52+03:00 =====
+
+    Instantaneous power reading:                   226 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      130 Watts
+    IPMI timestamp:                           07/10/2026 03:06:52 PM EEST    Sampling period:                          00003801 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 40.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 40.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 58.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3300.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:07:05+03:00 =====
+
+    Instantaneous power reading:                   228 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      130 Watts
+    IPMI timestamp:                           07/10/2026 03:07:04 PM EEST    Sampling period:                          00003813 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 40.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 40.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 58.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:07:17+03:00 =====
+
+    Instantaneous power reading:                   226 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      131 Watts
+    IPMI timestamp:                           07/10/2026 03:07:17 PM EEST    Sampling period:                          00003826 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 41.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 40.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 58.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:07:29+03:00 =====
+
+    Instantaneous power reading:                   228 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      131 Watts
+    IPMI timestamp:                           07/10/2026 03:07:29 PM EEST    Sampling period:                          00003838 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 41.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 41.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 58.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:07:41+03:00 =====
+
+    Instantaneous power reading:                   228 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      131 Watts
+    IPMI timestamp:                           07/10/2026 03:07:41 PM EEST    Sampling period:                          00003850 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 41.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 41.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 58.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:07:54+03:00 =====
+
+    Instantaneous power reading:                   228 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      132 Watts
+    IPMI timestamp:                           07/10/2026 03:07:53 PM EEST    Sampling period:                          00003862 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 41.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 41.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 58.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:08:06+03:00 =====
+
+    Instantaneous power reading:                   228 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      132 Watts
+    IPMI timestamp:                           07/10/2026 03:08:05 PM EEST    Sampling period:                          00003874 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 41.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 41.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 58.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:08:18+03:00 =====
+
+    Instantaneous power reading:                   228 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      132 Watts
+    IPMI timestamp:                           07/10/2026 03:08:18 PM EEST    Sampling period:                          00003887 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 41.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 41.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 58.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:08:30+03:00 =====
+
+    Instantaneous power reading:                   228 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      132 Watts
+    IPMI timestamp:                           07/10/2026 03:08:30 PM EEST    Sampling period:                          00003899 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 42.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 41.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 59.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3500.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:08:43+03:00 =====
+
+    Instantaneous power reading:                   228 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      133 Watts
+    IPMI timestamp:                           07/10/2026 03:08:42 PM EEST    Sampling period:                          00003911 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 42.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 41.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 59.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3600.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:08:55+03:00 =====
+
+    Instantaneous power reading:                   228 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      133 Watts
+    IPMI timestamp:                           07/10/2026 03:08:55 PM EEST    Sampling period:                          00003924 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 42.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 42.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 59.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3600.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:09:07+03:00 =====
+
+    Instantaneous power reading:                   228 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      133 Watts
+    IPMI timestamp:                           07/10/2026 03:09:07 PM EEST    Sampling period:                          00003936 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 42.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 41.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 59.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3600.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:09:19+03:00 =====
+
+    Instantaneous power reading:                   228 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      134 Watts
+    IPMI timestamp:                           07/10/2026 03:09:19 PM EEST    Sampling period:                          00003948 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 42.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 42.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 59.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3600.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:09:31+03:00 =====
+
+    Instantaneous power reading:                   228 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      134 Watts
+    IPMI timestamp:                           07/10/2026 03:09:31 PM EEST    Sampling period:                          00003960 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 42.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 42.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 26.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 59.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3600.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:09:43+03:00 =====
+
+    Instantaneous power reading:                   228 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      134 Watts
+    IPMI timestamp:                           07/10/2026 03:09:43 PM EEST    Sampling period:                          00003972 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 42.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 42.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 59.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3600.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:09:56+03:00 =====
+
+    Instantaneous power reading:                   228 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      135 Watts
+    IPMI timestamp:                           07/10/2026 03:09:55 PM EEST    Sampling period:                          00003984 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 42.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 42.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 26.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 59.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3600.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:10:08+03:00 =====
+
+    Instantaneous power reading:                   228 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      135 Watts
+    IPMI timestamp:                           07/10/2026 03:10:07 PM EEST    Sampling period:                          00003996 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 42.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 42.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 59.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3600.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:10:20+03:00 =====
+
+    Instantaneous power reading:                   133 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      135 Watts
+    IPMI timestamp:                           07/10/2026 03:10:19 PM EEST    Sampling period:                          00004008 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 38.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 38.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 59.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3500.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3600.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:10:32+03:00 =====
+
+    Instantaneous power reading:                   130 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      135 Watts
+    IPMI timestamp:                           07/10/2026 03:10:31 PM EEST    Sampling period:                          00004020 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 37.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 37.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 59.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3500.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3600.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        
+===== 2026-07-10T15:10:43+03:00 =====
+
+    Instantaneous power reading:                   127 Watts
+    Minimum during sampling period:                109 Watts
+    Maximum during sampling period:                228 Watts
+    Average power reading over sample period:      135 Watts
+    IPMI timestamp:                           07/10/2026 03:10:43 PM EEST    Sampling period:                          00004032 Seconds.
+    Power reading state is:                   activated
+
+
+CPU1 Temp        | 36.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+CPU2 Temp        | 36.000     | degrees C  | ok    | 0.000     | 0.000     | 0.000     | 85.000    | 90.000    | 90.000    
+System Temp      | 25.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+Peripheral Temp  | 41.000     | degrees C  | ok    | -10.000   | -5.000    | 0.000     | 80.000    | 85.000    | 90.000    
+MB_10G Temp      | 59.000     | degrees C  | ok    | -5.000    | 0.000     | 5.000     | 95.000    | 100.000   | 105.000   
+FAN1             | 3400.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN2             | 3500.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FAN3             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN4             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN5             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FAN6             | na         |            | na    | na        | na        | na        | na        | na        | na        
+FANA             | 3600.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000 
+FANB             | na         |            | na    | na        | na        | na        | na        | na        | na        
+PS1 Status       | 0x1        | discrete   | 0x0100| na        | na        | na        | na        | na        | na        
+PS2 Status       | 0xb        | discrete   | 0x0b00| na        | na        | na        | na        | na        | na        

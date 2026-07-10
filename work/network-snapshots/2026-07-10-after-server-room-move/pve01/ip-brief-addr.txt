@@ -1,0 +1,9 @@
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+nic0             UP             
+nic1             UP             
+vmbr0            UP             192.168.31.50/24 fe80::ae1f:6bff:fe4c:d742/64 
+tailscale0       UNKNOWN        100.110.23.10/32 fd7a:115c:a1e0::ee3b:170b/128 fe80::1f5e:d3a0:c11e:888e/64 
+vmbr2            UP             fe80::ae1f:6bff:fe4c:d743/64 
+vmbr2.10@vmbr2   UP             10.10.10.11/24 fe80::ae1f:6bff:fe4c:d743/64 
+vmbr2.40@vmbr2   UP             10.10.40.3/24 fe80::ae1f:6bff:fe4c:d743/64 
+vmbr2.20@vmbr2   UP             10.10.20.11/24 fe80::ae1f:6bff:fe4c:d743/64 

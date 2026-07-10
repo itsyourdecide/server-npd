@@ -1,0 +1,6 @@
+no such logical volume pve/data
+Name             Type     Status     Total (KiB)      Used (KiB) Available (KiB)        %
+local             dir     active       864029824             128       864029696    0.00%
+local-lvm     lvmthin   inactive               0               0               0    0.00%
+local-zfs     zfspool     active       900049424        36019724       864029700    4.00%
+JobID      Enabled    Target                           LastSync             NextSync   Duration  FailCount State

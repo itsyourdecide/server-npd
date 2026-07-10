@@ -1,0 +1,5 @@
+Name             Type     Status     Total (KiB)      Used (KiB) Available (KiB)        %
+local             dir     active        98497780        14121532        79326700   14.34%
+local-lvm     lvmthin     active       794595328               0       794595328    0.00%
+local-zfs     zfspool     active       902297932        36002224       866295708    3.99%
+JobID      Enabled    Target                           LastSync             NextSync   Duration  FailCount State

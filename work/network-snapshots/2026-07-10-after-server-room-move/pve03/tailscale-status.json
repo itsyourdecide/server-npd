@@ -1,0 +1,277 @@
+{
+  "Version": "1.98.8-t1241b225b-g0520dfda5",
+  "TUN": true,
+  "BackendState": "Running",
+  "HaveNodeKey": true,
+  "AuthURL": "",
+  "TailscaleIPs": [
+    "100.86.225.123",
+    "fd7a:115c:a1e0::7b3b:e17d"
+  ],
+  "Self": {
+    "ID": "nkGvkAGNg711CNTRL",
+    "PublicKey": "nodekey:15480dc2f16f3cc0c38b48ffc73e8a5455ff757b2d561f2f926d86300d90d255",
+    "HostName": "pve03",
+    "DNSName": "pve03.taile43d6d.ts.net.",
+    "OS": "linux",
+    "UserID": 6107539292909506,
+    "TailscaleIPs": [
+      "100.86.225.123",
+      "fd7a:115c:a1e0::7b3b:e17d"
+    ],
+    "AllowedIPs": [
+      "100.86.225.123/32",
+      "fd7a:115c:a1e0::7b3b:e17d/128"
+    ],
+    "Addrs": [
+      "91.202.128.23:48231",
+      "91.202.128.23:41641",
+      "10.10.10.13:41641",
+      "10.10.20.13:41641"
+    ],
+    "CurAddr": "",
+    "Relay": "waw",
+    "PeerRelay": "",
+    "RxBytes": 0,
+    "TxBytes": 0,
+    "Created": "2026-07-07T16:36:20.568482237Z",
+    "LastWrite": "0001-01-01T00:00:00Z",
+    "LastSeen": "0001-01-01T00:00:00Z",
+    "LastHandshake": "0001-01-01T00:00:00Z",
+    "Online": true,
+    "ExitNode": false,
+    "ExitNodeOption": false,
+    "Active": false,
+    "PeerAPIURL": [
+      "http://100.86.225.123:57609",
+      "http://[fd7a:115c:a1e0::7b3b:e17d]:40015"
+    ],
+    "TaildropTarget": 0,
+    "NoFileSharingReason": "",
+    "Capabilities": [
+      "HTTPS://TAILSCALE.COM/s/DEPRECATED-NODE-CAPS#see-https://github.com/tailscale/tailscale/issues/11508",
+      "default-auto-update",
+      "https://tailscale.com/cap/file-sharing",
+      "https://tailscale.com/cap/is-admin",
+      "https://tailscale.com/cap/is-owner",
+      "https://tailscale.com/cap/ssh",
+      "https://tailscale.com/cap/tailnet-lock",
+      "probe-udp-lifetime",
+      "ssh-behavior-v1",
+      "ssh-env-vars",
+      "store-appc-routes",
+      "tailnet-display-name"
+    ],
+    "CapMap": {
+      "default-auto-update": [
+        true
+      ],
+      "https://tailscale.com/cap/file-sharing": null,
+      "https://tailscale.com/cap/is-admin": null,
+      "https://tailscale.com/cap/is-owner": null,
+      "https://tailscale.com/cap/ssh": null,
+      "https://tailscale.com/cap/tailnet-lock": null,
+      "probe-udp-lifetime": null,
+      "ssh-behavior-v1": null,
+      "ssh-env-vars": null,
+      "store-appc-routes": null,
+      "tailnet-display-name": [
+        "itsyourdecide.github"
+      ]
+    },
+    "InNetworkMap": true,
+    "InMagicSock": false,
+    "InEngine": false,
+    "KeyExpiry": "2027-01-06T11:28:18Z"
+  },
+  "Health": [
+    "Some peers are advertising routes but --accept-routes is false"
+  ],
+  "MagicDNSSuffix": "taile43d6d.ts.net",
+  "CurrentTailnet": {
+    "Name": "itsyourdecide.github",
+    "MagicDNSSuffix": "taile43d6d.ts.net",
+    "MagicDNSEnabled": true
+  },
+  "CertDomains": null,
+  "Peer": {
+    "nodekey:2d39a5696a09fef6567dfdeb68838d502966c2a28d7f2bb9782be8766229500f": {
+      "ID": "nwZjmiydoe11CNTRL",
+      "PublicKey": "nodekey:2d39a5696a09fef6567dfdeb68838d502966c2a28d7f2bb9782be8766229500f",
+      "HostName": "DESKTOP-4MD6F5P",
+      "DNSName": "desktop-4md6f5p.taile43d6d.ts.net.",
+      "OS": "windows",
+      "UserID": 6107539292909506,
+      "TailscaleIPs": [
+        "100.105.80.15",
+        "fd7a:115c:a1e0::6201:50a3"
+      ],
+      "AllowedIPs": [
+        "100.105.80.15/32",
+        "fd7a:115c:a1e0::6201:50a3/128"
+      ],
+      "Addrs": null,
+      "CurAddr": "",
+      "Relay": "waw",
+      "PeerRelay": "",
+      "RxBytes": 0,
+      "TxBytes": 0,
+      "Created": "2026-06-27T11:19:10.875497962Z",
+      "LastWrite": "0001-01-01T00:00:00Z",
+      "LastSeen": "0001-01-01T00:00:00Z",
+      "LastHandshake": "0001-01-01T00:00:00Z",
+      "Online": true,
+      "ExitNode": false,
+      "ExitNodeOption": false,
+      "Active": false,
+      "PeerAPIURL": [
+        "http://100.105.80.15:59768",
+        "http://[fd7a:115c:a1e0::6201:50a3]:39971"
+      ],
+      "TaildropTarget": 1,
+      "NoFileSharingReason": "",
+      "InNetworkMap": true,
+      "InMagicSock": true,
+      "InEngine": false,
+      "KeyExpiry": "2026-12-24T11:19:10Z"
+    },
+    "nodekey:3a3ba3f00b9995409dc822f87c84b8b5eca0e4503487bc332128296d7a63b24f": {
+      "ID": "nBLTGUfxTL11CNTRL",
+      "PublicKey": "nodekey:3a3ba3f00b9995409dc822f87c84b8b5eca0e4503487bc332128296d7a63b24f",
+      "HostName": "pve02",
+      "DNSName": "pve02.taile43d6d.ts.net.",
+      "OS": "linux",
+      "UserID": 6107539292909506,
+      "TailscaleIPs": [
+        "100.100.173.60",
+        "fd7a:115c:a1e0::db3b:ad3d"
+      ],
+      "AllowedIPs": [
+        "100.100.173.60/32",
+        "fd7a:115c:a1e0::db3b:ad3d/128"
+      ],
+      "Addrs": null,
+      "CurAddr": "",
+      "Relay": "waw",
+      "PeerRelay": "",
+      "RxBytes": 0,
+      "TxBytes": 0,
+      "Created": "2026-07-07T16:34:50.699047259Z",
+      "LastWrite": "0001-01-01T00:00:00Z",
+      "LastSeen": "0001-01-01T00:00:00Z",
+      "LastHandshake": "0001-01-01T00:00:00Z",
+      "Online": true,
+      "ExitNode": false,
+      "ExitNodeOption": false,
+      "Active": false,
+      "PeerAPIURL": [
+        "http://100.100.173.60:33997",
+        "http://[fd7a:115c:a1e0::db3b:ad3d]:56790"
+      ],
+      "TaildropTarget": 1,
+      "NoFileSharingReason": "",
+      "InNetworkMap": true,
+      "InMagicSock": true,
+      "InEngine": false,
+      "KeyExpiry": "2027-01-06T11:27:32Z"
+    },
+    "nodekey:abf6ccdb77d0f65583e6f3c28e02565f1b796094956456980054f2bf9e1bdd2a": {
+      "ID": "nzb1wvPG4j11CNTRL",
+      "PublicKey": "nodekey:abf6ccdb77d0f65583e6f3c28e02565f1b796094956456980054f2bf9e1bdd2a",
+      "HostName": "tykhon-Victus-by-HP-Gaming-Laptop-15-fa1xxx",
+      "DNSName": "tykhon-victus-by-hp-gaming-laptop-15-fa1xxx.taile43d6d.ts.net.",
+      "OS": "linux",
+      "UserID": 8302433075446675,
+      "TailscaleIPs": [
+        "100.91.221.42",
+        "fd7a:115c:a1e0::9e3b:dd2b"
+      ],
+      "AllowedIPs": [
+        "100.91.221.42/32",
+        "fd7a:115c:a1e0::9e3b:dd2b/128"
+      ],
+      "Addrs": null,
+      "CurAddr": "",
+      "Relay": "waw",
+      "PeerRelay": "",
+      "RxBytes": 0,
+      "TxBytes": 0,
+      "Created": "2026-06-27T11:31:00.903992089Z",
+      "LastWrite": "0001-01-01T00:00:00Z",
+      "LastSeen": "2026-07-10T11:05:47.1Z",
+      "LastHandshake": "0001-01-01T00:00:00Z",
+      "Online": false,
+      "ExitNode": false,
+      "ExitNodeOption": false,
+      "Active": false,
+      "PeerAPIURL": null,
+      "TaildropTarget": 5,
+      "NoFileSharingReason": "",
+      "InNetworkMap": true,
+      "InMagicSock": true,
+      "InEngine": false,
+      "KeyExpiry": "2026-12-24T11:31:00Z"
+    },
+    "nodekey:c1423928c99b5b55fc233e013d4b11fb8244b1f2f3ab7af663c339e8eeae170a": {
+      "ID": "ncex6onqvc11CNTRL",
+      "PublicKey": "nodekey:c1423928c99b5b55fc233e013d4b11fb8244b1f2f3ab7af663c339e8eeae170a",
+      "HostName": "pve01",
+      "DNSName": "pve01.taile43d6d.ts.net.",
+      "OS": "linux",
+      "UserID": 6107539292909506,
+      "TailscaleIPs": [
+        "100.110.23.10",
+        "fd7a:115c:a1e0::ee3b:170b"
+      ],
+      "AllowedIPs": [
+        "100.110.23.10/32",
+        "fd7a:115c:a1e0::ee3b:170b/128",
+        "10.10.10.0/24",
+        "10.10.40.0/24"
+      ],
+      "PrimaryRoutes": [
+        "10.10.10.0/24",
+        "10.10.40.0/24"
+      ],
+      "Addrs": null,
+      "CurAddr": "",
+      "Relay": "waw",
+      "PeerRelay": "",
+      "RxBytes": 0,
+      "TxBytes": 0,
+      "Created": "2026-07-01T11:24:35.491939204Z",
+      "LastWrite": "0001-01-01T00:00:00Z",
+      "LastSeen": "0001-01-01T00:00:00Z",
+      "LastHandshake": "0001-01-01T00:00:00Z",
+      "Online": true,
+      "ExitNode": false,
+      "ExitNodeOption": false,
+      "Active": false,
+      "PeerAPIURL": [
+        "http://100.110.23.10:53936",
+        "http://[fd7a:115c:a1e0::ee3b:170b]:36477"
+      ],
+      "TaildropTarget": 1,
+      "NoFileSharingReason": "",
+      "InNetworkMap": true,
+      "InMagicSock": true,
+      "InEngine": false,
+      "KeyExpiry": "2026-12-28T11:24:35Z"
+    }
+  },
+  "User": {
+    "6107539292909506": {
+      "ID": 6107539292909506,
+      "LoginName": "itsyourdecide@github",
+      "DisplayName": "Ivan",
+      "ProfilePicURL": "https://avatars.githubusercontent.com/u/45913590?v=4"
+    },
+    "8302433075446675": {
+      "ID": 8302433075446675,
+      "LoginName": "kurkintihon@gmail.com",
+      "DisplayName": "Tykhon Kurkin",
+      "ProfilePicURL": "https://lh3.googleusercontent.com/a/ACg8ocI_alj0DHrVaEaLsV35wx1mpXj5wx4vcFJ-JcuXz-d8X-6CnQ=s96-c"
+    }
+  },
+  "ClientVersion": null
+}

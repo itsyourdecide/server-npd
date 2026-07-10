@@ -1,0 +1,15 @@
+#!ipxe
+
+set server http://10.10.80.10
+set alma_repo http://repo.almalinux.org/almalinux/9/BaseOS/x86_64/os
+set alma_stage2 ${server}/alma/9/BaseOS/x86_64/os
+set alma_kernel ${server}/alma/9/BaseOS/x86_64/os/images/pxeboot/vmlinuz
+set alma_initrd ${server}/alma/9/BaseOS/x86_64/os/images/pxeboot/initrd.img
+set ks ${server}/kickstart/alma9-basic.ks
+
+echo Starting unattended AlmaLinux 9 BASIC install
+echo WARNING: this profile wipes the target disk.
+echo Kickstart: ${ks}
+kernel ${alma_kernel} initrd=initrd.img ip=dhcp inst.stage2=${alma_stage2} inst.repo=${alma_repo} inst.ks=${ks} inst.text inst.debug
+initrd ${alma_initrd}
+boot

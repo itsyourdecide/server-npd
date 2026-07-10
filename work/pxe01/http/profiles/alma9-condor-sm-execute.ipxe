@@ -1,0 +1,8 @@
+#!ipxe
+
+echo Starting AlmaLinux 9 installer for Supermicro HTCondor execute VM
+echo Current mode: manual installer, no disk wipe kickstart yet.
+echo Planned role: condor-smXX execute node
+kernel ${alma_kernel} initrd=initrd.img ip=dhcp inst.repo=${alma_repo} inst.text
+initrd ${alma_initrd}
+boot

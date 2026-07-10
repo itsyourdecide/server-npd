@@ -1,0 +1,32 @@
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+nic0             UP             
+nic1             UP             
+vmbr0            UP             192.168.31.50/24 fe80::ae1f:6bff:fe4c:d742/64 
+tailscale0       UNKNOWN        100.110.23.10/32 fd7a:115c:a1e0::ee3b:170b/128 fe80::1f5e:d3a0:c11e:888e/64 
+vmbr2            UP             fe80::ae1f:6bff:fe4c:d743/64 
+vmbr2.10@vmbr2   UP             10.10.10.11/24 fe80::ae1f:6bff:fe4c:d743/64 
+vmbr2.40@vmbr2   UP             10.10.40.3/24 fe80::ae1f:6bff:fe4c:d743/64 
+vmbr2.20@vmbr2   UP             10.10.20.11/24 fe80::ae1f:6bff:fe4c:d743/64 
+default via 192.168.31.1 dev vmbr0 proto kernel onlink 
+10.10.10.0/24 dev vmbr2.10 proto kernel scope link src 10.10.10.11 
+10.10.20.0/24 dev vmbr2.20 proto kernel scope link src 10.10.20.11 
+10.10.30.0/24 via 10.10.10.1 dev vmbr2.10 
+10.10.40.0/24 dev vmbr2.40 proto kernel scope link src 10.10.40.3 
+10.10.80.0/24 via 10.10.10.1 dev vmbr2.10 
+192.168.31.0/24 dev vmbr0 proto kernel scope link src 192.168.31.50 
+port              vlan-id  
+nic0              1 PVID Egress Untagged
+nic1              10 PVID Egress Untagged
+                  20
+                  30
+                  40
+                  50
+                  80
+                  99
+vmbr0             1 PVID Egress Untagged
+vmbr2             1 PVID Egress Untagged
+                  10
+                  20
+                  40
+2: nic0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master vmbr0 state forwarding priority 32 cost 5 
+3: nic1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master vmbr2 state forwarding priority 32 cost 5 

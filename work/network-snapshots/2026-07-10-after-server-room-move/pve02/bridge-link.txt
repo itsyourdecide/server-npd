@@ -1,0 +1,12 @@
+2: nic0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master vmbr0 state forwarding priority 32 cost 5 
+8: tap100i0: <BROADCAST,MULTICAST,PROMISC,UP,LOWER_UP> mtu 1500 master vmbr0 state forwarding priority 32 cost 2 
+9: tap100i2: <BROADCAST,MULTICAST,PROMISC,UP,LOWER_UP> mtu 1500 master vmbr0 state forwarding priority 32 cost 2 
+10: tap100i3: <BROADCAST,MULTICAST,PROMISC,UP,LOWER_UP> mtu 1500 master vmbr0 state forwarding priority 32 cost 2 
+11: tap100i4: <BROADCAST,MULTICAST,PROMISC,UP,LOWER_UP> mtu 1500 master vmbr0 state forwarding priority 32 cost 2 
+12: tap100i5: <BROADCAST,MULTICAST,PROMISC,UP,LOWER_UP> mtu 1500 master vmbr0 state forwarding priority 32 cost 2 
+13: veth101i0@nic0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master vmbr0 state forwarding priority 32 cost 2 
+14: veth110i0@nic0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master fwbr110i0 state forwarding priority 32 cost 2 
+15: tap100i6: <BROADCAST,MULTICAST,PROMISC,UP,LOWER_UP> mtu 1500 master vmbr0 state forwarding priority 32 cost 2 
+17: fwpr110p0@fwln110i0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master vmbr0 state forwarding priority 32 cost 2 
+18: fwln110i0@fwpr110p0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master fwbr110i0 state forwarding priority 32 cost 2 
+19: tap100i7: <BROADCAST,MULTICAST,PROMISC,UP,LOWER_UP> mtu 1500 master vmbr0 state forwarding priority 32 cost 2 

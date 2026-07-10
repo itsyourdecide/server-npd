@@ -1,0 +1,15 @@
+  pool: rpool
+ state: ONLINE
+config:
+
+	NAME                                          STATE     READ WRITE CKSUM
+	rpool                                         ONLINE       0     0     0
+	  ata-Micron_5200_MTFDDAK960TDD_18031DBC5C7C  ONLINE       0     0     0
+
+errors: No known data errors
+NAME    SIZE  ALLOC   FREE  CKPOINT  EXPANDSZ   FRAG    CAP  DEDUP    HEALTH  ALTROOT
+rpool   888G  1.83G   886G        -         -     0%     0%  1.00x    ONLINE  -
+NAME                       USED  AVAIL  REFER  MOUNTPOINT
+rpool                     34.3G   826G    96K  /rpool
+rpool/data                34.3G   826G    96K  /rpool/data
+rpool/data/vm-100-disk-0  34.3G   859G  1.83G  -

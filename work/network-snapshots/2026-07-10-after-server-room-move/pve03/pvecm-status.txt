@@ -1,0 +1,30 @@
+Cluster information
+-------------------
+Name:             npd
+Config Version:   4
+Transport:        knet
+Secure auth:      on
+
+Quorum information
+------------------
+Date:             Fri Jul 10 14:29:59 2026
+Quorum provider:  corosync_votequorum
+Nodes:            3
+Node ID:          0x00000003
+Ring ID:          1.6a
+Quorate:          Yes
+
+Votequorum information
+----------------------
+Expected votes:   3
+Highest expected: 3
+Total votes:      3
+Quorum:           2  
+Flags:            Quorate 
+
+Membership information
+----------------------
+    Nodeid      Votes Name
+0x00000001          1 10.10.20.11
+0x00000002          1 10.10.20.12
+0x00000003          1 10.10.20.13 (local)

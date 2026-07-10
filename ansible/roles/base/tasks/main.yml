@@ -1,0 +1,23 @@
+---
+- name: Install baseline administration packages
+  ansible.builtin.dnf:
+    name:
+      - chrony
+      - curl
+      - dnf-plugins-core
+      - openssh-server
+      - python3
+      - rsync
+      - sudo
+      - vim-minimal
+      - wget
+    state: present
+
+- name: Enable core services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop:
+    - chronyd
+    - sshd
