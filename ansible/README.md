@@ -10,7 +10,8 @@ Initial flow:
 3. Run the base playbook:
 
 ```bash
-ansible-playbook -i inventory/hosts.yml playbooks/base.yml
+cd /root/server-npd/ansible
+ansible-playbook playbooks/base.yml
 ```
 
 Later roles:
@@ -26,6 +27,7 @@ Current checkpoint:
 - Run base checks with:
 
 ```bash
-ansible -i inventory/hosts.yml asus_nodes -m ping
-ansible-playbook -i inventory/hosts.yml playbooks/base.yml
+cd /root/server-npd/ansible
+ansible asus_nodes -m ping
+ansible-playbook playbooks/base.yml --limit asus_nodes
 ```
