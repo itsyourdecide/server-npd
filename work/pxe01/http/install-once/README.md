@@ -24,6 +24,14 @@ Use `/usr/local/sbin/create-install-once.sh` on `pxe01` when possible:
 /usr/local/sbin/create-install-once.sh 20:cf:30:72:52:ae
 ```
 
+For a whole rail or any selector from the CSV inventory:
+
+```sh
+/usr/local/sbin/create-install-once-batch.sh --dry-run r1
+/usr/local/sbin/create-install-once-batch.sh r1
+/usr/local/sbin/create-install-once-batch.sh asus-r1n1 asus-r1n4
+```
+
 That helper starts `install-once-watcher.sh`, which watches only new nginx log
 entries and moves a consumed flag into `install-once/used/` after the first
 successful `GET /install-once/<mac>.ipxe` with HTTP 200.

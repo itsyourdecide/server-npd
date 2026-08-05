@@ -1,7 +1,7 @@
 # HTCondor + PXE architecture plan
 
-Дата: 2026-07-10
-Статус: draft v0.2, PXE для первой ASUS-рельсы проверен и переведен в install-once режим
+Дата: 2026-08-05
+Статус: draft v0.3, первая ASUS-рельса установлена 4/4, следующий шаг — batch PXE следующей рельсы
 
 ## Цель
 
@@ -26,6 +26,7 @@
 - HTTP/TFTP на `pxe01` проверены из VLAN80.
 - `boot.ipxe` содержит MAC-based список известных ASUS. Для них destructive install запускается только если есть файл `/srv/pxe/http/install-once/<mac>.ipxe`; если файла нет, iPXE выходит в BIOS boot order.
 - Для ASUS с legacy BIOS нельзя полагаться на `sanboot --drive 0x80`: на этих нодах он зависал на `Booting from SAN device 0x80`. Используем `exit` из iPXE и правильный BIOS boot order.
+- AlmaLinux packages идут через локальный nginx cache на `pxe01`: `http://10.10.80.10/alma-cache/almalinux/9/...`. Первый запрос к RPM может сходить во внешний интернет, повторные установки берут пакет локально.
 
 ## Согласованная архитектура
 
@@ -107,6 +108,15 @@ rear / ports side
 | `asus-r1n2.internal` | `c8:60:00:31:8c:13` | `10.10.80.102` | `c8:60:00:8b:d5:8b` | `10.10.30.102` | 15 | 42 |
 | `asus-r1n3.internal` | `20:cf:30:7c:98:f2` | `10.10.80.103` | `c8:60:00:ea:3b:9e` | `10.10.30.103` | 16 | 43 |
 | `asus-r1n4.internal` | `c8:60:00:39:1e:fb` | `10.10.80.104` | `c8:60:00:ea:3b:a6` | `10.10.30.104` | 17 | 44 |
+
+Состояние на 2026-08-05:
+
+| Hostname | OS/SSH | firstboot | IPMI ping | Notes |
+| --- | --- | --- | --- | --- |
+| `asus-r1n1.internal` | OK | OK | OK | LAN/PXE fixed, reinstalled successfully |
+| `asus-r1n2.internal` | OK | OK | OK | ready for Ansible |
+| `asus-r1n3.internal` | OK | OK | pending | OS ready, IPMI later |
+| `asus-r1n4.internal` | OK | OK | pending | OS ready, IPMI later |
 
 BIOS boot order для массовой установки с возможностью последующих reinstall:
 
@@ -258,9 +268,27 @@ MAC -> hostname -> static IP -> profile -> disk policy
 - `/srv/pxe/http/scripts/asus-firstboot.sh` — первый boot ОС выставляет hostname, статический OS IP и IPMI IP;
 - `/srv/pxe/http/install-once/<mac>.ipxe` — одноразовый destructive reinstall-флаг;
 - `/usr/local/sbin/create-install-once.sh <mac>` — безопасное создание флага с watcher;
+- `/usr/local/sbin/create-install-once-batch.sh r1` — batch-создание install-once flags по CSV inventory;
 - `/usr/local/sbin/install-once-watcher.sh` — удаляет флаг только после нового HTTP 200 GET.
 
 Важно: install-once watcher должен смотреть только новые строки nginx access log с момента запуска. Старый вариант, который grep-ал весь лог, мог удалить свежий флаг из-за старого `200` события.
+
+Перед следующей рельсой:
+
+1. Добавить строки `asus-r2n1` ... `asus-r2n4` в CSV inventory с LAN MAC, IPMI MAC, OS/IPMI IP и портами.
+2. Добавить MAC в `boot.ipxe` как known ASUS nodes.
+3. Синхронизировать CSV/boot script на `pxe01`.
+4. Проверить dry-run:
+
+```sh
+/usr/local/sbin/create-install-once-batch.sh --dry-run r2
+```
+
+5. Создать flags и включить ноды:
+
+```sh
+/usr/local/sbin/create-install-once-batch.sh r2
+```
 
 ## Первый milestone
 

@@ -1115,3 +1115,25 @@ http://10.10.80.10/alma-cache/almalinux/9/AppStream/x86_64/os
 ```
 
 Это не полный mirror: первый запрос конкретного RPM может скачать его через интернет, но все следующие ноды получают этот RPM локально с `pxe01`.
+
+### 2026-08-05 — ASUS rail 1 — OS install checkpoint 4/4
+
+После исправления физического LAN/PXE для `asus-r1n1` выполнена повторная install-once установка. Firstboot отработал:
+
+```text
+asus-r1n1.internal -> 10.10.80.101 SSH OK, firstboot_done, IPMI 10.10.30.101 ping OK
+asus-r1n2.internal -> 10.10.80.102 SSH OK, firstboot_done, IPMI 10.10.30.102 ping OK
+asus-r1n3.internal -> 10.10.80.103 SSH OK, firstboot_done, IPMI 10.10.30.103 ping pending
+asus-r1n4.internal -> 10.10.80.104 SSH OK, firstboot_done, IPMI 10.10.30.104 ping pending
+```
+
+Итог: первая ASUS-рельса готова как base AlmaLinux fleet для Ansible и будущего HTCondor execute role. IPMI на `r1n3/r1n4` не блокирует следующий этап и отложен.
+
+Добавлен batch-helper на `pxe01`:
+
+```sh
+/usr/local/sbin/create-install-once-batch.sh --dry-run r1
+/usr/local/sbin/create-install-once-batch.sh r1
+```
+
+Он читает CSV inventory, создает install-once files для выбранной рельсы/hostname и запускает watcher один раз. Следующий практический PXE шаг: добавить inventory для `asus-r2n1` ... `asus-r2n4`, добавить их MAC в `boot.ipxe`, затем прогнать batch install на одной новой рельсе.
