@@ -1,7 +1,7 @@
 #!ipxe
 
 set server http://10.10.80.10
-set alma_repo http://repo.almalinux.org/almalinux/9/BaseOS/x86_64/os
+set alma_repo ${server}/alma-cache/almalinux/9/BaseOS/x86_64/os
 set alma_stage2 ${server}/alma/9/BaseOS/x86_64/os
 set alma_kernel ${server}/alma/9/BaseOS/x86_64/os/images/pxeboot/vmlinuz
 set alma_initrd ${server}/alma/9/BaseOS/x86_64/os/images/pxeboot/initrd.img

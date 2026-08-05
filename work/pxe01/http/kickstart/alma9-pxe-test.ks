@@ -19,8 +19,8 @@ firewall --enabled --service=ssh
 selinux --enforcing
 services --enabled=sshd,chronyd,NetworkManager
 
-url --url=http://repo.almalinux.org/almalinux/9/BaseOS/x86_64/os
-repo --name=AppStream --baseurl=http://repo.almalinux.org/almalinux/9/AppStream/x86_64/os
+url --url=http://10.10.80.10/alma-cache/almalinux/9/BaseOS/x86_64/os
+repo --name=AppStream --baseurl=http://10.10.80.10/alma-cache/almalinux/9/AppStream/x86_64/os
 
 zerombr
 clearpart --all --initlabel

@@ -48,3 +48,14 @@ Recommended ASUS BIOS order:
 If a node has already been installed and does not need remote reinstall, SATA
 first is also acceptable. Avoid putting both network devices before the disk:
 after iPXE exits, BIOS will try the second NIC and may show `PXE-E61`.
+
+Package downloads use the local AlmaLinux cache on `pxe01`:
+
+```text
+http://10.10.80.10/alma-cache/almalinux/9/BaseOS/x86_64/os
+http://10.10.80.10/alma-cache/almalinux/9/AppStream/x86_64/os
+```
+
+The cache proxies `repo.almalinux.org` and stores RPMs under
+`/srv/pxe/cache/nginx/alma`. The first install that needs a package may still
+download it from the internet; later installs use the local cached copy.

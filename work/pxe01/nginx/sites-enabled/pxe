@@ -1,0 +1,30 @@
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    server_name _;
+    root /srv/pxe/http;
+    index index.html;
+
+    location /alma-cache/ {
+        proxy_pass http://repo.almalinux.org/;
+        proxy_http_version 1.1;
+        proxy_set_header Host repo.almalinux.org;
+        proxy_set_header Connection "";
+
+        proxy_cache alma_cache;
+        proxy_cache_valid 200 302 30d;
+        proxy_cache_valid 404 10m;
+        proxy_cache_revalidate on;
+        proxy_cache_lock on;
+        proxy_cache_lock_timeout 20m;
+        proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+        proxy_ignore_headers Set-Cookie;
+        add_header X-NPD-Cache $upstream_cache_status always;
+    }
+
+    location / {
+        autoindex on;
+        try_files $uri $uri/ =404;
+    }
+}

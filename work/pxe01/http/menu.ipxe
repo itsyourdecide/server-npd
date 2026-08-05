@@ -2,9 +2,9 @@
 
 set menu-timeout 10000
 set server http://10.10.80.10
-set alma_repo http://repo.almalinux.org/almalinux/9/BaseOS/x86_64/os
-set alma_kernel ${alma_repo}/images/pxeboot/vmlinuz
-set alma_initrd ${alma_repo}/images/pxeboot/initrd.img
+set alma_repo ${server}/alma-cache/almalinux/9/BaseOS/x86_64/os
+set alma_kernel ${server}/alma/9/BaseOS/x86_64/os/images/pxeboot/vmlinuz
+set alma_initrd ${server}/alma/9/BaseOS/x86_64/os/images/pxeboot/initrd.img
 
 :menu
 menu NPD PXE boot menu

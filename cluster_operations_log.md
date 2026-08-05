@@ -1077,3 +1077,41 @@ asus-r1n4  LAN c8:60:00:39:1e:fb  OS 10.10.80.104  IPMI c8:60:00:ea:3b:a6  10.10
 `asus-firstboot.sh` применяет hostname, static OS IP и in-band IPMI IP из `/srv/pxe/http/asus-r1-map.csv`.
 
 Фикс install-once watcher: старый watcher grep-ал весь nginx access log и мог удалить свежий флаг из-за старой записи `200`. Новый watcher стартует с текущего byte offset access log и реагирует только на новые строки.
+
+### 2026-08-05 — pxe01 — добавлен локальный AlmaLinux repo cache для ускорения массового PXE
+
+После возврата к работе проверено состояние первой ASUS-рельсы:
+
+```text
+asus-r1n2 -> 10.10.80.102 SSH OK, firstboot_done
+asus-r1n3 -> 10.10.80.103 SSH OK, firstboot_done
+asus-r1n4 -> 10.10.80.104 SSH OK, firstboot_done
+asus-r1n1 -> переустановка запущена заново после исправления LAN/PXE
+```
+
+На `r1n1` подтвержден свежий PXE install:
+
+```text
+10.10.80.117 GET /install-once/20:cf:30:72:52:ae.ipxe -> 200
+10.10.80.117 GET /profiles/alma9-basic-autoinstall.ipxe -> 200
+10.10.80.117 GET /alma/9/BaseOS/x86_64/os/images/pxeboot/vmlinuz -> 200
+10.10.80.117 GET /alma/9/BaseOS/x86_64/os/images/pxeboot/initrd.img -> 200
+10.10.80.117 GET /alma/9/BaseOS/x86_64/os/images/install.img -> 200
+10.10.80.117 GET /kickstart/alma9-basic.ks -> 200
+```
+
+Проблема скорости: `install.img`/kernel/initrd уже локальные, но RPM-пакеты в kickstart тянулись с `repo.almalinux.org`, из-за чего каждая новая нода могла ждать внешний интернет.
+
+Сделано:
+
+- rootfs `pxe01` увеличен с 16G до 60G;
+- добавлен nginx proxy cache `/alma-cache/` с backend `repo.almalinux.org`;
+- cache storage: `/srv/pxe/cache/nginx/alma`, лимит `40g`;
+- `alma9-basic.ks`, `alma9-pxe-test.ks` и iPXE profiles переключены на:
+
+```text
+http://10.10.80.10/alma-cache/almalinux/9/BaseOS/x86_64/os
+http://10.10.80.10/alma-cache/almalinux/9/AppStream/x86_64/os
+```
+
+Это не полный mirror: первый запрос конкретного RPM может скачать его через интернет, но все следующие ноды получают этот RPM локально с `pxe01`.
