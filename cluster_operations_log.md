@@ -32,6 +32,33 @@
 
 Открыто: добавить HTCondor Ansible roles и проверить первый `condor_status`/test job.
 
+### 2026-08-06 — condor01/asus-r1 — первый рабочий HTCondor pool
+
+Через Ansible добавлены роли:
+- `htcondor_common`
+- `htcondor_manager`
+- `htcondor_submit`
+- `htcondor_execute`
+
+`condor01.internal` настроен как central manager + submit/access point. Из-за stale DNS lease `condor01.internal -> 10.10.80.181` в HTCondor временно используется `CONDOR_HOST = 10.10.80.20`.
+
+ASUS первая рельса настроена как execute-ноды:
+- `asus-r1n1.internal` / `10.10.80.101`
+- `asus-r1n2.internal` / `10.10.80.102`
+- `asus-r1n3.internal` / `10.10.80.103`
+- `asus-r1n4.internal` / `10.10.80.104`
+
+Проверки:
+- `condor_status` на `condor01` видит 4 `Unclaimed Idle` слота.
+- `condor_status -schedd` видит `condor01.internal`.
+- `condor_q` работает и не падает на старый DHCP IP.
+- Повторный Ansible прогон manager/execute: `changed=0`, `failed=0`.
+- Smoke test: 4 jobs в cluster `1`, все завершились; log подтвердил запуск по одной job на каждой ASUS-ноде.
+
+Итог: минимальный HTCondor pool `condor01 + 4 ASUS` работает.
+
+Открыто: DNS override для `condor01.internal`, затем CVMFS/storage/monitoring.
+
 ## День 1 — 2026-07-01
 
 Сводка: `pve01` введён в строй (Proxmox на бывшем `head01`), собрана первая рабочая связка OPNsense-роутер + тестовая VM за NAT. Этапы 1–6 плана `today_plan` (в `archive/`) выполнены, этап 7 (свитч) — частично. `pve02/pve03` не трогались, Ceph/JBOD не подключались.

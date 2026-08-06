@@ -1,0 +1,34 @@
+---
+- name: Check for HTCondor execute marker
+  ansible.builtin.stat:
+    path: /etc/condor/config.d/00-npd-execute
+  register: htcondor_execute_marker
+
+- name: Configure HTCondor execute node
+  ansible.builtin.command:
+    argv:
+      - /usr/local/sbin/get_htcondor
+      - --no-dry-run
+      - --channel
+      - "{{ htcondor_channel }}"
+      - --ep
+      - "{{ htcondor_central_manager }}"
+  environment:
+    GET_HTCONDOR_PASSWORD: "{{ htcondor_pool_password }}"
+  when: not htcondor_execute_marker.stat.exists
+  no_log: true
+
+- name: Write execute policy
+  ansible.builtin.copy:
+    dest: /etc/condor/config.d/00-npd-execute
+    content: |
+      # Managed by Ansible. First-stage policy: always accept jobs.
+      NPD_ROLE_EXECUTE = true
+      START = true
+      SUSPEND = false
+      PREEMPT = false
+      KILL = false
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart condor

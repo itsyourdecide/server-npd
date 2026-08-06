@@ -1,0 +1,45 @@
+---
+- name: Check for HTCondor central manager marker
+  ansible.builtin.stat:
+    path: /etc/condor/config.d/99-npd-central-manager
+  register: htcondor_manager_marker
+
+- name: Check for get_htcondor central manager config
+  ansible.builtin.stat:
+    path: /etc/condor/config.d/01-central-manager.config
+  register: htcondor_manager_get_config
+
+- name: Configure HTCondor central manager
+  ansible.builtin.command:
+    argv:
+      - /usr/local/sbin/get_htcondor
+      - --no-dry-run
+      - --channel
+      - "{{ htcondor_channel }}"
+      - --cm
+      - "{{ htcondor_central_manager }}"
+  environment:
+    GET_HTCONDOR_PASSWORD: "{{ htcondor_pool_password }}"
+  when:
+    - not htcondor_manager_marker.stat.exists
+    - not htcondor_manager_get_config.stat.exists
+  no_log: true
+
+- name: Write central manager marker
+  ansible.builtin.copy:
+    dest: /etc/condor/config.d/99-npd-central-manager
+    content: |
+      # Managed by Ansible. Marker for the NPD central manager role.
+      NPD_ROLE_CENTRAL_MANAGER = true
+      CONDOR_HOST = {{ htcondor_central_manager }}
+      NETWORK_INTERFACE = {{ htcondor_central_manager }}
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart condor
+
+- name: Remove legacy early central manager override
+  ansible.builtin.file:
+    path: /etc/condor/config.d/00-npd-central-manager
+    state: absent
+  notify: Restart condor

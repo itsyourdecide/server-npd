@@ -1,0 +1,8 @@
+---
+- name: Configure HTCondor central manager and submit node
+  hosts: condor_managers:condor_submit_nodes
+  gather_facts: true
+  roles:
+    - htcondor_common
+    - htcondor_manager
+    - htcondor_submit

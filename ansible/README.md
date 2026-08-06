@@ -34,3 +34,18 @@ ansible asus_nodes -m ping
 ansible-playbook playbooks/base.yml --limit asus_nodes
 ansible-playbook playbooks/base.yml --limit condor01.internal
 ```
+
+HTCondor first pool:
+
+```bash
+cd /root/server-npd/ansible
+ansible-playbook playbooks/htcondor_manager.yml
+ansible-playbook playbooks/htcondor_execute.yml --limit asus_nodes
+ansible condor01.internal -m shell -a 'condor_status; condor_q'
+```
+
+Local secret:
+
+- Create `inventory/group_vars/all/vault.yml` locally before HTCondor playbooks.
+- It must define `htcondor_pool_password`.
+- This file is ignored by git.

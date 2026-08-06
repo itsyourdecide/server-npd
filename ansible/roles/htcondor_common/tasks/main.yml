@@ -1,0 +1,28 @@
+---
+- name: Require local HTCondor pool password
+  ansible.builtin.assert:
+    that:
+      - htcondor_pool_password is defined
+      - htcondor_pool_password | length >= 20
+    fail_msg: "Create ansible/group_vars/all/vault.yml with htcondor_pool_password before running HTCondor playbooks."
+  no_log: true
+
+- name: Install prerequisites for get_htcondor
+  ansible.builtin.dnf:
+    name:
+      - ca-certificates
+      - curl
+    state: present
+
+- name: Download get_htcondor installer
+  ansible.builtin.get_url:
+    url: "{{ htcondor_get_script_url }}"
+    dest: /usr/local/sbin/get_htcondor
+    mode: "0755"
+
+- name: Ensure condor service is enabled when installed
+  ansible.builtin.service:
+    name: condor
+    enabled: true
+  failed_when: false
+  changed_when: false

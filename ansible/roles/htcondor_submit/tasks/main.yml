@@ -1,0 +1,20 @@
+---
+- name: Configure local HTCondor submit daemon
+  ansible.builtin.copy:
+    dest: /etc/condor/config.d/99-npd-submit
+    content: |
+      # Managed by Ansible. First-stage submit role on condor01.
+      NPD_ROLE_SUBMIT = true
+      CONDOR_HOST = {{ htcondor_central_manager }}
+      NETWORK_INTERFACE = {{ htcondor_central_manager }}
+      DAEMON_LIST = MASTER COLLECTOR NEGOTIATOR SCHEDD
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart condor
+
+- name: Remove legacy early submit override
+  ansible.builtin.file:
+    path: /etc/condor/config.d/00-npd-submit
+    state: absent
+  notify: Restart condor

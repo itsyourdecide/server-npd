@@ -1,7 +1,7 @@
 # HTCondor + PXE architecture plan
 
 Дата: 2026-08-06
-Статус: draft v0.4, первая ASUS-рельса установлена 4/4, `condor01` VM заведена через PXE install-once
+Статус: draft v0.5, первый HTCondor pool работает: `condor01` + 4 ASUS execute-ноды
 
 ## Цель
 
@@ -224,6 +224,27 @@ Everything role-specific is configured later with Ansible:
 - users and policy.
 
 This lets the first 4-8 ASUS nodes be installed quickly as a base fleet, then iterated on without reinstalling the OS.
+
+## HTCondor milestone 1
+
+Состояние на 2026-08-06:
+
+- `condor01.internal` установлен как central manager + submit/access point.
+- `CONDOR_HOST` временно задан как `10.10.80.20`, потому что DNS `condor01.internal` после PXE/DHCP может указывать на старый временный lease.
+- `asus-r1n1.internal` ... `asus-r1n4.internal` установлены как execute nodes.
+- `condor_status` на `condor01` видит 4 idle execute slots.
+- Smoke test `cluster 1` отправил 4 jobs; job log подтвердил запуск на всех четырех ASUS:
+  - `10.10.80.101` / `asus-r1n1.internal`
+  - `10.10.80.102` / `asus-r1n2.internal`
+  - `10.10.80.103` / `asus-r1n3.internal`
+  - `10.10.80.104` / `asus-r1n4.internal`
+
+Открыто:
+
+- Сделать DNS host override/reservation для `condor01.internal -> 10.10.80.20`, потом можно вернуть `CONDOR_HOST` к имени.
+- Добавить CVMFS/client role.
+- Добавить storage/JBOD mount design.
+- Добавить monitoring и power/thermal benchmarks.
 
 ## PXE profiles to implement
 

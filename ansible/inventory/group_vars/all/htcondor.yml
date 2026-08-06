@@ -1,0 +1,5 @@
+---
+htcondor_central_manager: 10.10.80.20
+htcondor_central_manager_hostname: condor01.internal
+htcondor_get_script_url: https://get.htcondor.org
+htcondor_channel: stable
