@@ -27,7 +27,7 @@ clearpart --all --initlabel
 autopart --type=lvm
 bootloader --location=mbr --append="console=ttyS0,115200n8"
 
-%packages
+%packages --excludedocs --excludeWeakdeps
 @^minimal-environment
 chrony
 curl

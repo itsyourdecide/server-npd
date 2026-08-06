@@ -1,0 +1,12 @@
+[Unit]
+Description=NPD condor01 first boot hostname and static network configuration
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=!/var/lib/npd-condor01-firstboot.done
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/condor01-firstboot.sh
+
+[Install]
+WantedBy=multi-user.target

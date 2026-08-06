@@ -1,0 +1,15 @@
+#!ipxe
+
+set server http://10.10.80.10
+set alma_repo ${server}/alma-cache/almalinux/9/BaseOS/x86_64/os
+set alma_stage2 ${server}/alma/9/BaseOS/x86_64/os
+set alma_kernel ${server}/alma/9/BaseOS/x86_64/os/images/pxeboot/vmlinuz
+set alma_initrd ${server}/alma/9/BaseOS/x86_64/os/images/pxeboot/initrd.img
+set ks ${server}/kickstart/alma9-condor01.ks
+
+echo Starting unattended AlmaLinux 9 install for condor01
+echo WARNING: this profile wipes the target disk.
+echo Kickstart: ${ks}
+kernel ${alma_kernel} initrd=initrd.img ip=dhcp inst.stage2=${alma_stage2} inst.repo=${alma_repo} inst.ks=${ks} inst.text inst.debug
+initrd ${alma_initrd}
+boot

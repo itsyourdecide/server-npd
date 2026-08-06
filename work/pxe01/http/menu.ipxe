@@ -11,6 +11,7 @@ menu NPD PXE boot menu
 item --gap --           Installers
 item alma9_manual       AlmaLinux 9 installer - manual
 item alma9_basic        AlmaLinux 9 BASIC autoinstall - wipes disk
+item alma9_condor01     AlmaLinux 9 condor01 autoinstall - wipes disk
 item alma9_sm_execute   Supermicro execute VM - manual installer
 item alma9_asus_execute ASUS node - manual installer
 item --gap --           Tools
@@ -24,6 +25,9 @@ chain ${server}/profiles/alma9-manual.ipxe || goto menu
 
 :alma9_basic
 chain ${server}/profiles/alma9-basic-autoinstall.ipxe || goto menu
+
+:alma9_condor01
+chain ${server}/profiles/alma9-condor01-autoinstall.ipxe || goto menu
 
 :alma9_sm_execute
 chain ${server}/profiles/alma9-condor-sm-execute.ipxe || goto menu

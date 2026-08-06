@@ -1,7 +1,7 @@
 # HTCondor + PXE architecture plan
 
-Дата: 2026-08-05
-Статус: draft v0.3, первая ASUS-рельса установлена 4/4, следующий шаг — batch PXE следующей рельсы
+Дата: 2026-08-06
+Статус: draft v0.4, первая ASUS-рельса установлена 4/4, `condor01` VM заведена через PXE install-once
 
 ## Цель
 
@@ -255,6 +255,19 @@ This lets the first 4-8 ASUS nodes be installed quickly as a base fleet, then it
 - iPXE shell.
 
 `condor01` создается отдельно как обычная VM на `pve02`, а не как обязательный PXE-профиль. Это снижает риск случайной переустановки управляющей VM через PXE.
+
+Текущий `condor01`:
+
+| Field | Value |
+| --- | --- |
+| Proxmox node | `pve02` |
+| VMID | `130` |
+| MAC | `bc:24:11:cd:01:30` |
+| VLAN | `80` |
+| OS IP | `10.10.80.20` |
+| Disk | `local-zfs`, 64G |
+| vCPU/RAM | 4 vCPU / 8G RAM |
+| PXE profile | `alma9-condor01-autoinstall.ipxe` |
 
 После первого успешного цикла можно перейти к MAC-based inventory:
 

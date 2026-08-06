@@ -7,9 +7,12 @@ server {
     index index.html;
 
     location /alma-cache/ {
-        proxy_pass http://repo.almalinux.org/;
+        resolver 10.10.80.1 valid=300s ipv6=off;
+        set $alma_mirror repo.almalinux.org;
+        rewrite ^/alma-cache/(.*)$ /$1 break;
+        proxy_pass http://$alma_mirror;
         proxy_http_version 1.1;
-        proxy_set_header Host repo.almalinux.org;
+        proxy_set_header Host $alma_mirror;
         proxy_set_header Connection "";
 
         proxy_cache alma_cache;

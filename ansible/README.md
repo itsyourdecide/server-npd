@@ -24,10 +24,13 @@ Current checkpoint:
 
 - `asus-r1n1.internal` through `asus-r1n4.internal` are installed with the
   base AlmaLinux PXE profile and reachable over SSH.
+- `condor01.internal` is planned as the first HTCondor central manager and
+  submit node on `pve02`, IP `10.10.80.20`.
 - Run base checks with:
 
 ```bash
 cd /root/server-npd/ansible
 ansible asus_nodes -m ping
 ansible-playbook playbooks/base.yml --limit asus_nodes
+ansible-playbook playbooks/base.yml --limit condor01.internal
 ```

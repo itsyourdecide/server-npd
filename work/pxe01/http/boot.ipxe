@@ -8,10 +8,17 @@ isset ${net0/mac} && iseq ${net0/mac} 20:cf:30:72:52:ae && goto asus_known ||
 isset ${net0/mac} && iseq ${net0/mac} c8:60:00:31:8c:13 && goto asus_known ||
 isset ${net0/mac} && iseq ${net0/mac} 20:cf:30:7c:98:f2 && goto asus_known ||
 isset ${net0/mac} && iseq ${net0/mac} c8:60:00:39:1e:fb && goto asus_known ||
+isset ${net0/mac} && iseq ${net0/mac} bc:24:11:cd:01:30 && goto managed_known ||
 chain ${server}/menu.ipxe || shell
 
 :asus_known
 echo Known ASUS node ${mac}
+goto install_once
+
+:managed_known
+echo Known managed node ${mac}
+
+:install_once
 echo Trying install-once flag first, then local disk.
 chain ${server}/install-once/${mac}.ipxe || goto local
 

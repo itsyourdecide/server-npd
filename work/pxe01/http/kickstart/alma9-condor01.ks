@@ -1,6 +1,6 @@
-# AlmaLinux 9 basic unattended install.
-# This profile wipes all attached disks. It intentionally installs only a
-# small SSH-manageable base; node roles are applied later with Ansible.
+# AlmaLinux 9 unattended install for condor01.
+# This profile wipes the target disk and installs only the base OS. HTCondor
+# roles are applied later with Ansible.
 
 text
 skipx
@@ -11,7 +11,7 @@ lang en_US.UTF-8
 keyboard us
 timezone Europe/Kyiv --utc
 
-network --bootproto=dhcp --device=link --activate
+network --bootproto=dhcp --device=link --activate --hostname=condor01.internal
 
 rootpw --lock
 user --name=npdadmin --groups=wheel --shell=/bin/bash
@@ -29,13 +29,13 @@ autopart --type=lvm
 bootloader --location=mbr
 
 %packages --excludedocs --excludeWeakdeps
-@core
+@^minimal-environment
 chrony
 curl
 dnf-plugins-core
 openssh-server
-ipmitool
 python3
+rsync
 sudo
 vim-minimal
 wget
@@ -61,10 +61,10 @@ chmod 440 /etc/sudoers.d/90-npdadmin
 mkdir -p /scratch
 chmod 1777 /scratch
 
-curl -fsS http://10.10.80.10/scripts/asus-firstboot.sh -o /usr/local/sbin/asus-firstboot.sh
-curl -fsS http://10.10.80.10/scripts/npd-asus-firstboot.service -o /etc/systemd/system/npd-asus-firstboot.service
-chmod 755 /usr/local/sbin/asus-firstboot.sh
-systemctl enable npd-asus-firstboot.service
+curl -fsS http://10.10.80.10/scripts/condor01-firstboot.sh -o /usr/local/sbin/condor01-firstboot.sh
+curl -fsS http://10.10.80.10/scripts/npd-condor01-firstboot.service -o /etc/systemd/system/npd-condor01-firstboot.service
+chmod 755 /usr/local/sbin/condor01-firstboot.sh
+systemctl enable npd-condor01-firstboot.service
 
 systemctl enable sshd chronyd NetworkManager
 %end

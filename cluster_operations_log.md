@@ -10,6 +10,28 @@
 
 ---
 
+## День 38 — 2026-08-06
+
+### 2026-08-06 — pve02/pxe01 — создан PXE-профиль и VM `condor01`
+
+Создан отдельный AlmaLinux 9 PXE/Kickstart профиль для управляющей HTCondor VM `condor01`, чтобы не использовать ASUS firstboot/IPMI-логику на серверной VM.
+- VM: `condor01`, VMID `130`, host `pve02`.
+- Network: `vmbr0`, VLAN80, MAC `bc:24:11:cd:01:30`.
+- Target IP после firstboot: `10.10.80.20/24`, gw/DNS `10.10.80.1`, hostname `condor01.internal`.
+- Resources: 4 vCPU, 8G RAM, `local-zfs` disk 64G.
+- PXE files:
+  - `/srv/pxe/http/profiles/alma9-condor01-autoinstall.ipxe`
+  - `/srv/pxe/http/kickstart/alma9-condor01.ks`
+  - `/srv/pxe/http/scripts/condor01-firstboot.sh`
+  - `/srv/pxe/http/scripts/npd-condor01-firstboot.service`
+- `boot.ipxe` knows MAC `bc:24:11:cd:01:30` and checks install-once before local disk.
+- install-once flag was consumed manually after the first HTTP 200 to avoid reinstall loops.
+- `pxe01` nginx was found failed after reboot because startup-time DNS could not resolve `repo.almalinux.org`; repo config updated to use runtime resolver for `/alma-cache/`.
+
+Итог: `condor01` PXE install completed; host отвечает на `10.10.80.20`, hostname `condor01.internal`, firstboot marker `/var/lib/npd-condor01-firstboot.done` есть. Boot order переключен на `scsi0;net0`, install-once файл перенесен в `used/`, чтобы не было reinstall loop. Ansible `base` применен к `condor01.internal`: `ok=3`, `changed=0`, `failed=0`. Nginx runtime-resolver fix применен live на `pxe01`, `nginx -t` OK, `/alma-cache/.../repomd.xml` отвечает `200`.
+
+Открыто: добавить HTCondor Ansible roles и проверить первый `condor_status`/test job.
+
 ## День 1 — 2026-07-01
 
 Сводка: `pve01` введён в строй (Proxmox на бывшем `head01`), собрана первая рабочая связка OPNsense-роутер + тестовая VM за NAT. Этапы 1–6 плана `today_plan` (в `archive/`) выполнены, этап 7 (свитч) — частично. `pve02/pve03` не трогались, Ceph/JBOD не подключались.
