@@ -152,6 +152,25 @@ CVMFS_HTTP_PROXY="http://10.10.80.11:3128|DIRECT"
 
 Итог: CVMFS теперь ходит через локальный Squid proxy с direct fallback.
 
+### 2026-08-07 — pve01/JBOD — preflight перед созданием `/data`
+
+Пользователь подтвердил, что данные на JBOD можно полностью стереть, и разрешил создание storage layer. Перед destructive действиями выполнен preflight на `pve01`.
+
+Проверки:
+- `lsblk` показывает только два системных Micron SSD:
+  - `sda` `Micron_5200_MTFDDAK960TDD` `18031DBC5C7D` — Proxmox/LVM.
+  - `sdb` `Micron_5200_MTFDDAK960TDD` `18031DBC5C7C` — `rpool`.
+- Ожидаемые 24 JBOD-диска `TOSHIBA MG04ACA600E` сейчас не видны.
+- `lspci` видит оба LSI/Broadcom SAS HBA:
+  - `SAS3216`
+  - `SAS3224`
+- `mpt3sas` загружен, SCSI rescan выполнен, но новых дисков/expander/enclosure не появилось.
+- `zpool status` показывает только `rpool`; `zpool import` показывает старый/importable `zroot` на `zd0`, не JBOD.
+
+Итог: destructive storage step остановлен. Нельзя создавать ZFS pool, пока `pve01` не видит 24 JBOD-диска.
+
+Открыто: физически проверить питание JBOD, SAS cable, правильный внешний HBA/порт, индикацию link/activity на полке и HBA.
+
 ## День 1 — 2026-07-01
 
 Сводка: `pve01` введён в строй (Proxmox на бывшем `head01`), собрана первая рабочая связка OPNsense-роутер + тестовая VM за NAT. Этапы 1–6 плана `today_plan` (в `archive/`) выполнены, этап 7 (свитч) — частично. `pve02/pve03` не трогались, Ceph/JBOD не подключались.
