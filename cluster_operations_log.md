@@ -74,6 +74,27 @@ ASUS первая рельса настроена как execute-ноды:
 
 Итог: `condor_status` снова видит 4 ASUS slots, `condor_status -schedd` видит `condor01`, повторный Ansible прогон manager/execute: `changed=0`, `failed=0`.
 
+### 2026-08-07 — pve01 — добавлен cluster health-check
+
+Добавлен `scripts/cluster-health.sh` — единая быстрая проверка текущего минимального стека. Скрипт запускается с `pve01` из корня репозитория:
+
+```bash
+./scripts/cluster-health.sh
+```
+
+Проверяет:
+- Proxmox cluster quorum.
+- `fw01`, `condor01`, `pxe01` running.
+- `pxe01` nginx + `tftpd-hpa`.
+- HTTP PXE endpoint `/boot.ipxe`.
+- DNS `condor01.internal -> 10.10.80.20`.
+- Ansible reachability до `condor01` и ASUS.
+- HTCondor service/queue на `condor01`.
+- `condor_status` видит 4 ASUS execute slots.
+- HTCondor smoke job завершается с `Normal termination (return value 0)`.
+
+Итог: первый прогон после фиксов: `11 checks, 0 failed`.
+
 ## День 1 — 2026-07-01
 
 Сводка: `pve01` введён в строй (Proxmox на бывшем `head01`), собрана первая рабочая связка OPNsense-роутер + тестовая VM за NAT. Этапы 1–6 плана `today_plan` (в `archive/`) выполнены, этап 7 (свитч) — частично. `pve02/pve03` не трогались, Ceph/JBOD не подключались.

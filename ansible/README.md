@@ -44,6 +44,13 @@ ansible-playbook playbooks/htcondor_execute.yml --limit asus_nodes
 ansible condor01.internal -m shell -a 'condor_status; condor_q'
 ```
 
+Cluster health check:
+
+```bash
+cd /root/server-npd
+./scripts/cluster-health.sh
+```
+
 Local secret:
 
 - Create `inventory/group_vars/all/vault.yml` locally before HTCondor playbooks.
