@@ -40,7 +40,7 @@
 - `htcondor_submit`
 - `htcondor_execute`
 
-`condor01.internal` настроен как central manager + submit/access point. Из-за stale DNS lease `condor01.internal -> 10.10.80.181` в HTCondor временно используется `CONDOR_HOST = 10.10.80.20`.
+`condor01.internal` настроен как central manager + submit/access point. После DNS override в OPNsense `condor01.internal` резолвится в `10.10.80.20`, поэтому `CONDOR_HOST` возвращен к имени. `NETWORK_INTERFACE` оставлен явным IP, потому что HTCondor ожидает интерфейс/IP, а не hostname.
 
 ASUS первая рельса настроена как execute-ноды:
 - `asus-r1n1.internal` / `10.10.80.101`
@@ -57,7 +57,22 @@ ASUS первая рельса настроена как execute-ноды:
 
 Итог: минимальный HTCondor pool `condor01 + 4 ASUS` работает.
 
-Открыто: DNS override для `condor01.internal`, затем CVMFS/storage/monitoring.
+Открыто: CVMFS/storage/monitoring.
+
+### 2026-08-07 — fw01/HTCondor — DNS override для `condor01`
+
+В OPNsense добавлен host override `condor01.internal -> 10.10.80.20`. Проверено:
+- `dig @10.10.10.1 condor01.internal A` → `10.10.80.20`.
+- `dig @10.10.80.1 condor01.internal A` → `10.10.80.20`.
+- ASUS-ноды резолвят `condor01.internal` в `10.10.80.20`.
+
+После перевода HTCondor с временного IP на имя обнаружено, что `NETWORK_INTERFACE = condor01.internal` невалиден: HTCondor не может определить IP по hostname для этой настройки. Исправлено:
+- `CONDOR_HOST = condor01.internal`.
+- `NETWORK_INTERFACE = 10.10.80.20` на `condor01`.
+- `NETWORK_INTERFACE = ansible_host` на ASUS execute-нодах.
+- Execute override перенесен в `99-npd-execute`, старый `00-npd-execute` удаляется Ansible.
+
+Итог: `condor_status` снова видит 4 ASUS slots, `condor_status -schedd` видит `condor01`, повторный Ansible прогон manager/execute: `changed=0`, `failed=0`.
 
 ## День 1 — 2026-07-01
 

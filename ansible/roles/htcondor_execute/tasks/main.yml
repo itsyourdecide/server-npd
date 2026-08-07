@@ -1,8 +1,13 @@
 ---
 - name: Check for HTCondor execute marker
   ansible.builtin.stat:
-    path: /etc/condor/config.d/00-npd-execute
+    path: /etc/condor/config.d/99-npd-execute
   register: htcondor_execute_marker
+
+- name: Check for get_htcondor execute config
+  ansible.builtin.stat:
+    path: /etc/condor/config.d/01-execute.config
+  register: htcondor_execute_get_config
 
 - name: Configure HTCondor execute node
   ansible.builtin.command:
@@ -15,15 +20,19 @@
       - "{{ htcondor_central_manager }}"
   environment:
     GET_HTCONDOR_PASSWORD: "{{ htcondor_pool_password }}"
-  when: not htcondor_execute_marker.stat.exists
+  when:
+    - not htcondor_execute_marker.stat.exists
+    - not htcondor_execute_get_config.stat.exists
   no_log: true
 
 - name: Write execute policy
   ansible.builtin.copy:
-    dest: /etc/condor/config.d/00-npd-execute
+    dest: /etc/condor/config.d/99-npd-execute
     content: |
       # Managed by Ansible. First-stage policy: always accept jobs.
       NPD_ROLE_EXECUTE = true
+      CONDOR_HOST = {{ htcondor_central_manager }}
+      NETWORK_INTERFACE = {{ ansible_host }}
       START = true
       SUSPEND = false
       PREEMPT = false
@@ -31,4 +40,10 @@
     owner: root
     group: root
     mode: "0644"
+  notify: Restart condor
+
+- name: Remove legacy early execute override
+  ansible.builtin.file:
+    path: /etc/condor/config.d/00-npd-execute
+    state: absent
   notify: Restart condor

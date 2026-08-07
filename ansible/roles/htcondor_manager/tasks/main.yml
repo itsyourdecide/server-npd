@@ -32,7 +32,7 @@
       # Managed by Ansible. Marker for the NPD central manager role.
       NPD_ROLE_CENTRAL_MANAGER = true
       CONDOR_HOST = {{ htcondor_central_manager }}
-      NETWORK_INTERFACE = {{ htcondor_central_manager }}
+      NETWORK_INTERFACE = {{ htcondor_central_manager_ip }}
     owner: root
     group: root
     mode: "0644"

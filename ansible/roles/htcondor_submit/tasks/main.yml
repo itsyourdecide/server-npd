@@ -6,7 +6,7 @@
       # Managed by Ansible. First-stage submit role on condor01.
       NPD_ROLE_SUBMIT = true
       CONDOR_HOST = {{ htcondor_central_manager }}
-      NETWORK_INTERFACE = {{ htcondor_central_manager }}
+      NETWORK_INTERFACE = {{ htcondor_central_manager_ip }}
       DAEMON_LIST = MASTER COLLECTOR NEGOTIATOR SCHEDD
     owner: root
     group: root

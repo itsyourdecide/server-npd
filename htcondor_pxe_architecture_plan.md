@@ -230,7 +230,8 @@ This lets the first 4-8 ASUS nodes be installed quickly as a base fleet, then it
 Состояние на 2026-08-06:
 
 - `condor01.internal` установлен как central manager + submit/access point.
-- `CONDOR_HOST` временно задан как `10.10.80.20`, потому что DNS `condor01.internal` после PXE/DHCP может указывать на старый временный lease.
+- `CONDOR_HOST` задан как `condor01.internal`; DNS override в OPNsense указывает `condor01.internal -> 10.10.80.20`.
+- `NETWORK_INTERFACE` задается явно: `10.10.80.20` на `condor01`, `ansible_host` на execute-нодах, чтобы HTCondor не рекламировал `127.0.0.1`.
 - `asus-r1n1.internal` ... `asus-r1n4.internal` установлены как execute nodes.
 - `condor_status` на `condor01` видит 4 idle execute slots.
 - Smoke test `cluster 1` отправил 4 jobs; job log подтвердил запуск на всех четырех ASUS:
@@ -241,7 +242,6 @@ This lets the first 4-8 ASUS nodes be installed quickly as a base fleet, then it
 
 Открыто:
 
-- Сделать DNS host override/reservation для `condor01.internal -> 10.10.80.20`, потом можно вернуть `CONDOR_HOST` к имени.
 - Добавить CVMFS/client role.
 - Добавить storage/JBOD mount design.
 - Добавить monitoring и power/thermal benchmarks.
