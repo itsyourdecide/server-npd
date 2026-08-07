@@ -44,6 +44,14 @@ ansible-playbook playbooks/htcondor_execute.yml --limit asus_nodes
 ansible condor01.internal -m shell -a 'condor_status; condor_q'
 ```
 
+CVMFS client:
+
+```bash
+cd /root/server-npd/ansible
+ansible-playbook playbooks/cvmfs_client.yml --limit 'condor01.internal:asus_nodes'
+ansible condor01.internal:asus_nodes -m shell -a 'cvmfs_config probe sft.cern.ch'
+```
+
 Cluster health check:
 
 ```bash

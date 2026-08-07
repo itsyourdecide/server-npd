@@ -1,0 +1,56 @@
+---
+- name: Install CVMFS release repository
+  ansible.builtin.dnf:
+    name: "{{ cvmfs_release_rpm_url }}"
+    disable_gpg_check: true
+    state: present
+
+- name: Install CVMFS client packages
+  ansible.builtin.dnf:
+    name:
+      - autofs
+      - cvmfs
+      - cvmfs-config-default
+    state: present
+
+- name: Configure CVMFS defaults
+  ansible.builtin.copy:
+    dest: /etc/cvmfs/default.local
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # Managed by Ansible.
+      CVMFS_REPOSITORIES="{{ cvmfs_repos | join(',') }}"
+      CVMFS_HTTP_PROXY="{{ cvmfs_http_proxy }}"
+      CVMFS_QUOTA_LIMIT="{{ cvmfs_quota_limit_mb }}"
+      CVMFS_CACHE_BASE="{{ cvmfs_cache_base }}"
+  notify: Restart autofs
+
+- name: Run CVMFS setup
+  ansible.builtin.command:
+    cmd: cvmfs_config setup
+    creates: /etc/auto.master.d/cvmfs.autofs
+
+- name: Enable and start autofs
+  ansible.builtin.service:
+    name: autofs
+    enabled: true
+    state: started
+
+- name: Ensure CVMFS mount point exists
+  ansible.builtin.file:
+    path: /cvmfs
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Probe configured CVMFS repositories
+  ansible.builtin.command:
+    argv:
+      - cvmfs_config
+      - probe
+      - "{{ item }}"
+  loop: "{{ cvmfs_repos }}"
+  changed_when: false

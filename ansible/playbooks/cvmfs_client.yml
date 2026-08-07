@@ -1,0 +1,6 @@
+---
+- name: Configure CVMFS clients
+  hosts: condor_managers:condor_submit_nodes:asus_nodes:supermicro_execute_vms
+  gather_facts: true
+  roles:
+    - cvmfs_client

@@ -242,7 +242,7 @@ This lets the first 4-8 ASUS nodes be installed quickly as a base fleet, then it
 
 Открыто:
 
-- Добавить CVMFS/client role.
+- CVMFS/client role добавлена; `sft.cern.ch` и `unpacked.cern.ch` проходят probe на `condor01` и первой ASUS-рельсе.
 - Добавить storage/JBOD mount design.
 - Добавить monitoring и power/thermal benchmarks.
 

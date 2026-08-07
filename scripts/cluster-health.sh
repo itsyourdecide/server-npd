@@ -116,6 +116,11 @@ test ! -s health."$cluster".0.err
 ' >/dev/null
 }
 
+check_cvmfs_probe() {
+  cd "$ANSIBLE_DIR" || return 1
+  ansible condor01.internal:asus_nodes -m shell -a 'cvmfs_config probe sft.cern.ch >/dev/null && cvmfs_config probe unpacked.cern.ch >/dev/null' >/dev/null
+}
+
 printf 'NPD cluster health check\n'
 printf 'Date: %s\n\n' "$(date -Is)"
 
@@ -130,6 +135,7 @@ run_check 'Ansible can reach condor01 and ASUS nodes' check_ansible_ping
 run_check 'HTCondor service and queue are healthy on condor01' check_condor_services
 run_check "HTCondor sees $EXPECTED_ASUS_SLOTS ASUS execute slots" check_condor_slots
 run_check 'HTCondor smoke job completes' check_condor_smoke_job
+run_check 'CVMFS probes sft.cern.ch and unpacked.cern.ch' check_cvmfs_probe
 
 printf '\nSummary: %s checks, %s failed\n' "$checks" "$failed"
 

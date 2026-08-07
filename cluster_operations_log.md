@@ -95,6 +95,31 @@ ASUS первая рельса настроена как execute-ноды:
 
 Итог: первый прогон после фиксов: `11 checks, 0 failed`.
 
+### 2026-08-07 — condor01/asus-r1 — CVMFS client
+
+Добавлена Ansible role `cvmfs_client` и playbook `ansible/playbooks/cvmfs_client.yml`.
+
+Настройки:
+- Repositories: `sft.cern.ch`, `unpacked.cern.ch`.
+- Proxy: `DIRECT`.
+- Cache base: `/var/lib/cvmfs`.
+- Quota: `8000` MB.
+
+Применено на:
+- `condor01.internal`
+- `asus-r1n1.internal`
+- `asus-r1n2.internal`
+- `asus-r1n3.internal`
+- `asus-r1n4.internal`
+
+Проверки:
+- `cvmfs_config probe sft.cern.ch` OK на всех 5 узлах.
+- `cvmfs_config probe unpacked.cern.ch` OK на всех 5 узлах.
+- Повторный Ansible прогон: `changed=0`, `failed=0`.
+- HTCondor smoke test cluster `7`: 4 jobs ушли на все ASUS-ноды и на каждой успешно прочитали `/cvmfs/sft.cern.ch` и `/cvmfs/unpacked.cern.ch`, return value `0`.
+
+Итог: CVMFS слой готов для первого HEP/software smoke test.
+
 ## День 1 — 2026-07-01
 
 Сводка: `pve01` введён в строй (Proxmox на бывшем `head01`), собрана первая рабочая связка OPNsense-роутер + тестовая VM за NAT. Этапы 1–6 плана `today_plan` (в `archive/`) выполнены, этап 7 (свитч) — частично. `pve02/pve03` не трогались, Ceph/JBOD не подключались.
