@@ -1,0 +1,43 @@
+auto lo
+iface lo inet loopback
+
+iface nic0 inet manual
+
+auto vmbr0
+iface vmbr0 inet static
+	address 192.168.31.50/24
+	gateway 192.168.31.1
+	bridge-ports nic0
+	bridge-stp off
+	bridge-fd 0
+
+auto nic1
+iface nic1 inet manual
+	bridge-pvid 10
+
+auto vmbr2
+iface vmbr2 inet manual
+	bridge-ports nic1
+	bridge-stp off
+	bridge-fd 0
+	bridge-vlan-aware yes
+	bridge-vids 10,20,30,40,50,80,99
+
+source /etc/network/interfaces.d/*
+
+auto vmbr2.10
+iface vmbr2.10 inet static
+        address 10.10.10.11/24
+        up ip route replace 10.10.30.0/24 via 10.10.10.1 dev vmbr2.10
+
+auto vmbr2.40
+iface vmbr2.40 inet static
+        address 10.10.40.3/24
+
+auto vmbr2.20
+iface vmbr2.20 inet static
+        address 10.10.20.11/24
+
+auto vmbr2.80
+iface vmbr2.80 inet static
+        address 10.10.80.2/24

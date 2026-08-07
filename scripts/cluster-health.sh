@@ -132,6 +132,30 @@ check_cvmfs_probe() {
   ansible condor01.internal:asus_nodes -m shell -a 'cvmfs_config probe sft.cern.ch >/dev/null && cvmfs_config probe unpacked.cern.ch >/dev/null' >/dev/null
 }
 
+check_storage_pool() {
+  zpool status npddata | grep -q 'state: ONLINE'
+}
+
+check_storage_export() {
+  exportfs -v | grep -q '/data.*10.10.80.0/24'
+}
+
+check_storage_clients() {
+  cd "$ANSIBLE_DIR" || return 1
+  ansible condor01.internal:asus_nodes -m shell -a 'findmnt -rn /data | grep -q "10.10.80.2:/data"' >/dev/null
+}
+
+check_storage_write() {
+  cd "$ANSIBLE_DIR" || return 1
+  ansible condor01.internal -m shell -a '
+set -euo pipefail
+testfile=/data/scratch/npd-health-$(hostname)-$(date +%s)
+echo ok > "$testfile"
+grep -qx ok "$testfile"
+rm -f "$testfile"
+' >/dev/null
+}
+
 printf 'NPD cluster health check\n'
 printf 'Date: %s\n\n' "$(date -Is)"
 
@@ -150,6 +174,10 @@ run_check 'HTCondor service and queue are healthy on condor01' check_condor_serv
 run_check "HTCondor sees $EXPECTED_ASUS_SLOTS ASUS execute slots" check_condor_slots
 run_check 'HTCondor smoke job completes' check_condor_smoke_job
 run_check 'CVMFS probes sft.cern.ch and unpacked.cern.ch' check_cvmfs_probe
+run_check 'JBOD ZFS pool npddata is online' check_storage_pool
+run_check 'pve01 exports /data over NFS to VLAN80' check_storage_export
+run_check 'Condor and ASUS nodes have /data mounted' check_storage_clients
+run_check 'Shared /data/scratch is writable from condor01' check_storage_write
 
 printf '\nSummary: %s checks, %s failed\n' "$checks" "$failed"
 

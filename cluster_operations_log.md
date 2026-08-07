@@ -171,6 +171,51 @@ CVMFS_HTTP_PROXY="http://10.10.80.11:3128|DIRECT"
 
 Открыто: физически проверить питание JBOD, SAS cable, правильный внешний HBA/порт, индикацию link/activity на полке и HBA.
 
+### 2026-08-07 — pve01/JBOD — создан общий ZFS/NFS storage `/data`
+
+После включения JBOD `pve01` увидел 24 диска `TOSHIBA MG04ACA600E` по 5.5T
+(`sdc`-`sdz`). Перед созданием пула:
+- `blkid /dev/sd[c-z]` не показал существующих файловых сигнатур.
+- SMART health у всех 24 JBOD-дисков: `PASSED`.
+- Системные Micron SSD `sda`/`sdb` не использовались.
+
+Создан ZFS pool:
+- Name: `npddata`.
+- Layout: `2 x raidz2`, по 12 дисков в каждом vdev.
+- Properties: `ashift=12`, `compression=lz4`, `atime=off`,
+  `xattr=sa`, `acltype=posixacl`, `mountpoint=/data`.
+- Доступно после создания: примерно `99.6T`.
+
+Созданы datasets:
+- `/data/projects` — persistent project data, `2775`, owner/group `1000:1000`.
+- `/data/results` — persistent job outputs, sticky writable для HTCondor jobs.
+- `/data/scratch` — temporary shared job data, sticky writable.
+
+Сеть:
+- На `pve01` добавлен `vmbr2.80` с адресом `10.10.80.2/24`.
+- Старый маршрут `10.10.80.0/24 via 10.10.10.1` с `vmbr2.10` удален из
+  `/etc/network/interfaces`, потому что VLAN80 теперь directly connected.
+- Бэкап перед правкой: `/etc/network/interfaces.bak.20260807-190342`.
+
+NFS:
+- Установлен и включен `nfs-kernel-server`.
+- Export: `/data 10.10.80.0/24(rw,sync,no_subtree_check,root_squash,crossmnt)`.
+- `crossmnt` нужен, потому что `/data/projects`, `/data/results` и
+  `/data/scratch` являются отдельными ZFS datasets под родителем `/data`.
+
+Ansible:
+- Добавлен playbook `ansible/playbooks/storage_client.yml`.
+- Добавлена role `ansible/roles/storage_client`.
+- Применено к `condor01.internal` и `asus-r1n1.internal`-`asus-r1n4.internal`.
+
+Проверки:
+- Все клиенты монтируют `10.10.80.2:/data` как `nfs4`.
+- Все клиенты пишут в `/data/scratch`.
+- HTCondor smoke job ушел на `asus-r1n3.internal` и успешно записал результат
+  в `/data/results` на JBOD.
+
+Итог: первый общий storage layer для HTCondor работает end-to-end.
+
 ## День 1 — 2026-07-01
 
 Сводка: `pve01` введён в строй (Proxmox на бывшем `head01`), собрана первая рабочая связка OPNsense-роутер + тестовая VM за NAT. Этапы 1–6 плана `today_plan` (в `archive/`) выполнены, этап 7 (свитч) — частично. `pve02/pve03` не трогались, Ceph/JBOD не подключались.

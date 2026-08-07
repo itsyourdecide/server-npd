@@ -1,0 +1,1 @@
+/data 10.10.80.0/24(rw,sync,no_subtree_check,root_squash,crossmnt)

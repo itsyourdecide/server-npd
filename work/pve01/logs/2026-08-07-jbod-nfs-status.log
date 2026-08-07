@@ -1,0 +1,41 @@
+2026-08-07T19:13:10+03:00
+  pool: npddata
+ state: ONLINE
+config:
+
+	NAME                                      STATE     READ WRITE CKSUM
+	npddata                                   ONLINE       0     0     0
+	  raidz2-0                                ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P1KWN9FTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_75N6K0YTFTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P2KRT0FTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P2KRTAFTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P1KWN8FTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P1KWNAFTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P1KWNMFTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P2KRSYFTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P2KRT1FTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P2KRTBFTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_68CXK83BFTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P2KRTCFTMB  ONLINE       0     0     0
+	  raidz2-1                                ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_68B7Y0M7FTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P2KRT6FTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_68B8Y0BVFTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P2KRT5FTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P2KRT7FTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P2KRT3FTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P2KRT8FTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P2KRT9FTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P2KRT4FTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P2KRT2FTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P2KRSZFTMB  ONLINE       0     0     0
+	    ata-TOSHIBA_MG04ACA600E_78P1KWNNFTMB  ONLINE       0     0     0
+
+errors: No known data errors
+NAME               USED  AVAIL  REFER  MOUNTPOINT
+npddata           2.42M  99.6T   256K  /data
+npddata/projects   219K  99.6T   219K  /data/projects
+npddata/results    274K  99.6T   274K  /data/results
+npddata/scratch    219K  99.6T   219K  /data/scratch
+/data         	10.10.80.0/24(sync,wdelay,hide,crossmnt,no_subtree_check,sec=sys,rw,secure,root_squash,no_all_squash)

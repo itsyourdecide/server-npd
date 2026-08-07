@@ -1,0 +1,21 @@
+---
+- name: Install NFS client package
+  ansible.builtin.dnf:
+    name: nfs-utils
+    state: present
+
+- name: Create shared storage mountpoint
+  ansible.builtin.file:
+    path: /data
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Mount shared JBOD storage
+  ansible.posix.mount:
+    path: /data
+    src: 10.10.80.2:/data
+    fstype: nfs4
+    opts: rw,_netdev,nofail,hard,timeo=600,retrans=2
+    state: mounted

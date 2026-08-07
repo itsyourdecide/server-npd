@@ -58,6 +58,23 @@ CVMFS uses the local Squid proxy first, with direct fallback:
 CVMFS_HTTP_PROXY="http://10.10.80.11:3128|DIRECT"
 ```
 
+Shared JBOD storage:
+
+- pve01 exports the JBOD ZFS pool as NFS at `10.10.80.2:/data`.
+- Pool name: `npddata`.
+- Datasets: `/data/projects` for persistent project data, `/data/results`
+  for job outputs, and `/data/scratch` for temporary shared job data.
+- `/data/results` and `/data/scratch` are sticky-writable so HTCondor runtime
+  users can write files there.
+
+Mount it on Condor and execute nodes:
+
+```bash
+cd /root/server-npd/ansible
+ansible-playbook playbooks/storage_client.yml --limit 'condor01.internal:asus_nodes'
+ansible condor01.internal:asus_nodes -m shell -a 'findmnt /data && touch /data/scratch/ansible-write-test && rm -f /data/scratch/ansible-write-test'
+```
+
 Cluster health check:
 
 ```bash
