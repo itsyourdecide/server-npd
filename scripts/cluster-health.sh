@@ -5,6 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ANSIBLE_DIR="$ROOT_DIR/ansible"
 PVE02="10.10.20.12"
 PXE_CTID="110"
+SQUID_CTID="111"
 FW_VMID="100"
 CONDOR_VMID="130"
 EXPECTED_ASUS_SLOTS="4"
@@ -51,6 +52,16 @@ check_pxe_services() {
 
 check_pxe_http() {
   curl -fsSI --connect-timeout 5 "http://10.10.80.10/boot.ipxe" >/dev/null
+}
+
+check_squid_service() {
+  ssh -o BatchMode=yes -o ConnectTimeout=5 "root@$PVE02" \
+    "pct exec $SQUID_CTID -- systemctl is-active --quiet squid"
+}
+
+check_squid_cvmfs_proxy() {
+  cd "$ANSIBLE_DIR" || return 1
+  ansible condor01.internal -m shell -a 'curl -fsSI --connect-timeout 5 -x http://10.10.80.11:3128 http://cvmfs-stratum-one.cern.ch/cvmfs/sft.cern.ch/.cvmfspublished >/dev/null' >/dev/null
 }
 
 check_dns() {
@@ -128,8 +139,11 @@ run_check 'Proxmox cluster is quorate' check_proxmox_quorum
 run_check 'fw01 VM is running' check_cluster_vm fw01
 run_check 'condor01 VM is running' check_cluster_vm condor01
 run_check 'pxe01 LXC is running' check_cluster_vm pxe01
+run_check 'squid01 LXC is running' check_cluster_vm squid01
 run_check 'pxe01 nginx and tftpd-hpa are active' check_pxe_services
 run_check 'PXE HTTP boot.ipxe is reachable' check_pxe_http
+run_check 'squid01 squid service is active' check_squid_service
+run_check 'squid01 proxies CVMFS HTTP traffic' check_squid_cvmfs_proxy
 run_check 'condor01.internal resolves to 10.10.80.20' check_dns
 run_check 'Ansible can reach condor01 and ASUS nodes' check_ansible_ping
 run_check 'HTCondor service and queue are healthy on condor01' check_condor_services

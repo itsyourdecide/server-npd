@@ -2,7 +2,7 @@
 cvmfs_repos:
   - sft.cern.ch
   - unpacked.cern.ch
-cvmfs_http_proxy: DIRECT
+cvmfs_http_proxy: http://10.10.80.11:3128|DIRECT
 cvmfs_quota_limit_mb: 8000
 cvmfs_cache_base: /var/lib/cvmfs
 cvmfs_release_rpm_url: https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm

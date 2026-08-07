@@ -35,6 +35,7 @@
 | Hostname | IP | Где живет | Роль |
 | --- | --- | --- | --- |
 | `pxe01.internal` | `10.10.80.10` | LXC на `pve02` | TFTP/HTTP для PXE/iPXE |
+| `squid01.internal` | `10.10.80.11` | LXC на `pve02` | Squid HTTP cache/proxy для CVMFS |
 | `condor01.internal` | `10.10.80.20` | VM на `pve02` | HTCondor central manager + submit |
 | `bastion01.internal` | `10.10.80.21` | VM, стартово можно на `pve02` | SSH-вход пользователей, сначала также submit/frontend |
 
@@ -243,6 +244,7 @@ This lets the first 4-8 ASUS nodes be installed quickly as a base fleet, then it
 Открыто:
 
 - CVMFS/client role добавлена; `sft.cern.ch` и `unpacked.cern.ch` проходят probe на `condor01` и первой ASUS-рельсе.
+- CVMFS использует локальный Squid-first proxy `http://10.10.80.11:3128|DIRECT`.
 - Добавить storage/JBOD mount design.
 - Добавить monitoring и power/thermal benchmarks.
 

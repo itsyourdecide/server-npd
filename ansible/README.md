@@ -52,6 +52,12 @@ ansible-playbook playbooks/cvmfs_client.yml --limit 'condor01.internal:asus_node
 ansible condor01.internal:asus_nodes -m shell -a 'cvmfs_config probe sft.cern.ch'
 ```
 
+CVMFS uses the local Squid proxy first, with direct fallback:
+
+```text
+CVMFS_HTTP_PROXY="http://10.10.80.11:3128|DIRECT"
+```
+
 Cluster health check:
 
 ```bash

@@ -120,6 +120,38 @@ ASUS первая рельса настроена как execute-ноды:
 
 Итог: CVMFS слой готов для первого HEP/software smoke test.
 
+### 2026-08-07 — pve02/squid01 — Squid proxy/cache для CVMFS
+
+Создан отдельный LXC `squid01` для локального HTTP proxy/cache CVMFS.
+
+Параметры:
+- Host: `pve02`.
+- CTID: `111`.
+- IP: `10.10.80.11/24`, gateway `10.10.80.1`.
+- VLAN: `80`.
+- OS: Debian 12 LXC.
+- Resources: 1 vCPU, 1G RAM, 64G rootfs.
+- Service: Squid, port `3128`.
+- ACL: разрешен `10.10.80.0/24`; management/VLAN10 не имеет доступа к proxy.
+- Cache: `/var/spool/squid`, `40960` MB, `maximum_object_size 1024 MB`.
+- Config snapshot: `work/squid01/squid.conf`.
+
+Исправление: CVMFS использует HTTP endpoints не только на 80, но и на `8000`, поэтому `Safe_ports` включает `80`, `443`, `8000`.
+
+CVMFS clients переключены на:
+
+```text
+CVMFS_HTTP_PROXY="http://10.10.80.11:3128|DIRECT"
+```
+
+Проверки:
+- `squid` active.
+- `curl -x http://10.10.80.11:3128 .../.cvmfspublished` с `condor01` → `200 OK`.
+- CVMFS probes на `condor01` и ASUS проходят.
+- `scripts/cluster-health.sh`: `15 checks, 0 failed`.
+
+Итог: CVMFS теперь ходит через локальный Squid proxy с direct fallback.
+
 ## День 1 — 2026-07-01
 
 Сводка: `pve01` введён в строй (Proxmox на бывшем `head01`), собрана первая рабочая связка OPNsense-роутер + тестовая VM за NAT. Этапы 1–6 плана `today_plan` (в `archive/`) выполнены, этап 7 (свитч) — частично. `pve02/pve03` не трогались, Ceph/JBOD не подключались.
