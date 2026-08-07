@@ -75,6 +75,16 @@ ansible-playbook playbooks/storage_client.yml --limit 'condor01.internal:asus_no
 ansible condor01.internal:asus_nodes -m shell -a 'findmnt /data && touch /data/scratch/ansible-write-test && rm -f /data/scratch/ansible-write-test'
 ```
 
+Run an end-to-end storage smoke test through HTCondor:
+
+```bash
+cd /root/server-npd
+./scripts/storage-smoke.sh
+```
+
+The optional first argument is the number of jobs, for example
+`./scripts/storage-smoke.sh 8`.
+
 Cluster health check:
 
 ```bash

@@ -216,6 +216,25 @@ Ansible:
 
 Итог: первый общий storage layer для HTCondor работает end-to-end.
 
+### 2026-08-07 — condor01/asus-r1/JBOD — добавлен storage smoke test
+
+Добавлен `scripts/storage-smoke.sh` — быстрый end-to-end тест общего storage:
+- submit идет через `condor01.internal`;
+- jobs выполняются на HTCondor execute-нодах;
+- каждая job пишет результат в `/data/results/npd-storage-smoke` на JBOD.
+
+Проверки:
+- `./scripts/storage-smoke.sh 1` — OK, результат записан с
+  `asus-r1n3.internal`.
+- `./scripts/storage-smoke.sh 4` — OK, результаты записаны с
+  `asus-r1n1.internal`, `asus-r1n2.internal`, `asus-r1n3.internal`,
+  `asus-r1n4.internal`.
+- `./scripts/cluster-health.sh` теперь включает этот тест и показывает
+  `20 checks, 0 failed`.
+
+Итог: общий storage проверяется не только mount/write-командой, но и настоящей
+HTCondor job.
+
 ## День 1 — 2026-07-01
 
 Сводка: `pve01` введён в строй (Proxmox на бывшем `head01`), собрана первая рабочая связка OPNsense-роутер + тестовая VM за NAT. Этапы 1–6 плана `today_plan` (в `archive/`) выполнены, этап 7 (свитч) — частично. `pve02/pve03` не трогались, Ceph/JBOD не подключались.

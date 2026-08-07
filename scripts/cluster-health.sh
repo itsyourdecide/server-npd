@@ -156,6 +156,10 @@ rm -f "$testfile"
 ' >/dev/null
 }
 
+check_condor_storage_job() {
+  "$ROOT_DIR/scripts/storage-smoke.sh" 1 >/dev/null
+}
+
 printf 'NPD cluster health check\n'
 printf 'Date: %s\n\n' "$(date -Is)"
 
@@ -178,6 +182,7 @@ run_check 'JBOD ZFS pool npddata is online' check_storage_pool
 run_check 'pve01 exports /data over NFS to VLAN80' check_storage_export
 run_check 'Condor and ASUS nodes have /data mounted' check_storage_clients
 run_check 'Shared /data/scratch is writable from condor01' check_storage_write
+run_check 'HTCondor job writes to shared /data/results' check_condor_storage_job
 
 printf '\nSummary: %s checks, %s failed\n' "$checks" "$failed"
 

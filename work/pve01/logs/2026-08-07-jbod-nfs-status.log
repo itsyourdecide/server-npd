@@ -1,4 +1,4 @@
-2026-08-07T19:13:10+03:00
+2026-08-07T19:20:09+03:00
   pool: npddata
  state: ONLINE
 config:
@@ -34,8 +34,13 @@ config:
 
 errors: No known data errors
 NAME               USED  AVAIL  REFER  MOUNTPOINT
-npddata           2.42M  99.6T   256K  /data
+npddata           2.48M  99.6T   256K  /data
 npddata/projects   219K  99.6T   219K  /data/projects
-npddata/results    274K  99.6T   274K  /data/results
+npddata/results    366K  99.6T   366K  /data/results
 npddata/scratch    219K  99.6T   219K  /data/scratch
 /data         	10.10.80.0/24(sync,wdelay,hide,crossmnt,no_subtree_check,sec=sys,rw,secure,root_squash,no_all_squash)
+1777 root:root /data/scratch
+2775 1000:1000 /data/projects
+3777 1000:1000 /data/results
+3777 nobody:1000 /data/results/npd-storage-smoke
+755 root:root /data
