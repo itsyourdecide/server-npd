@@ -1,0 +1,22 @@
+2026-08-07T19:33:57+03:00
+1777 root:root /data/scratch
+1777 root:root /data/scratch/condor
+1777 root:root /data/scratch/users
+2775 1000:1000 /data/projects
+2775 1000:1000 /data/projects/npd
+3777 1000:1000 /data/results
+3777 1000:1000 /data/results/npd
+3777 1000:1000 /data/results/npd-storage-smoke
+755 root:root /data
+● npd-scratch-clean.timer - Daily cleanup for NPD shared scratch storage
+     Loaded: loaded (/etc/systemd/system/npd-scratch-clean.timer; enabled; preset: enabled)
+     Active: active (waiting) since Fri 2026-08-07 19:33:43 EEST; 14s ago
+ Invocation: 5e28271f55794495ab12f78fdc45ce1f
+    Trigger: Sat 2026-08-08 00:06:08 EEST; 4h 32min left
+   Triggers: ● npd-scratch-clean.service
+
+Aug 07 19:33:43 pve01 systemd[1]: Started npd-scratch-clean.timer - Daily cleanup for NPD shared scratch storage.
+NEXT                             LEFT LAST PASSED UNIT                    ACTIVATES
+Sat 2026-08-08 00:06:08 EEST 4h 32min -         - npd-scratch-clean.timer npd-scratch-clean.service
+
+1 timers listed.

@@ -1,0 +1,8 @@
+[Unit]
+Description=Clean old files from NPD shared scratch storage
+
+[Service]
+Type=oneshot
+Environment=SCRATCH_DIR=/data/scratch
+Environment=RETENTION_DAYS=14
+ExecStart=/usr/local/sbin/npd-clean-scratch run

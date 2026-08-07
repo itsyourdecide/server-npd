@@ -156,6 +156,15 @@ rm -f "$testfile"
 ' >/dev/null
 }
 
+check_storage_policy() {
+  test -d /data/projects/npd &&
+    test -d /data/results/npd &&
+    test -d /data/scratch/condor &&
+    test -d /data/scratch/users &&
+    systemctl is-enabled --quiet npd-scratch-clean.timer &&
+    systemctl is-active --quiet npd-scratch-clean.timer
+}
+
 check_condor_storage_job() {
   "$ROOT_DIR/scripts/storage-smoke.sh" 1 >/dev/null
 }
@@ -182,6 +191,7 @@ run_check 'JBOD ZFS pool npddata is online' check_storage_pool
 run_check 'pve01 exports /data over NFS to VLAN80' check_storage_export
 run_check 'Condor and ASUS nodes have /data mounted' check_storage_clients
 run_check 'Shared /data/scratch is writable from condor01' check_storage_write
+run_check 'Shared storage policy and scratch cleanup timer are active' check_storage_policy
 run_check 'HTCondor job writes to shared /data/results' check_condor_storage_job
 
 printf '\nSummary: %s checks, %s failed\n' "$checks" "$failed"

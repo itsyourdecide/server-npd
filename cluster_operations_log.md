@@ -235,6 +235,40 @@ Ansible:
 Итог: общий storage проверяется не только mount/write-командой, но и настоящей
 HTCondor job.
 
+### 2026-08-07 — pve01/JBOD — закреплена политика `/data`
+
+Закреплена структура общего storage:
+- `/data/projects/npd` — persistent datasets/configs/project inputs.
+- `/data/results/npd` — persistent job outputs.
+- `/data/scratch/condor` — temporary HTCondor job data.
+- `/data/scratch/users` — temporary manual/user work.
+
+Права:
+- `/data/projects` и `/data/projects/npd`: `2775`, owner/group `1000:1000`.
+- `/data/results`, `/data/results/npd`,
+  `/data/results/npd-storage-smoke`: sticky-writable.
+- `/data/scratch`, `/data/scratch/condor`, `/data/scratch/users`:
+  sticky-writable.
+
+Добавлены скрипты:
+- `scripts/apply-storage-policy.sh` — применяет директории/права/ZFS properties.
+- `scripts/clean-scratch.sh` — чистит только `/data/scratch`.
+
+На `pve01` установлен systemd timer:
+- `npd-scratch-clean.timer` — daily, `Persistent=true`,
+  `RandomizedDelaySec=30m`.
+- `npd-scratch-clean.service` запускает `/usr/local/sbin/npd-clean-scratch`.
+- Retention: `14` дней.
+
+Снимки live-конфигов:
+- `work/pve01/configs/2026-08-07-npd-scratch-clean.service`.
+- `work/pve01/configs/2026-08-07-npd-scratch-clean.timer`.
+- `work/pve01/logs/2026-08-07-storage-policy.log`.
+
+Итог: `/data` получил понятные зоны ответственности; автоочистка касается
+только scratch и не трогает projects/results. `cluster-health.sh` расширен до
+`21 checks, 0 failed`.
+
 ## День 1 — 2026-07-01
 
 Сводка: `pve01` введён в строй (Proxmox на бывшем `head01`), собрана первая рабочая связка OPNsense-роутер + тестовая VM за NAT. Этапы 1–6 плана `today_plan` (в `archive/`) выполнены, этап 7 (свитч) — частично. `pve02/pve03` не трогались, Ceph/JBOD не подключались.

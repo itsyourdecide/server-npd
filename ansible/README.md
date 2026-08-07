@@ -64,8 +64,12 @@ Shared JBOD storage:
 - Pool name: `npddata`.
 - Datasets: `/data/projects` for persistent project data, `/data/results`
   for job outputs, and `/data/scratch` for temporary shared job data.
+- Project namespace: `/data/projects/npd`, `/data/results/npd`.
+- Scratch namespace: `/data/scratch/condor`, `/data/scratch/users`.
 - `/data/results` and `/data/scratch` are sticky-writable so HTCondor runtime
   users can write files there.
+- Scratch cleanup: files and empty directories under `/data/scratch` older
+  than 14 days are removed by the `npd-scratch-clean.timer` on `pve01`.
 
 Mount it on Condor and execute nodes:
 
