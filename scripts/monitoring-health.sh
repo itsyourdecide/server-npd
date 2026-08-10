@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PROMETHEUS_URL="${PROMETHEUS_URL:-http://10.10.10.30:9090}"
-EXPECTED_TARGETS="${EXPECTED_TARGETS:-10}"
+EXPECTED_TARGETS="${EXPECTED_TARGETS:-11}"
 
 payload="$(curl -fsS "$PROMETHEUS_URL/api/v1/targets")"
 

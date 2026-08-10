@@ -1,0 +1,8 @@
+[sshd]
+enabled = true
+backend = systemd
+port = ssh
+filter = sshd
+maxretry = 4
+findtime = 10m
+bantime = 1h

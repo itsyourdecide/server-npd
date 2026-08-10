@@ -303,6 +303,45 @@ Prometheus config:
 Итог: минимальная наблюдаемость CPU/RAM/disk/network по Proxmox, monitor01,
 condor01 и первой ASUS-рельсе работает.
 
+### 2026-08-10 — pve02/bastion01 — создан SSH bastion phase 1
+
+Создан LXC `bastion01`:
+- Host: `pve02`.
+- CTID: `102`.
+- IP: `10.10.50.10/24`, gateway/DNS `10.10.50.1`.
+- VLAN: `50` DMZ.
+- OS: Debian 12 LXC.
+- Resources: 1 vCPU, 1G RAM, 16G rootfs.
+- Services: `ssh`, `fail2ban`, `prometheus-node-exporter`.
+
+SSH hardening:
+- `PermitRootLogin no`.
+- `PasswordAuthentication no`.
+- `KbdInteractiveAuthentication no`.
+- `PubkeyAuthentication yes`.
+- `AllowAgentForwarding no`.
+- `AllowTcpForwarding yes` для будущего `ProxyJump`.
+- `X11Forwarding no`.
+- `fail2ban` jail `sshd` включен через `backend = systemd`.
+
+Monitoring:
+- `bastion01` добавлен в Prometheus target list как role `bastion`.
+- `scripts/monitoring-health.sh` теперь ожидает `11` targets.
+
+Снимки live-конфигов:
+- `work/bastion01/configs/2026-08-10-pct-config`.
+- `work/bastion01/configs/2026-08-10-sshd-npd-bastion.conf`.
+- `work/bastion01/configs/2026-08-10-fail2ban-sshd.local`.
+- `work/bastion01/logs/2026-08-10-bastion-health.log`.
+- `work/monitor01/configs/2026-08-10-prometheus-with-bastion.yml`.
+
+Важно: WAN/NAT/port-forward для bastion **не создан**. Bastion пока поднят и
+защищен внутри DMZ, но не опубликован наружу до отдельного решения по способу
+публичного входа и списку SSH-ключей пользователей.
+
+Итог: пользовательский SSH entrypoint подготовлен. `cluster-health.sh` расширен
+до `27 checks, 0 failed`.
+
 ## День 1 — 2026-07-01
 
 Сводка: `pve01` введён в строй (Proxmox на бывшем `head01`), собрана первая рабочая связка OPNsense-роутер + тестовая VM за NAT. Этапы 1–6 плана `today_plan` (в `archive/`) выполнены, этап 7 (свитч) — частично. `pve02/pve03` не трогались, Ceph/JBOD не подключались.

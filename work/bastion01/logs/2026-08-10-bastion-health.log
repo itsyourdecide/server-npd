@@ -1,0 +1,74 @@
+2026-08-10T18:48:19+03:00
+● ssh.service - OpenBSD Secure Shell server
+     Loaded: loaded (/lib/systemd/system/ssh.service; enabled; preset: enabled)
+     Active: active (running) since Mon 2026-08-10 15:44:15 UTC; 4min 4s ago
+TriggeredBy: ○ ssh.socket
+       Docs: man:sshd(8)
+             man:sshd_config(5)
+    Process: 7267 ExecStartPre=/usr/sbin/sshd -t (code=exited, status=0/SUCCESS)
+   Main PID: 7268 (sshd)
+      Tasks: 1 (limit: 578718)
+     Memory: 1.4M
+        CPU: 21ms
+     CGroup: /system.slice/ssh.service
+             └─7268 "sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups"
+
+Aug 10 15:44:15 bastion01 systemd[1]: Starting ssh.service - OpenBSD Secure Shell server...
+Aug 10 15:44:15 bastion01 sshd[7268]: Server listening on 0.0.0.0 port 22.
+Aug 10 15:44:15 bastion01 sshd[7268]: Server listening on :: port 22.
+Aug 10 15:44:15 bastion01 systemd[1]: Started ssh.service - OpenBSD Secure Shell server.
+
+● fail2ban.service - Fail2Ban Service
+     Loaded: loaded (/lib/systemd/system/fail2ban.service; enabled; preset: enabled)
+     Active: active (running) since Mon 2026-08-10 15:44:45 UTC; 3min 34s ago
+       Docs: man:fail2ban(1)
+   Main PID: 7290 (fail2ban-server)
+      Tasks: 5 (limit: 578718)
+     Memory: 13.5M
+        CPU: 224ms
+     CGroup: /system.slice/fail2ban.service
+             └─7290 /usr/bin/python3 /usr/bin/fail2ban-server -xf start
+
+Aug 10 15:44:45 bastion01 systemd[1]: Started fail2ban.service - Fail2Ban Service.
+Aug 10 15:44:45 bastion01 fail2ban-server[7290]: 2026-08-10 15:44:45,649 fail2ban.configreader   [7290]: WARNING 'allowipv6' not defined in 'Definition'. Using default one: 'auto'
+Aug 10 15:44:45 bastion01 fail2ban-server[7290]: Server ready
+
+● prometheus-node-exporter.service - Prometheus exporter for machine metrics
+     Loaded: loaded (/lib/systemd/system/prometheus-node-exporter.service; enabled; preset: enabled)
+     Active: active (running) since Mon 2026-08-10 15:43:58 UTC; 4min 21s ago
+       Docs: https://github.com/prometheus/node_exporter
+   Main PID: 1657 (prometheus-node)
+      Tasks: 6 (limit: 578718)
+     Memory: 15.5M
+        CPU: 960ms
+     CGroup: /system.slice/prometheus-node-exporter.service
+             └─1657 /usr/bin/prometheus-node-exporter
+
+Aug 10 15:45:03 bastion01 prometheus-node-exporter[1657]: ts=2026-08-10T15:45:03.176Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 127.0.0.1:9100" msg="->127.0.0.1:35926: write: broken pipe"
+Aug 10 15:45:03 bastion01 prometheus-node-exporter[1657]: ts=2026-08-10T15:45:03.177Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 127.0.0.1:9100" msg="->127.0.0.1:35926: write: broken pipe"
+Aug 10 15:45:03 bastion01 prometheus-node-exporter[1657]: ts=2026-08-10T15:45:03.177Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 127.0.0.1:9100" msg="->127.0.0.1:35926: write: broken pipe"
+Aug 10 15:45:03 bastion01 prometheus-node-exporter[1657]: ts=2026-08-10T15:45:03.177Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 127.0.0.1:9100" msg="->127.0.0.1:35926: write: broken pipe"
+Aug 10 15:45:03 bastion01 prometheus-node-exporter[1657]: ts=2026-08-10T15:45:03.177Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 127.0.0.1:9100" msg="->127.0.0.1:35926: write: broken pipe"
+Aug 10 15:45:03 bastion01 prometheus-node-exporter[1657]: ts=2026-08-10T15:45:03.177Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 127.0.0.1:9100" msg="->127.0.0.1:35926: write: broken pipe"
+Aug 10 15:45:03 bastion01 prometheus-node-exporter[1657]: ts=2026-08-10T15:45:03.177Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 127.0.0.1:9100" msg="->127.0.0.1:35926: write: broken pipe"
+Aug 10 15:45:03 bastion01 prometheus-node-exporter[1657]: ts=2026-08-10T15:45:03.177Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 127.0.0.1:9100" msg="->127.0.0.1:35926: write: broken pipe"
+Aug 10 15:45:03 bastion01 prometheus-node-exporter[1657]: ts=2026-08-10T15:45:03.177Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 127.0.0.1:9100" msg="->127.0.0.1:35926: write: broken pipe"
+Aug 10 15:45:03 bastion01 prometheus-node-exporter[1657]: ts=2026-08-10T15:45:03.177Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 127.0.0.1:9100" msg="->127.0.0.1:35926: write: broken pipe"
+
+permitrootlogin no
+pubkeyauthentication yes
+passwordauthentication no
+kbdinteractiveauthentication no
+x11forwarding no
+allowtcpforwarding yes
+allowagentforwarding no
+
+Status for the jail: sshd
+|- Filter
+|  |- Currently failed:	0
+|  |- Total failed:	0
+|  `- Journal matches:	_SYSTEMD_UNIT=sshd.service + _COMM=sshd
+`- Actions
+   |- Currently banned:	0
+   |- Total banned:	0
+   `- Banned IP list:	

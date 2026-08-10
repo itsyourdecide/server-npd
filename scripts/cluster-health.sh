@@ -65,6 +65,16 @@ check_monitor_services() {
     "pct exec $MONITOR_CTID -- systemctl is-active --quiet prometheus && pct exec $MONITOR_CTID -- systemctl is-active --quiet prometheus-node-exporter"
 }
 
+check_bastion_services() {
+  ssh -o BatchMode=yes -o ConnectTimeout=5 "root@$PVE02" \
+    "pct exec 102 -- systemctl is-active --quiet ssh && pct exec 102 -- systemctl is-active --quiet fail2ban && pct exec 102 -- systemctl is-active --quiet prometheus-node-exporter"
+}
+
+check_bastion_ssh_hardening() {
+  ssh -o BatchMode=yes -o ConnectTimeout=5 "root@$PVE02" \
+    "pct exec 102 -- bash -lc 'sshd -T | grep -qx \"permitrootlogin no\" && sshd -T | grep -qx \"passwordauthentication no\" && sshd -T | grep -qx \"kbdinteractiveauthentication no\" && sshd -T | grep -qx \"pubkeyauthentication yes\"'"
+}
+
 check_squid_cvmfs_proxy() {
   cd "$ANSIBLE_DIR" || return 1
   ansible condor01.internal -m shell -a 'curl -fsSI --connect-timeout 5 -x http://10.10.80.11:3128 http://cvmfs-stratum-one.cern.ch/cvmfs/sft.cern.ch/.cvmfspublished >/dev/null' >/dev/null
@@ -184,6 +194,7 @@ printf 'Date: %s\n\n' "$(date -Is)"
 
 run_check 'Proxmox cluster is quorate' check_proxmox_quorum
 run_check 'fw01 VM is running' check_cluster_vm fw01
+run_check 'bastion01 LXC is running' check_cluster_vm bastion01
 run_check 'condor01 VM is running' check_cluster_vm condor01
 run_check 'pxe01 LXC is running' check_cluster_vm pxe01
 run_check 'squid01 LXC is running' check_cluster_vm squid01
@@ -192,6 +203,8 @@ run_check 'pxe01 nginx and tftpd-hpa are active' check_pxe_services
 run_check 'PXE HTTP boot.ipxe is reachable' check_pxe_http
 run_check 'squid01 squid service is active' check_squid_service
 run_check 'monitor01 prometheus and node exporter are active' check_monitor_services
+run_check 'bastion01 ssh, fail2ban and node exporter are active' check_bastion_services
+run_check 'bastion01 SSH root/password login are disabled' check_bastion_ssh_hardening
 run_check 'squid01 proxies CVMFS HTTP traffic' check_squid_cvmfs_proxy
 run_check 'condor01.internal resolves to 10.10.80.20' check_dns
 run_check 'Ansible can reach condor01 and ASUS nodes' check_ansible_ping

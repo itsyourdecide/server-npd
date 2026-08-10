@@ -21,6 +21,8 @@ Prometheus scrapes:
 - Monitoring:
   - `monitor01` `10.10.10.30:9100`
   - Prometheus itself `10.10.10.30:9090`
+- Bastion:
+  - `bastion01` `10.10.50.10:9100`
 - HTCondor:
   - `condor01` `10.10.80.20:9100`
   - `asus-r1n1` `10.10.80.101:9100`
@@ -36,7 +38,7 @@ cd /root/server-npd
 ./scripts/cluster-health.sh
 ```
 
-`monitoring-health.sh` expects all 10 Prometheus targets to be `up`.
+`monitoring-health.sh` expects all 11 Prometheus targets to be `up`.
 
 ## Extending
 
