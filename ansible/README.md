@@ -18,7 +18,7 @@ Later roles:
 
 - `htcondor_execute` for ASUS bare-metal workers and Supermicro execute VMs.
 - `cvmfs_client` for CERN/HEP software access.
-- `monitoring` after the first HTCondor smoke test.
+- `node_exporter` for Prometheus host metrics on AlmaLinux nodes.
 
 Current checkpoint:
 
@@ -94,6 +94,13 @@ Cluster health check:
 ```bash
 cd /root/server-npd
 ./scripts/cluster-health.sh
+```
+
+Monitoring health check:
+
+```bash
+cd /root/server-npd
+./scripts/monitoring-health.sh
 ```
 
 Local secret:

@@ -17,5 +17,5 @@
     path: /data
     src: 10.10.80.2:/data
     fstype: nfs4
-    opts: rw,_netdev,nofail,hard,timeo=600,retrans=2
+    opts: rw,_netdev,nofail,x-systemd.automount,x-systemd.requires=network-online.target,hard,timeo=600,retrans=2
     state: mounted

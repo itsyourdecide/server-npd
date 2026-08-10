@@ -269,6 +269,40 @@ HTCondor job.
 только scratch и не трогает projects/results. `cluster-health.sh` расширен до
 `21 checks, 0 failed`.
 
+### 2026-08-10 — pve02/monitor01 — поднят Prometheus monitoring phase 1
+
+Создан LXC `monitor01`:
+- Host: `pve02`.
+- CTID: `112`.
+- IP: `10.10.10.30/24`, gateway/DNS `10.10.10.1`.
+- VLAN: `10` management.
+- OS: Debian 12 LXC.
+- Resources: 2 vCPU, 2G RAM, 32G rootfs.
+- Services: `prometheus`, `prometheus-node-exporter`.
+
+Node exporter установлен:
+- Proxmox: `pve01` `10.10.10.11:9100`, `pve02` `10.10.10.12:9100`,
+  `pve03` `10.10.10.13:9100`.
+- Monitoring: `monitor01` `10.10.10.30:9100`.
+- Alma/HTCondor: `condor01` `10.10.80.20:9100`,
+  `asus-r1n1`-`asus-r1n4` `10.10.80.101`-`10.10.80.104:9100`.
+
+Для AlmaLinux узлов добавлена воспроизводимая Ansible role `node_exporter`.
+Используется официальный `node_exporter 1.12.1 linux-amd64` с SHA256:
+`b51d8a76aa2a9156a55d501aca6276fae09e262259a5e4e831d2c2222f084e63`.
+
+Prometheus config:
+- Snapshot/source: `work/monitor01/prometheus.yml`.
+- Live path внутри LXC: `/etc/prometheus/prometheus.yml`.
+- UI: `http://10.10.10.30:9090`.
+
+Проверки:
+- `scripts/monitoring-health.sh` видит `10/10` targets `up`.
+- `cluster-health.sh` расширен monitoring-проверками.
+
+Итог: минимальная наблюдаемость CPU/RAM/disk/network по Proxmox, monitor01,
+condor01 и первой ASUS-рельсе работает.
+
 ## День 1 — 2026-07-01
 
 Сводка: `pve01` введён в строй (Proxmox на бывшем `head01`), собрана первая рабочая связка OPNsense-роутер + тестовая VM за NAT. Этапы 1–6 плана `today_plan` (в `archive/`) выполнены, этап 7 (свитч) — частично. `pve02/pve03` не трогались, Ceph/JBOD не подключались.

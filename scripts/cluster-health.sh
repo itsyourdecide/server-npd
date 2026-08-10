@@ -6,6 +6,7 @@ ANSIBLE_DIR="$ROOT_DIR/ansible"
 PVE02="10.10.20.12"
 PXE_CTID="110"
 SQUID_CTID="111"
+MONITOR_CTID="112"
 FW_VMID="100"
 CONDOR_VMID="130"
 EXPECTED_ASUS_SLOTS="4"
@@ -57,6 +58,11 @@ check_pxe_http() {
 check_squid_service() {
   ssh -o BatchMode=yes -o ConnectTimeout=5 "root@$PVE02" \
     "pct exec $SQUID_CTID -- systemctl is-active --quiet squid"
+}
+
+check_monitor_services() {
+  ssh -o BatchMode=yes -o ConnectTimeout=5 "root@$PVE02" \
+    "pct exec $MONITOR_CTID -- systemctl is-active --quiet prometheus && pct exec $MONITOR_CTID -- systemctl is-active --quiet prometheus-node-exporter"
 }
 
 check_squid_cvmfs_proxy() {
@@ -169,6 +175,10 @@ check_condor_storage_job() {
   "$ROOT_DIR/scripts/storage-smoke.sh" 1 >/dev/null
 }
 
+check_monitoring_targets() {
+  "$ROOT_DIR/scripts/monitoring-health.sh" >/dev/null
+}
+
 printf 'NPD cluster health check\n'
 printf 'Date: %s\n\n' "$(date -Is)"
 
@@ -177,9 +187,11 @@ run_check 'fw01 VM is running' check_cluster_vm fw01
 run_check 'condor01 VM is running' check_cluster_vm condor01
 run_check 'pxe01 LXC is running' check_cluster_vm pxe01
 run_check 'squid01 LXC is running' check_cluster_vm squid01
+run_check 'monitor01 LXC is running' check_cluster_vm monitor01
 run_check 'pxe01 nginx and tftpd-hpa are active' check_pxe_services
 run_check 'PXE HTTP boot.ipxe is reachable' check_pxe_http
 run_check 'squid01 squid service is active' check_squid_service
+run_check 'monitor01 prometheus and node exporter are active' check_monitor_services
 run_check 'squid01 proxies CVMFS HTTP traffic' check_squid_cvmfs_proxy
 run_check 'condor01.internal resolves to 10.10.80.20' check_dns
 run_check 'Ansible can reach condor01 and ASUS nodes' check_ansible_ping
@@ -193,6 +205,7 @@ run_check 'Condor and ASUS nodes have /data mounted' check_storage_clients
 run_check 'Shared /data/scratch is writable from condor01' check_storage_write
 run_check 'Shared storage policy and scratch cleanup timer are active' check_storage_policy
 run_check 'HTCondor job writes to shared /data/results' check_condor_storage_job
+run_check 'Prometheus monitoring targets are healthy' check_monitoring_targets
 
 printf '\nSummary: %s checks, %s failed\n' "$checks" "$failed"
 

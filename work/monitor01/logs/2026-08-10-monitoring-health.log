@@ -1,0 +1,57 @@
+2026-08-10T18:29:22+03:00
+node	10.10.10.11:9100	proxmox	up
+node	10.10.10.12:9100	proxmox	up
+node	10.10.10.13:9100	proxmox	up
+node	10.10.10.30:9100	monitoring	up
+node	10.10.80.101:9100	htcondor-execute	up
+node	10.10.80.102:9100	htcondor-execute	up
+node	10.10.80.103:9100	htcondor-execute	up
+node	10.10.80.104:9100	htcondor-execute	up
+node	10.10.80.20:9100	htcondor-manager	up
+prometheus	10.10.10.30:9090	monitoring	up
+Monitoring targets healthy: 10/10 up
+
+● prometheus.service - Monitoring system and time series database
+     Loaded: loaded (/lib/systemd/system/prometheus.service; enabled; preset: enabled)
+     Active: active (running) since Mon 2026-08-10 15:21:07 UTC; 8min ago
+       Docs: https://prometheus.io/docs/introduction/overview/
+             man:prometheus(1)
+   Main PID: 7113 (prometheus)
+      Tasks: 8 (limit: 578718)
+     Memory: 87.6M
+        CPU: 3.514s
+     CGroup: /system.slice/prometheus.service
+             └─7113 /usr/bin/prometheus
+
+Aug 10 15:21:08 monitor01 prometheus[7113]: ts=2026-08-10T15:21:08.016Z caller=head.go:614 level=info component=tsdb msg="Replaying WAL, this may take a while"
+Aug 10 15:21:08 monitor01 prometheus[7113]: ts=2026-08-10T15:21:08.047Z caller=head.go:685 level=info component=tsdb msg="WAL segment loaded" segment=0 maxSegment=1
+Aug 10 15:21:08 monitor01 prometheus[7113]: ts=2026-08-10T15:21:08.048Z caller=head.go:685 level=info component=tsdb msg="WAL segment loaded" segment=1 maxSegment=1
+Aug 10 15:21:08 monitor01 prometheus[7113]: ts=2026-08-10T15:21:08.048Z caller=head.go:722 level=info component=tsdb msg="WAL replay completed" checkpoint_replay_duration=62.63µs wal_replay_duration=31.776471ms wbl_replay_duration=142ns total_replay_duration=31.871284ms
+Aug 10 15:21:08 monitor01 prometheus[7113]: ts=2026-08-10T15:21:08.050Z caller=main.go:1009 level=info fs_type=2fc12fc1
+Aug 10 15:21:08 monitor01 prometheus[7113]: ts=2026-08-10T15:21:08.050Z caller=main.go:1012 level=info msg="TSDB started"
+Aug 10 15:21:08 monitor01 prometheus[7113]: ts=2026-08-10T15:21:08.050Z caller=main.go:1192 level=info msg="Loading configuration file" filename=/etc/prometheus/prometheus.yml
+Aug 10 15:21:08 monitor01 prometheus[7113]: ts=2026-08-10T15:21:08.051Z caller=main.go:1229 level=info msg="Completed loading of configuration file" filename=/etc/prometheus/prometheus.yml totalDuration=529.447µs db_storage=968ns remote_storage=1.615µs web_handler=386ns query_engine=667ns scrape=186.636µs scrape_sd=27.397µs notify=897ns notify_sd=1.967µs rules=1.199µs tracing=7.724µs
+Aug 10 15:21:08 monitor01 prometheus[7113]: ts=2026-08-10T15:21:08.051Z caller=main.go:973 level=info msg="Server is ready to receive web requests."
+Aug 10 15:21:08 monitor01 prometheus[7113]: ts=2026-08-10T15:21:08.051Z caller=manager.go:978 level=info component="rule manager" msg="Starting rule manager..."
+
+● prometheus-node-exporter.service - Prometheus exporter for machine metrics
+     Loaded: loaded (/lib/systemd/system/prometheus-node-exporter.service; enabled; preset: enabled)
+     Active: active (running) since Mon 2026-08-10 15:14:44 UTC; 14min ago
+       Docs: https://github.com/prometheus/node_exporter
+   Main PID: 1650 (prometheus-node)
+      Tasks: 7 (limit: 578718)
+     Memory: 17.8M
+        CPU: 5.200s
+     CGroup: /system.slice/prometheus-node-exporter.service
+             └─1650 /usr/bin/prometheus-node-exporter
+
+Aug 10 15:20:00 monitor01 prometheus-node-exporter[1650]: ts=2026-08-10T15:20:00.318Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 10.10.10.30:9100" msg="->10.10.10.30:59278: write: broken pipe"
+Aug 10 15:20:00 monitor01 prometheus-node-exporter[1650]: ts=2026-08-10T15:20:00.318Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 10.10.10.30:9100" msg="->10.10.10.30:59278: write: broken pipe"
+Aug 10 15:20:00 monitor01 prometheus-node-exporter[1650]: ts=2026-08-10T15:20:00.318Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 10.10.10.30:9100" msg="->10.10.10.30:59278: write: broken pipe"
+Aug 10 15:20:00 monitor01 prometheus-node-exporter[1650]: ts=2026-08-10T15:20:00.318Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 10.10.10.30:9100" msg="->10.10.10.30:59278: write: broken pipe"
+Aug 10 15:20:00 monitor01 prometheus-node-exporter[1650]: ts=2026-08-10T15:20:00.318Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 10.10.10.30:9100" msg="->10.10.10.30:59278: write: broken pipe"
+Aug 10 15:20:00 monitor01 prometheus-node-exporter[1650]: ts=2026-08-10T15:20:00.318Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 10.10.10.30:9100" msg="->10.10.10.30:59278: write: broken pipe"
+Aug 10 15:20:00 monitor01 prometheus-node-exporter[1650]: ts=2026-08-10T15:20:00.318Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 10.10.10.30:9100" msg="->10.10.10.30:59278: write: broken pipe"
+Aug 10 15:20:00 monitor01 prometheus-node-exporter[1650]: ts=2026-08-10T15:20:00.318Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 10.10.10.30:9100" msg="->10.10.10.30:59278: write: broken pipe"
+Aug 10 15:20:00 monitor01 prometheus-node-exporter[1650]: ts=2026-08-10T15:20:00.318Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 10.10.10.30:9100" msg="->10.10.10.30:59278: write: broken pipe"
+Aug 10 15:20:00 monitor01 prometheus-node-exporter[1650]: ts=2026-08-10T15:20:00.321Z caller=stdlib.go:105 level=error caller="error encoding and sending metric family: write tcp 10.10.10.30:9100" msg="->10.10.10.30:59278: write: broken pipe"
