@@ -1,0 +1,17 @@
+[Unit]
+Description=NPD public endpoints via Tailscale Funnel
+After=network-online.target tailscaled.service nginx.service npd-bastion-ssh-forward.service
+Wants=network-online.target
+Requires=tailscaled.service nginx.service npd-bastion-ssh-forward.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/usr/bin/tailscale status --peers=false
+ExecStart=/usr/bin/tailscale funnel --yes --bg --https 443 127.0.0.1:18080
+ExecStart=/usr/bin/tailscale funnel --yes --bg --tcp 10000 tcp://127.0.0.1:10022
+ExecStop=/usr/bin/tailscale funnel --https=443 off
+ExecStop=/usr/bin/tailscale funnel --tcp=10000 off
+
+[Install]
+WantedBy=multi-user.target
