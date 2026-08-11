@@ -158,7 +158,7 @@ check_storage_export() {
 
 check_storage_clients() {
   cd "$ANSIBLE_DIR" || return 1
-  ansible condor01.internal:asus_nodes -m shell -a 'findmnt -rn /data | grep -q "10.10.80.2:/data"' >/dev/null
+  ansible condor01.internal:asus_nodes -m shell -a 'ls /data >/dev/null && findmnt -rn /data | grep -q "10.10.80.2:/data"' >/dev/null
 }
 
 check_storage_write() {
