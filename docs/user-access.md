@@ -37,25 +37,74 @@ Monitoring:
 - `prometheus-node-exporter` listens on `10.10.50.10:9100`.
 - `monitor01` scrapes it as role `bastion`.
 
-## Not Exposed Yet
+## Public Entry
 
-No WAN/NAT/port-forward rule has been created yet.
+The lab is behind university NAT, so the current public entry is Tailscale
+Funnel on `pve02`, not router port forwarding.
 
-Before exposing SSH to users, decide:
+Public endpoints:
 
-- Public entry method: university public IP, router port forward, VPN/Tailscale,
-  or reverse tunnel/VPS.
-- User list and SSH public keys.
-- Which internal hosts users may reach through `ProxyJump`.
-- Whether users get direct shell access on `bastion01`, or only jump access.
+```text
+https://pve02.taile43d6d.ts.net
+ssh -p 10000 <username>@pve02.taile43d6d.ts.net
+```
+
+Funnel runs on `pve02` and forwards SSH to `bastion01`:
+
+```text
+pve02.taile43d6d.ts.net:10000
+  -> 127.0.0.1:10022 on pve02
+  -> bastion01 10.10.50.10:22
+```
+
+The local services that keep this alive after boot:
+
+```text
+nginx.service
+npd-bastion-ssh-forward.service
+npd-tailscale-funnel.service
+```
+
+Users are still manually provisioned by an administrator. No shared password or
+anonymous account is used.
+
+## Create A User
+
+Ask the user for their SSH public key, for example `id_ed25519.pub`.
+
+From `pve01`:
+
+```bash
+cd /root/server-npd
+./scripts/create-cluster-user.py <username> /path/to/id_ed25519.pub
+```
+
+The script creates the same key-only account on:
+
+- `bastion01`
+- `condor01`
+
+It also creates shared storage directories:
+
+```text
+/data/projects/users/<username>
+/data/results/users/<username>
+/data/scratch/users/<username>
+```
+
+User IDs are allocated from `20000-29999` so NFS ownership is consistent
+between `bastion01`, `condor01`, and `/data`.
+
+Password login remains disabled. The user gets no sudo privileges.
 
 ## Example SSH Config
 
-After a user's SSH key is installed and external access is published:
+After a user's SSH key is installed:
 
 ```sshconfig
 Host bastion01
-  HostName <public-host-or-ip>
+  HostName pve02.taile43d6d.ts.net
+  Port 10000
   User <username>
   IdentityFile ~/.ssh/<key>
 
@@ -63,4 +112,44 @@ Host condor01
   HostName 10.10.80.20
   User <username>
   ProxyJump bastion01
+```
+
+Quick login test:
+
+```bash
+ssh -p 10000 <username>@pve02.taile43d6d.ts.net
+ssh condor01
+condor_q
+```
+
+## Minimal HTCondor Job
+
+On `condor01`:
+
+```bash
+mkdir -p ~/condor-tests/hello
+cd ~/condor-tests/hello
+
+cat > hello.sh <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+echo "hello from $(hostname)"
+date
+mkdir -p "/data/results/users/$USER"
+printf 'finished on %s\n' "$(hostname)" > "/data/results/users/$USER/hello-result.txt"
+EOF
+chmod +x hello.sh
+
+cat > hello.sub <<'EOF'
+executable = hello.sh
+output = hello.$(ClusterId).$(ProcId).out
+error = hello.$(ClusterId).$(ProcId).err
+log = hello.log
+request_cpus = 1
+request_memory = 512MB
+queue 1
+EOF
+
+condor_submit hello.sub
+condor_q
 ```
