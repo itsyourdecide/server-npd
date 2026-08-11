@@ -10,6 +10,7 @@
 | Поэтапный порядок внедрения (Этапы A–G) | **`cluster_implementation_plan.md`** |
 | Конкретные подсети VLAN и шлюзы (`10.10.<VLAN>.0/24`) | **`cluster_lab_poc_plan.md`** §4 |
 | Фактическое состояние портов switch1 сейчас | **`switch1_port_map.md`** |
+| Фактическое состояние портов Force10 сейчас | **`force10_port_map.md`** |
 | Целевой план портов (2 свитча / 58 узлов) | **`production_port_plan.md`** |
 | Почему хранилище на ZFS-репликации, а не Ceph | **`storage_decision_zfs_replication.md`** |
 
@@ -26,8 +27,9 @@
 - `cluster_power_thermal_priority.md` — энергоменеджмент и тепловая защита (в основном будущий Slurm-слой; общие разделы BMC/тепла актуальны).
 
 **Сеть и хранилище (предметные решения):**
-- `production_port_plan.md` — целевая раскладка портов на два HP 3500yl.
-- `switch1_port_map.md` — фактическое текущее состояние портов единственного развёрнутого свитча.
+- `production_port_plan.md` — целевая раскладка портов на Force10 S60 + HP 3500yl.
+- `force10_port_map.md` — фактическое текущее состояние портов Force10 S60 в шкафу Supermicro.
+- `switch1_port_map.md` — фактическое текущее состояние портов HP 3500yl в шкафу ASUS.
 - `storage_decision_zfs_replication.md` — решение-запись: ZFS-репликация как основной путь к HA, Ceph отложен.
 
 **Журнал:**

@@ -1469,3 +1469,49 @@ asus-r1n4.internal -> 10.10.80.104 SSH OK, firstboot_done, IPMI 10.10.30.104 pin
 ```
 
 Он читает CSV inventory, создает install-once files для выбранной рельсы/hostname и запускает watcher один раз. Следующий практический PXE шаг: добавить inventory для `asus-r2n1` ... `asus-r2n4`, добавить их MAC в `boot.ipxe`, затем прогнать batch install на одной новой рельсе.
+
+### 2026-08-11 — Force10 / Supermicro rack — сверка портов после подключения новых нод
+
+Пользователь физически поправил trunk `pve01` и подключил две новые Supermicro
+ноды в шкаф Supermicro. Проверка с `pve01`:
+
+```text
+pve01 nic1 -> Up, 1000Mb/s Full
+cluster-health --skip-storage -> 21 checks, 0 failed, 6 skipped
+```
+
+JBOD сознательно отложен, поэтому storage-проверки пропущены через новый режим
+`./scripts/cluster-health.sh --skip-storage`.
+
+По выводу Force10:
+
+```text
+Gi 0/6  Up 1000 Full trunk VLAN 10,20,30,40,50,80,99
+        MAC VLAN10 ac:1f:6b:4c:d7:ca  -> future pve04 LAN1
+Gi 0/7  Up 1000 Full trunk VLAN 10,20,30,40,50,80,99
+        MAC VLAN10 ac:1f:6b:4c:d7:c8  -> future pve05 LAN1
+Gi 0/16 Up 1000 Full VLAN30
+        MAC ac:1f:6b:4c:ce:80        -> future pve04 IPMI
+Gi 0/17 Up 1000 Full VLAN30
+        MAC ac:1f:6b:4c:ce:7f        -> future pve05 IPMI
+```
+
+Вывод: физическое подключение будущих `pve04`/`pve05` на уровне Force10
+выглядит корректно. Ноды пока не введены в Proxmox-кластер и не отвечают на
+ожидаемые management IP.
+
+Найденная текущая проблема:
+
+```text
+Force10 Gi 0/1 -> Down
+Force10 Gi 0/2 -> Up, member of Po1
+```
+
+То есть межшкафный LACP Force10 <-> switch1 временно деградировал до одного
+линка. Нужно проверить кабель `Force10 Gi 0/1` ↔ `switch1 port 2`.
+
+Документация обновлена:
+
+- добавлен `force10_port_map.md` как фактическая карта портов Force10;
+- `production_port_plan.md` очищен от устаревшего пункта про перенос `pve01`;
+- README теперь указывает оба port-map документа: Force10 и switch1.
