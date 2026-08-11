@@ -29,3 +29,10 @@ cd /root/server-npd
 ./scripts/storage-smoke.sh 4
 ./scripts/cluster-health.sh
 ```
+
+When JBOD shelves are intentionally powered off or physically deferred, run the
+general health check without storage assertions:
+
+```bash
+./scripts/cluster-health.sh --skip-storage
+```

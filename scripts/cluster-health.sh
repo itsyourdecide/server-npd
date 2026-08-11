@@ -10,9 +10,40 @@ MONITOR_CTID="112"
 FW_VMID="100"
 CONDOR_VMID="130"
 EXPECTED_ASUS_SLOTS="4"
+SKIP_STORAGE="${NPD_SKIP_STORAGE:-0}"
 
 checks=0
 failed=0
+skipped=0
+
+usage() {
+  cat <<EOF
+Usage: $0 [--skip-storage]
+
+Options:
+  --skip-storage   Skip JBOD/NFS storage checks when shelves are intentionally offline.
+
+Environment:
+  NPD_SKIP_STORAGE=1  Same as --skip-storage.
+EOF
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --skip-storage)
+      SKIP_STORAGE=1
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      usage >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
 
 ok() {
   checks=$((checks + 1))
@@ -23,6 +54,11 @@ fail() {
   checks=$((checks + 1))
   failed=$((failed + 1))
   printf 'FAIL %s\n' "$1"
+}
+
+skip() {
+  skipped=$((skipped + 1))
+  printf 'SKIP %s\n' "$1"
 }
 
 run_check() {
@@ -212,15 +248,26 @@ run_check 'HTCondor service and queue are healthy on condor01' check_condor_serv
 run_check "HTCondor sees $EXPECTED_ASUS_SLOTS ASUS execute slots" check_condor_slots
 run_check 'HTCondor smoke job completes' check_condor_smoke_job
 run_check 'CVMFS probes sft.cern.ch and unpacked.cern.ch' check_cvmfs_probe
-run_check 'JBOD ZFS pool npddata is online' check_storage_pool
-run_check 'pve01 exports /data over NFS to VLAN80' check_storage_export
-run_check 'Condor and ASUS nodes have /data mounted' check_storage_clients
-run_check 'Shared /data/scratch is writable from condor01' check_storage_write
-run_check 'Shared storage policy and scratch cleanup timer are active' check_storage_policy
-run_check 'HTCondor job writes to shared /data/results' check_condor_storage_job
+
+if [ "$SKIP_STORAGE" = "1" ]; then
+  skip 'JBOD ZFS pool npddata is online'
+  skip 'pve01 exports /data over NFS to VLAN80'
+  skip 'Condor and ASUS nodes have /data mounted'
+  skip 'Shared /data/scratch is writable from condor01'
+  skip 'Shared storage policy and scratch cleanup timer are active'
+  skip 'HTCondor job writes to shared /data/results'
+else
+  run_check 'JBOD ZFS pool npddata is online' check_storage_pool
+  run_check 'pve01 exports /data over NFS to VLAN80' check_storage_export
+  run_check 'Condor and ASUS nodes have /data mounted' check_storage_clients
+  run_check 'Shared /data/scratch is writable from condor01' check_storage_write
+  run_check 'Shared storage policy and scratch cleanup timer are active' check_storage_policy
+  run_check 'HTCondor job writes to shared /data/results' check_condor_storage_job
+fi
+
 run_check 'Prometheus monitoring targets are healthy' check_monitoring_targets
 
-printf '\nSummary: %s checks, %s failed\n' "$checks" "$failed"
+printf '\nSummary: %s checks, %s failed, %s skipped\n' "$checks" "$failed" "$skipped"
 
 if [ "$failed" -ne 0 ]; then
   exit 1
