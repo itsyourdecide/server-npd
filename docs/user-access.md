@@ -1,46 +1,29 @@
-# User Access Layer
+# User Access Workflow
 
-## Recommendation
+Status: phase 1, SSH-only user access. Users are created manually by the
+administrator. No shared password, anonymous login, VPN requirement, or public
+Proxmox access.
 
-Use two layers:
+## Current Shape
 
-1. `bastion01` for SSH access and `ProxyJump`.
-2. JupyterHub later for browser-based interactive work and notebooks.
+```text
+Internet user
+  -> Tailscale Funnel on pve02, tcp/10000
+  -> pve02 localhost tcp/10022
+  -> bastion01 10.10.50.10:22
+  -> ProxyJump to condor01 10.10.80.20:22
+  -> HTCondor submit from condor01
+  -> ASUS execute nodes
+```
 
-Open OnDemand remains a candidate for a future HPC portal, but it is not the
-first choice for the current HTCondor-only phase. It is strongest when the site
-already has a traditional HPC scheduler workflow and web apps to expose.
+Roles:
 
-## Bastion
-
-- Hostname: `bastion01`.
-- CTID: `102`.
-- Proxmox host: `pve02`.
-- VLAN: `50` DMZ.
-- IP: `10.10.50.10/24`.
-- Gateway/DNS: `10.10.50.1`.
-- OS: Debian 12 LXC.
-- Resources: 1 vCPU, 1G RAM, 16G rootfs.
-
-SSH hardening:
-
-- Root SSH login disabled.
-- Password and keyboard-interactive login disabled.
-- Public key auth enabled.
-- Agent forwarding disabled.
-- TCP forwarding enabled for SSH `ProxyJump`.
-- X11 forwarding disabled.
-- `fail2ban` enabled for `sshd`.
-
-Monitoring:
-
-- `prometheus-node-exporter` listens on `10.10.50.10:9100`.
-- `monitor01` scrapes it as role `bastion`.
-
-## Public Entry
-
-The lab is behind university NAT, so the current public entry is Tailscale
-Funnel on `pve02`, not router port forwarding.
+| Host | Role | Address |
+|---|---|---|
+| `pve02` | public Funnel endpoint and local TCP forward | `pve02.taile43d6d.ts.net` |
+| `bastion01` | SSH bastion only | `10.10.50.10`, CTID `102` on `pve02` |
+| `condor01` | HTCondor central manager + submit node | `10.10.80.20` |
+| `asus-r1n1`-`asus-r1n4` | first execute nodes | `10.10.80.101`-`10.10.80.104` |
 
 Public endpoints:
 
@@ -49,82 +32,131 @@ https://pve02.taile43d6d.ts.net
 ssh -p 10000 <username>@pve02.taile43d6d.ts.net
 ```
 
-Funnel runs on `pve02` and forwards SSH to `bastion01`:
+The SSH endpoint is the important one. The web endpoint is only a lightweight
+landing/check page for now.
 
-```text
-pve02.taile43d6d.ts.net:10000
-  -> 127.0.0.1:10022 on pve02
-  -> bastion01 10.10.50.10:22
-```
+## Security Model
 
-The local services that keep this alive after boot:
+`bastion01` SSH hardening:
 
-```text
-nginx.service
-npd-bastion-ssh-forward.service
-npd-tailscale-funnel.service
-```
+- root SSH login disabled;
+- password and keyboard-interactive login disabled;
+- public key authentication enabled;
+- agent forwarding disabled;
+- TCP forwarding enabled for `ProxyJump`;
+- X11 forwarding disabled;
+- `fail2ban` enabled for `sshd`;
+- node exporter enabled for monitoring.
 
-Users are still manually provisioned by an administrator. No shared password or
-anonymous account is used.
+Users:
 
-## Create A User
+- get a normal Linux account on `bastion01` and `condor01`;
+- authenticate only with their SSH public key;
+- get no sudo privileges;
+- use UID range `20000-29999`, reserved for human cluster users;
+- submit HTCondor jobs from `condor01`.
 
-Ask the user for their SSH public key, for example `id_ed25519.pub`.
+Important: users should normally connect directly to `condor01` through
+`ProxyJump`, not log into `bastion01` first and then SSH onward. Agent
+forwarding is intentionally disabled on `bastion01`, so direct second-hop SSH
+from inside bastion is not the default path.
 
-From `pve01`:
+## Admin Workflow
+
+Ask the user for:
+
+- desired lowercase login name, for example `denis`;
+- SSH public key, usually `id_ed25519.pub`;
+- short purpose / expected workload.
+
+Store the public key temporarily on `pve01`, then run:
 
 ```bash
 cd /root/server-npd
 ./scripts/create-cluster-user.py <username> /path/to/id_ed25519.pub
 ```
 
-The script creates the same key-only account on:
+The script:
 
-- `bastion01`
-- `condor01`
+- validates the login name and OpenSSH public key;
+- allocates the first free UID in `20000-29999`, unless `--uid` is given;
+- creates the same locked-password, key-only account on `bastion01`;
+- creates the same account on `condor01`;
+- creates `/data` user directories only when `/data` is mounted and accessible.
 
-It also creates shared storage directories:
+Current storage note: JBOD/NFS storage may be intentionally offline. In that
+case the script skips `/data/projects/users/<user>`,
+`/data/results/users/<user>`, and `/data/scratch/users/<user>`. This is OK for
+phase 1: basic HTCondor jobs can still run from the user's home directory on
+`condor01`. After JBOD is online, re-run:
 
-```text
-/data/projects/users/<username>
-/data/results/users/<username>
-/data/scratch/users/<username>
+```bash
+cd /root/server-npd
+./scripts/create-cluster-user.py <username> /path/to/id_ed25519.pub --storage-only
 ```
 
-User IDs are allocated from `20000-29999` so NFS ownership is consistent
-between `bastion01`, `condor01`, and `/data`.
+Use `--accounts-only` when you explicitly do not want to touch `/data`.
 
-Password login remains disabled. The user gets no sudo privileges.
+## Admin Verification
 
-## Example SSH Config
+Replace `<username>` before running.
 
-After a user's SSH key is installed:
+```bash
+# Account exists on bastion01.
+ssh pve02 'pct exec 102 -- id <username>'
+
+# Account exists on condor01.
+ssh npdadmin@10.10.80.20 'id <username>'
+
+# Public entry is open.
+nc -vz -w 5 pve02.taile43d6d.ts.net 10000
+
+# Cluster user can reach condor01 through the bastion.
+ssh -J <username>@pve02.taile43d6d.ts.net:10000 <username>@10.10.80.20 'hostname; condor_q'
+```
+
+Run the full health check after user provisioning:
+
+```bash
+cd /root/server-npd
+./scripts/cluster-health.sh --skip-storage
+```
+
+## User SSH Config
+
+Recommended `~/.ssh/config` for the user:
 
 ```sshconfig
-Host bastion01
+Host npd-bastion
   HostName pve02.taile43d6d.ts.net
   Port 10000
   User <username>
-  IdentityFile ~/.ssh/<key>
+  IdentityFile ~/.ssh/id_ed25519
+  IdentitiesOnly yes
 
-Host condor01
+Host npd-condor
   HostName 10.10.80.20
   User <username>
-  ProxyJump bastion01
+  ProxyJump npd-bastion
+  IdentityFile ~/.ssh/id_ed25519
+  IdentitiesOnly yes
 ```
 
-Quick login test:
+Login:
 
 ```bash
-ssh -p 10000 <username>@pve02.taile43d6d.ts.net
-ssh condor01
-condor_q
+ssh npd-condor
+```
+
+One-shot command:
+
+```bash
+ssh npd-condor 'hostname; condor_q'
 ```
 
 ## Minimal HTCondor Job
 
-On `condor01`:
+Run this on `condor01` as the user:
 
 ```bash
 mkdir -p ~/condor-tests/hello
@@ -135,8 +167,6 @@ cat > hello.sh <<'EOF'
 set -euo pipefail
 echo "hello from $(hostname)"
 date
-mkdir -p "/data/results/users/$USER"
-printf 'finished on %s\n' "$(hostname)" > "/data/results/users/$USER/hello-result.txt"
 EOF
 chmod +x hello.sh
 
@@ -153,3 +183,30 @@ EOF
 condor_submit hello.sub
 condor_q
 ```
+
+When the job finishes:
+
+```bash
+cat hello.*.out
+cat hello.*.err
+condor_history -limit 5
+```
+
+## What Changes After JBOD Storage
+
+When `/data` is permanently online:
+
+- user project input lives in `/data/projects/users/<username>`;
+- job results live in `/data/results/users/<username>`;
+- temporary shared data lives in `/data/scratch/users/<username>`;
+- storage checks in `cluster-health.sh` should run without `--skip-storage`.
+
+Until then, keep first user tests small and home-directory based.
+
+## Future UI Layer
+
+Phase 1 is intentionally SSH-only. Later options:
+
+- JupyterHub for browser notebooks and interactive Python work;
+- Open OnDemand if the workflow becomes a more traditional HPC portal;
+- a small custom landing page with examples, status, and request form.
