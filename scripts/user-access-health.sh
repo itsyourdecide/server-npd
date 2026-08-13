@@ -93,7 +93,7 @@ check_user_condor() {
   local user="$1"
   ssh -o BatchMode=yes -o ConnectTimeout=5 "$CONDOR_HOST" \
     "id \"$user\" >/dev/null &&
-     test -s \"\$(getent passwd \"$user\" | cut -d: -f6)/.ssh/authorized_keys\""
+     sudo -n test -s \"\$(getent passwd \"$user\" | cut -d: -f6)/.ssh/authorized_keys\""
 }
 
 echo "NPD user access health check"

@@ -33,6 +33,8 @@
       NPD_ROLE_CENTRAL_MANAGER = true
       CONDOR_HOST = {{ htcondor_central_manager }}
       NETWORK_INTERFACE = {{ htcondor_central_manager_ip }}
+      UID_DOMAIN = {{ htcondor_uid_domain }}
+      TRUST_UID_DOMAIN = True
     owner: root
     group: root
     mode: "0644"

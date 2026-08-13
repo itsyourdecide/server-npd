@@ -61,6 +61,8 @@ Network/firewall requirement:
 Users:
 
 - get a normal Linux account on `bastion01` and `condor01`;
+- get a locked-password POSIX identity account on HTCondor execute nodes when
+  jobs should run under their real UID instead of `nobody`;
 - authenticate only with their SSH public key;
 - get no sudo privileges;
 - use UID range `20000-29999`, reserved for human cluster users;
@@ -83,7 +85,7 @@ Store the public key temporarily on `pve01`, then run:
 
 ```bash
 cd /root/server-npd
-./scripts/create-cluster-user.py <username> /path/to/id_ed25519.pub
+./scripts/create-cluster-user.py <username> /path/to/id_ed25519.pub --execute-nodes
 ```
 
 The script:
@@ -92,7 +94,13 @@ The script:
 - allocates the first free UID in `20000-29999`, unless `--uid` is given;
 - creates the same locked-password, key-only account on `bastion01`;
 - creates the same account on `condor01`;
+- creates locked-password POSIX identity accounts on ASUS execute nodes when
+  `--execute-nodes` is used;
 - creates `/data` user directories only when `/data` is mounted and accessible.
+
+Execute-node accounts intentionally do not get SSH keys. They exist so
+HTCondor can map jobs to the same Linux UID on every worker. Users still enter
+through `bastion01 -> condor01`.
 
 Current storage note: JBOD/NFS storage may be intentionally offline. In that
 case the script skips `/data/projects/users/<user>`,
@@ -106,6 +114,31 @@ cd /root/server-npd
 ```
 
 Use `--accounts-only` when you explicitly do not want to touch `/data`.
+
+For an already-created user, sync only the execute-node POSIX identities:
+
+```bash
+cd /root/server-npd
+./scripts/create-cluster-user.py <username> --execute-only
+```
+
+## HTCondor Identity Policy
+
+Current production policy:
+
+```text
+UID_DOMAIN = internal
+TRUST_UID_DOMAIN = True
+FILESYSTEM_DOMAIN = each host's own FQDN
+```
+
+`UID_DOMAIN = internal` tells HTCondor that matching numeric UIDs are valid
+across `condor01` and the execute nodes. `TRUST_UID_DOMAIN = True` then allows
+jobs submitted as a real user to run as that same user on ASUS nodes.
+
+`FILESYSTEM_DOMAIN` is intentionally still per-host until `/data` is permanently
+mounted and validated everywhere. That keeps Condor conservative about local
+home directories and file transfer.
 
 ## Admin Verification
 
@@ -227,6 +260,16 @@ Until then, keep first user tests small and home-directory based.
 - a minimal HTCondor job submitted by `npdtest` completed on
   `asus-r1n1.internal` with exit code 0;
 - `npdtest` had no sudo access on `condor01`.
+
+2026-08-13 identity validation:
+
+- `npdtest` UID `20000` was synced to `asus-r1n1` through `asus-r1n4` as a
+  locked-password execute-node identity with no SSH keys;
+- HTCondor was switched to `UID_DOMAIN = internal` and
+  `TRUST_UID_DOMAIN = True`;
+- a follow-up HTCondor job submitted by `npdtest` completed on
+  `asus-r1n3.internal` as `npdtest` / UID `20000`;
+- the previous `nobody` / UID `65534` execution issue is resolved.
 
 ## Future UI Layer
 

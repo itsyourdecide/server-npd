@@ -1618,3 +1618,79 @@ cluster-health.sh --skip-storage: 21 checks, 0 failed, 6 skipped
 Итог: постоянной поломки monitoring не найдено; вероятно, кратковременный
 scrape/down во время перезапуска или нагрузки. Текущий минимальный стек снова
 зелёный.
+
+### 2026-08-13 — user access — HTCondor запускает jobs под реальным UID
+
+Закрыта проблема из предыдущего smoke test, где пользовательский job доходил до
+ASUS execute-ноды, но выполнялся как `nobody` / UID `65534`.
+
+Что изменено:
+
+```text
+scripts/create-cluster-user.py
+  --execute-nodes  создать locked POSIX identity на ASUS вместе с новым user
+  --execute-only   досинхронизировать identity для уже существующего user
+
+HTCondor config on condor01 + ASUS:
+  UID_DOMAIN = internal
+  TRUST_UID_DOMAIN = True
+  FILESYSTEM_DOMAIN = per-host FQDN, пока /data не считается постоянным
+```
+
+Для `npdtest` UID `20000` создан на `condor01` и `asus-r1n1`-`asus-r1n4`.
+На execute-нодах SSH-ключи не ставятся: эти аккаунты нужны только для
+POSIX/HTCondor identity, вход пользователей остаётся через
+`bastion01 -> condor01`.
+
+Проверка:
+
+```text
+HTCondor cluster 42
+execute host: asus-r1n3.internal
+whoami: npdtest
+id -u: 20000
+exit code: 0
+
+Final smoke check:
+HTCondor cluster 45
+JobStatus: 4 completed
+ExitCode: 0
+whoami/id: npdtest / 20000
+```
+
+Также исправлен `scripts/user-access-health.sh`: проверка
+`authorized_keys` на `condor01` теперь идёт через `sudo -n test`, потому что
+домашние каталоги пользователей закрыты правами `700`.
+
+### 2026-08-13 — pve02 — Funnel автоподъём после ребута
+
+После ребута `npd-tailscale-funnel.service` мог падать, если `tailscaled` ещё
+не успел выйти из `NoState`. На `pve02` добавлен systemd drop-in:
+
+```text
+/etc/systemd/system/npd-tailscale-funnel.service.d/retry.conf
+```
+
+Локальная копия сохранена в репозитории:
+
+```text
+work/pve02/npd-tailscale-funnel-retry.conf
+```
+
+Проверенное текущее состояние:
+
+```text
+npd-tailscale-funnel.service      active
+npd-bastion-ssh-forward.service   active
+tailscaled.service                active
+
+tcp://pve02.taile43d6d.ts.net:10000 -> 127.0.0.1:10022
+https://pve02.taile43d6d.ts.net     -> 127.0.0.1:18080
+```
+
+Быстрые проверки после фикса:
+
+```text
+user-access-health.sh npdtest:        6 checks, 0 failed
+cluster-health.sh --skip-storage:    21 checks, 0 failed, 6 skipped
+```

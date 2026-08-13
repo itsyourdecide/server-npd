@@ -44,6 +44,29 @@ ansible-playbook playbooks/htcondor_execute.yml --limit asus_nodes
 ansible condor01.internal -m shell -a 'condor_status; condor_q'
 ```
 
+Current HTCondor identity policy:
+
+```text
+UID_DOMAIN = internal
+TRUST_UID_DOMAIN = True
+FILESYSTEM_DOMAIN = per-host FQDN for now
+```
+
+Human users must have the same UID on `condor01` and execute nodes before their
+jobs should run as that user. Create new users with:
+
+```bash
+cd /root/server-npd
+./scripts/create-cluster-user.py <username> /path/to/id_ed25519.pub --execute-nodes
+```
+
+For an existing user, sync only the ASUS execute-node POSIX identity:
+
+```bash
+cd /root/server-npd
+./scripts/create-cluster-user.py <username> --execute-only
+```
+
 CVMFS client:
 
 ```bash

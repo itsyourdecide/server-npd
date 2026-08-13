@@ -8,6 +8,8 @@
       CONDOR_HOST = {{ htcondor_central_manager }}
       NETWORK_INTERFACE = {{ htcondor_central_manager_ip }}
       DAEMON_LIST = MASTER COLLECTOR NEGOTIATOR SCHEDD
+      UID_DOMAIN = {{ htcondor_uid_domain }}
+      TRUST_UID_DOMAIN = True
     owner: root
     group: root
     mode: "0644"
