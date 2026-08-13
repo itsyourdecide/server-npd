@@ -1515,3 +1515,106 @@ Force10 Gi 0/2 -> Up, member of Po1
 - добавлен `force10_port_map.md` как фактическая карта портов Force10;
 - `production_port_plan.md` очищен от устаревшего пункта про перенос `pve01`;
 - README теперь указывает оба port-map документа: Force10 и switch1.
+
+### 2026-08-12 — bastion/HTCondor — end-to-end user access validation
+
+Проверен полный пользовательский путь SSH-only доступа:
+
+```text
+Internet/Tailscale Funnel :10000
+  -> bastion01 10.10.50.10:22
+  -> ProxyJump
+  -> condor01 10.10.80.20:22
+  -> HTCondor submit
+  -> ASUS execute node
+```
+
+Создан временный тестовый пользователь `npdtest` (UID `20000`) на `bastion01`
+и `condor01` через штатный `scripts/create-cluster-user.py --accounts-only`.
+Пользователь key-only, без sudo. Временный private key после проверки удалён с
+`/tmp`.
+
+Найден и исправлен недостающий firewall-проход: на OPNsense в правилах `DMZ`
+добавлено narrow pass rule выше `Block DMZ to HTCONDOR`:
+
+```text
+source:      10.10.50.10   # bastion01
+destination: 10.10.80.20   # condor01
+protocol:    TCP/22
+```
+
+ICMP из DMZ в HTCONDOR остаётся заблокирован, но SSH `bastion01 -> condor01:22`
+открыт, чего достаточно для ProxyJump.
+
+Результат пользовательского smoke job:
+
+```text
+npdtest -> condor01 -> HTCondor cluster 35
+execute host: asus-r1n1.internal
+exit code: 0
+output: hello from asus-r1n1.internal
+```
+
+Замечание: job на execute-ноде выполнилась как `nobody` (UID 65534), потому что
+`npdtest` пока создан только на `bastion01`/`condor01`, не на ASUS execute
+нодах. Для простых file-transfer job это работает. Для production `/data` и
+нормальных POSIX-прав нужно решить модель идентичности: создавать пользователей
+на execute-нодах через Ansible либо изменить HTCondor identity policy.
+
+### 2026-08-12/13 — power characterization — первые реальные замеры потребления
+
+Создан файл замеров:
+
+```text
+work/measurements/2026-08-12-power-characterization/README.md
+```
+
+Ключевые измеренные значения:
+
+```text
+pve01 Supermicro idle:                 111 W
+pve01 Supermicro boot peak:            180 W
+pve01 Supermicro CPU-only:             226 W
+pve01 Supermicro heavy RAM 256 GiB:    221 W stable / 238 W peak
+pve01 Supermicro mixed heavy:          230 W stable / 240 W peak
+
+ASUS rail 1 idle, 4 nodes:             320 W
+ASUS rail 1 boot peak, 4 nodes:        870 W
+ASUS rail 1 CPU load, 4 nodes:        1300 W stable
+
+Force10 S60 idle/max observed:         120 W / 200 W
+HP 3500yl idle/max observed:           120 W / 200 W
+
+JBOD shelf startup/idle:               350 W / 230 W
+Expected JBOD estate:                  roughly 8-12 shelves in docs,
+                                       current planning range 8-10 shelves
+```
+
+Планировочный вывод:
+
+```text
+10 Supermicro heavy:                  ~2.4 kW
+48 ASUS heavy:                       ~15.6 kW
+2 switches max:                       ~0.4 kW
+8-10 JBOD idle:                       ~1.8-2.3 kW
+Full measured heavy + JBOD idle:      ~20.2-20.7 kW
+With 30% reserve:                     ~26.3-26.9 kW
+```
+
+Итог: ASUS-парк является главным потребителем. До подтверждения PDU/линий и
+охлаждения нельзя включать/нагружать все ASUS-рельсы одновременно.
+
+### 2026-08-13 — monitoring — повторная проверка `pve03:9100`
+
+После вчерашней ASUS CPU-нагрузки один health-check показал
+`pve03:9100 down`. Повторная проверка 2026-08-13:
+
+```text
+pve03 prometheus-node-exporter: active, listening on *:9100
+monitoring-health.sh: 11/11 up
+cluster-health.sh --skip-storage: 21 checks, 0 failed, 6 skipped
+```
+
+Итог: постоянной поломки monitoring не найдено; вероятно, кратковременный
+scrape/down во время перезапуска или нагрузки. Текущий минимальный стек снова
+зелёный.

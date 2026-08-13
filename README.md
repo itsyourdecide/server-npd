@@ -26,6 +26,7 @@
 - `cluster_lab_poc_plan.md` — лабораторный PoC: физическая схема, VLAN/IP-план, порядок сборки, acceptance tests.
 - `cluster_inventory_checklist.md` — чеклист выездной инвентаризации (Supermicro, ASUS, JBOD, HP, склад, питание).
 - `cluster_power_thermal_priority.md` — энергоменеджмент и тепловая защита (в основном будущий Slurm-слой; общие разделы BMC/тепла актуальны).
+- `work/measurements/2026-08-12-power-characterization/README.md` — реальные замеры потребления: Supermicro, ASUS-рельса, свитчи, JBOD и расчёты по парку.
 
 **Сеть и хранилище (предметные решения):**
 - `production_port_plan.md` — целевая раскладка портов на Force10 S60 + HP 3500yl.

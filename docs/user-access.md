@@ -37,6 +37,16 @@ landing/check page for now.
 
 ## Security Model
 
+Network/firewall requirement:
+
+- OPNsense `DMZ` rules must include a narrow pass rule above `Block DMZ to
+  HTCONDOR`:
+  - source: `10.10.50.10` (`bastion01`);
+  - destination: `10.10.80.20` (`condor01`);
+  - protocol/port: TCP/22.
+- ICMP from `bastion01` to `condor01` can stay blocked. The user workflow only
+  needs SSH forwarding to TCP/22.
+
 `bastion01` SSH hardening:
 
 - root SSH login disabled;
@@ -110,6 +120,9 @@ ssh npdadmin@10.10.80.20 'id <username>'
 
 # Public entry is open.
 nc -vz -w 5 pve02.taile43d6d.ts.net 10000
+
+# Bastion can reach the Condor submit host over SSH.
+ssh pve02 'pct exec 102 -- nc -vz -w 5 10.10.80.20 22'
 
 # Cluster user can reach condor01 through the bastion.
 ssh -J <username>@pve02.taile43d6d.ts.net:10000 <username>@10.10.80.20 'hostname; condor_q'
@@ -202,6 +215,18 @@ When `/data` is permanently online:
 - storage checks in `cluster-health.sh` should run without `--skip-storage`.
 
 Until then, keep first user tests small and home-directory based.
+
+## Validation Notes
+
+2026-08-12 end-to-end validation:
+
+- temporary user `npdtest` was created with UID `20000`;
+- public login to `bastion01` through Tailscale Funnel worked;
+- ProxyJump from `bastion01` to `condor01` worked after the OPNsense DMZ rule
+  above was added;
+- a minimal HTCondor job submitted by `npdtest` completed on
+  `asus-r1n1.internal` with exit code 0;
+- `npdtest` had no sudo access on `condor01`.
 
 ## Future UI Layer
 
