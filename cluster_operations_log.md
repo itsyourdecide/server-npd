@@ -1694,3 +1694,67 @@ https://pve02.taile43d6d.ts.net     -> 127.0.0.1:18080
 user-access-health.sh npdtest:        6 checks, 0 failed
 cluster-health.sh --skip-storage:    21 checks, 0 failed, 6 skipped
 ```
+
+### 2026-08-28 — vpn-npd — primary public gateway через Azure + WireGuard
+
+Создан отдельный внешний gateway `vpn-npd`, чтобы пользовательский доступ не
+зависел от Tailscale как единственной публичной двери.
+
+Текущая схема:
+
+```text
+Internet user
+  -> 20.215.200.4:10000
+  -> vpn-npd wg0 10.255.80.1
+  -> WireGuard UDP/51820
+  -> pve02 wg0 10.255.80.2:10022
+  -> bastion01 10.10.50.10:22
+  -> ProxyJump to condor01 10.10.80.20
+```
+
+Хосты и сервисы:
+
+```text
+vpn-npd:
+  OS: Ubuntu 24.04.4 LTS
+  public IP: 20.215.200.4
+  wg0: 10.255.80.1/30
+  services:
+    wg-quick@wg0
+    npd-public-bastion-ssh-forward.service
+
+pve02:
+  wg0: 10.255.80.2/30
+  services:
+    wg-quick@wg0
+    npd-vpn-bastion-ssh-forward.service
+```
+
+Azure NSG inbound rules:
+
+```text
+UDP 51820  allow-wireguard-51820
+TCP 10000  allow-npd-bastion-10000
+```
+
+Проверка после открытия правил:
+
+```text
+20.215.200.4:10000 open
+20.215.200.4:51820 udp reachable
+pve02 -> 10.255.80.1 ping: 0% loss, ~31 ms
+vpn-npd -> 10.255.80.2 ping: 0% loss, ~31 ms
+WireGuard latest handshake: present
+20.215.200.4:10000 banner: SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u10
+user-access-health.sh npdtest: 8 checks, 0 failed
+```
+
+Локальные service snapshots сохранены без приватных WireGuard ключей:
+
+```text
+work/vpn-npd/npd-public-bastion-ssh-forward.service
+work/pve02/npd-vpn-bastion-ssh-forward.service
+```
+
+Tailscale Funnel остаётся как admin/fallback channel, но primary user-facing
+endpoint теперь `ssh -p 10000 <username>@20.215.200.4`.

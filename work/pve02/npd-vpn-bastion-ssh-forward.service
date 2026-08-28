@@ -1,0 +1,14 @@
+[Unit]
+Description=SSH forward from vpn-npd WireGuard tunnel to bastion01
+After=network-online.target wg-quick@wg0.service
+Wants=network-online.target
+Requires=wg-quick@wg0.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/socat TCP-LISTEN:10022,bind=10.255.80.2,fork,reuseaddr TCP:10.10.50.10:22
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

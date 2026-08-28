@@ -4,8 +4,10 @@ set -uo pipefail
 PVE02="${PVE02:-pve02}"
 BASTION_CTID="${BASTION_CTID:-102}"
 CONDOR_HOST="${CONDOR_HOST:-npdadmin@10.10.80.20}"
-FUNNEL_HOST="${FUNNEL_HOST:-pve02.taile43d6d.ts.net}"
-FUNNEL_SSH_PORT="${FUNNEL_SSH_PORT:-10000}"
+VPN_HOST="${VPN_HOST:-vpn-npd}"
+VPN_PEER_IP="${VPN_PEER_IP:-10.255.80.1}"
+PUBLIC_SSH_HOST="${PUBLIC_SSH_HOST:-20.215.200.4}"
+PUBLIC_SSH_PORT="${PUBLIC_SSH_PORT:-10000}"
 USER_TO_CHECK="${1:-}"
 
 checks=0
@@ -16,7 +18,8 @@ usage() {
 Usage: $0 [username]
 
 Checks the phase-1 user access layer:
-  - Tailscale Funnel SSH endpoint
+  - public SSH gateway endpoint
+  - vpn-npd WireGuard and TCP forward services
   - bastion01 SSH/fail2ban/node-exporter services
   - bastion01 SSH hardening
   - condor01 SSH/HTCondor availability
@@ -53,7 +56,20 @@ run_check() {
 }
 
 check_funnel_ssh() {
-  nc -vz -w 5 "$FUNNEL_HOST" "$FUNNEL_SSH_PORT"
+  nc -vz -w 5 "$PUBLIC_SSH_HOST" "$PUBLIC_SSH_PORT"
+}
+
+check_vpn_gateway_services() {
+  ssh -o BatchMode=yes -o ConnectTimeout=5 "$VPN_HOST" \
+    "sudo -n systemctl is-active --quiet wg-quick@wg0 &&
+     sudo -n systemctl is-active --quiet npd-public-bastion-ssh-forward.service"
+}
+
+check_vpn_tunnel() {
+  ssh -o BatchMode=yes -o ConnectTimeout=5 "$PVE02" \
+    "systemctl is-active --quiet wg-quick@wg0 &&
+     systemctl is-active --quiet npd-vpn-bastion-ssh-forward.service &&
+     ping -c 1 -W 2 $VPN_PEER_IP >/dev/null"
 }
 
 check_bastion_services() {
@@ -100,7 +116,9 @@ echo "NPD user access health check"
 date --iso-8601=seconds
 echo
 
-run_check "Tailscale Funnel SSH endpoint is open" check_funnel_ssh
+run_check "public SSH gateway endpoint is open" check_funnel_ssh
+run_check "vpn-npd WireGuard and public forward services are active" check_vpn_gateway_services
+run_check "pve02 WireGuard tunnel to vpn-npd is alive" check_vpn_tunnel
 run_check "bastion01 ssh, fail2ban and node exporter are active" check_bastion_services
 run_check "bastion01 SSH hardening is enforced" check_bastion_hardening
 run_check "condor01 SSH and HTCondor submit are available" check_condor_submit

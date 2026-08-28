@@ -8,8 +8,9 @@ Proxmox access.
 
 ```text
 Internet user
-  -> Tailscale Funnel on pve02, tcp/10000
-  -> pve02 localhost tcp/10022
+  -> vpn-npd public gateway 20.215.200.4, tcp/10000
+  -> WireGuard tunnel vpn-npd 10.255.80.1 <-> pve02 10.255.80.2
+  -> pve02 wg0 tcp/10022
   -> bastion01 10.10.50.10:22
   -> ProxyJump to condor01 10.10.80.20:22
   -> HTCondor submit from condor01
@@ -20,7 +21,9 @@ Roles:
 
 | Host | Role | Address |
 |---|---|---|
-| `pve02` | public Funnel endpoint and local TCP forward | `pve02.taile43d6d.ts.net` |
+| `vpn-npd` | primary public SSH gateway | `20.215.200.4`, WireGuard `10.255.80.1` |
+| `pve02` | WireGuard peer and local TCP forward | `10.255.80.2` on `wg0` |
+| `pve02` | fallback/admin Tailscale Funnel endpoint | `pve02.taile43d6d.ts.net` |
 | `bastion01` | SSH bastion only | `10.10.50.10`, CTID `102` on `pve02` |
 | `condor01` | HTCondor central manager + submit node | `10.10.80.20` |
 | `asus-r1n1`-`asus-r1n4` | first execute nodes | `10.10.80.101`-`10.10.80.104` |
@@ -28,12 +31,15 @@ Roles:
 Public endpoints:
 
 ```text
-https://pve02.taile43d6d.ts.net
+ssh -p 10000 <username>@20.215.200.4
+
+Fallback/admin:
 ssh -p 10000 <username>@pve02.taile43d6d.ts.net
 ```
 
-The SSH endpoint is the important one. The web endpoint is only a lightweight
-landing/check page for now.
+The Azure gateway is the primary user-facing endpoint. Tailscale remains useful
+for administrator access and emergency fallback, but users should not need it
+for normal SSH access.
 
 ## Security Model
 
@@ -152,20 +158,31 @@ ssh pve02 'pct exec 102 -- id <username>'
 ssh npdadmin@10.10.80.20 'id <username>'
 
 # Public entry is open.
-nc -vz -w 5 pve02.taile43d6d.ts.net 10000
+nc -vz -w 5 20.215.200.4 10000
+
+# WireGuard tunnel between vpn-npd and pve02 is alive.
+ssh pve02 'ping -c 3 -W 2 10.255.80.1 && wg show'
 
 # Bastion can reach the Condor submit host over SSH.
 ssh pve02 'pct exec 102 -- nc -vz -w 5 10.10.80.20 22'
 
 # Cluster user can reach condor01 through the bastion.
-ssh -J <username>@pve02.taile43d6d.ts.net:10000 <username>@10.10.80.20 'hostname; condor_q'
+ssh -J <username>@20.215.200.4:10000 <username>@10.10.80.20 'hostname; condor_q'
 ```
 
 Run the full health check after user provisioning:
 
 ```bash
 cd /root/server-npd
+./scripts/user-access-health.sh <username>
 ./scripts/cluster-health.sh --skip-storage
+```
+
+To check the Tailscale fallback endpoint explicitly:
+
+```bash
+cd /root/server-npd
+PUBLIC_SSH_HOST=pve02.taile43d6d.ts.net ./scripts/user-access-health.sh <username>
 ```
 
 ## User SSH Config
@@ -174,7 +191,7 @@ Recommended `~/.ssh/config` for the user:
 
 ```sshconfig
 Host npd-bastion
-  HostName pve02.taile43d6d.ts.net
+  HostName 20.215.200.4
   Port 10000
   User <username>
   IdentityFile ~/.ssh/id_ed25519
@@ -198,6 +215,17 @@ One-shot command:
 
 ```bash
 ssh npd-condor 'hostname; condor_q'
+```
+
+Fallback/admin bastion endpoint:
+
+```sshconfig
+Host npd-bastion-ts
+  HostName pve02.taile43d6d.ts.net
+  Port 10000
+  User <username>
+  IdentityFile ~/.ssh/id_ed25519
+  IdentitiesOnly yes
 ```
 
 ## Minimal HTCondor Job
@@ -270,6 +298,17 @@ Until then, keep first user tests small and home-directory based.
 - a follow-up HTCondor job submitted by `npdtest` completed on
   `asus-r1n3.internal` as `npdtest` / UID `20000`;
 - the previous `nobody` / UID `65534` execution issue is resolved.
+
+2026-08-28 Azure gateway validation:
+
+- `vpn-npd` was created as a clean Ubuntu 24.04.4 public gateway;
+- WireGuard `wg0` was configured between `vpn-npd` (`10.255.80.1`) and `pve02`
+  (`10.255.80.2`);
+- public TCP `20.215.200.4:10000` forwards through the tunnel to
+  `bastion01:22`;
+- Azure NSG inbound rules required: UDP `51820` and TCP `10000`;
+- verified: `20.215.200.4:10000` is open, WireGuard handshake is present, and
+  SSH banner from `bastion01` is visible through the public gateway.
 
 ## Future UI Layer
 

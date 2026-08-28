@@ -35,7 +35,7 @@
 - `storage_decision_zfs_replication.md` — решение-запись: ZFS-репликация как основной путь к HA, Ceph отложен.
 
 **Пользователи:**
-- `docs/user-access.md` — админский workflow: bastion, ProxyJump, создание пользователя, проверки.
+- `docs/user-access.md` — админский workflow: Azure gateway, bastion, ProxyJump, создание пользователя, проверки.
 - `docs/user-quickstart.md` — короткая инструкция, которую можно отправить тестовому пользователю.
 
 **Журнал:**

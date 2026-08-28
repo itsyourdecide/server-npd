@@ -21,7 +21,7 @@ Replace `<username>` with your cluster login.
 
 ```sshconfig
 Host npd-bastion
-  HostName pve02.taile43d6d.ts.net
+  HostName 20.215.200.4
   Port 10000
   User <username>
   IdentityFile ~/.ssh/id_ed25519
