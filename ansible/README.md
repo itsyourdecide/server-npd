@@ -1,5 +1,10 @@
 # NPD Ansible
 
+- Статус: current
+- Последняя проверка: 2026-09-05
+- Назначение: воспроизводимая конфигурация AlmaLinux-узлов кластера
+- Источник истины для: состава Ansible inventory, playbook и role
+
 PXE/Kickstart installs only a small AlmaLinux base with SSH and the
 `npdadmin` sudo user. Everything role-specific is applied from here.
 
@@ -24,8 +29,8 @@ Current checkpoint:
 
 - `asus-r1n1.internal` through `asus-r1n4.internal` are installed with the
   base AlmaLinux PXE profile and reachable over SSH.
-- `condor01.internal` is planned as the first HTCondor central manager and
-  submit node on `pve02`, IP `10.10.80.20`.
+- `condor01.internal` is deployed as the HTCondor central manager and submit
+  node on `pve02`, IP `10.10.80.20`.
 - Run base checks with:
 
 ```bash
@@ -131,3 +136,10 @@ Local secret:
 - Create `inventory/group_vars/all/vault.yml` locally before HTCondor playbooks.
 - It must define `htcondor_pool_password`.
 - This file is ignored by git.
+
+Related documentation:
+
+- [Current state](../docs/current-state.md).
+- [HTCondor service](../docs/services/htcondor.md).
+- [Node provisioning runbook](../docs/runbooks/provision-node.md).
+- [User provisioning runbook](../docs/runbooks/provision-user.md).

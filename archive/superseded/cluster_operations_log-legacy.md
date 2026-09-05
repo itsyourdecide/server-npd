@@ -1,0 +1,1765 @@
+# Журнал изменений и операций
+
+> **Архивировано 2026-09-05.** Исходный монолитный журнал сохранён для
+> проверки полноты миграции. Активная хронология разделена по месяцам в
+> [`docs/history/`](../../docs/history/README.md); актуальные задачи находятся
+> в [`docs/project/open-issues.md`](../../docs/project/open-issues.md).
+
+Версия: 2.0 (компактный формат с 2026-07-03)
+Дата начала: 01.07.2026
+Назначение: фиксировать все изменения конфигурации, сети, storage, boot, cluster membership и firewall по узлам кластера. Это основной источник истины по факту «что и когда сделано».
+
+## Как вести журнал
+
+Каждая запись: заголовок `### дата — узел — что`, затем кратко **что и зачем**, затем **ключевые команды/факты** (IP, MAC, config — то, что нельзя восстановить по памяти), строка **Итог:** и, если осталось, **Открыто:**. Исполнитель по умолчанию — vinni (сам вводит команды у оборудования); указывается явно только если иначе. Если действие меняет сеть/storage/boot/cluster/firewall — запись обязательна. Сырые выводы команд — в `work/<узел>/logs/`, снимки конфигов — в `work/<узел>/configs/`.
+
+---
+
+## День 38 — 2026-08-06
+
+### 2026-08-06 — pve02/pxe01 — создан PXE-профиль и VM `condor01`
+
+Создан отдельный AlmaLinux 9 PXE/Kickstart профиль для управляющей HTCondor VM `condor01`, чтобы не использовать ASUS firstboot/IPMI-логику на серверной VM.
+- VM: `condor01`, VMID `130`, host `pve02`.
+- Network: `vmbr0`, VLAN80, MAC `bc:24:11:cd:01:30`.
+- Target IP после firstboot: `10.10.80.20/24`, gw/DNS `10.10.80.1`, hostname `condor01.internal`.
+- Resources: 4 vCPU, 8G RAM, `local-zfs` disk 64G.
+- PXE files:
+  - `/srv/pxe/http/profiles/alma9-condor01-autoinstall.ipxe`
+  - `/srv/pxe/http/kickstart/alma9-condor01.ks`
+  - `/srv/pxe/http/scripts/condor01-firstboot.sh`
+  - `/srv/pxe/http/scripts/npd-condor01-firstboot.service`
+- `boot.ipxe` knows MAC `bc:24:11:cd:01:30` and checks install-once before local disk.
+- install-once flag was consumed manually after the first HTTP 200 to avoid reinstall loops.
+- `pxe01` nginx was found failed after reboot because startup-time DNS could not resolve `repo.almalinux.org`; repo config updated to use runtime resolver for `/alma-cache/`.
+
+Итог: `condor01` PXE install completed; host отвечает на `10.10.80.20`, hostname `condor01.internal`, firstboot marker `/var/lib/npd-condor01-firstboot.done` есть. Boot order переключен на `scsi0;net0`, install-once файл перенесен в `used/`, чтобы не было reinstall loop. Ansible `base` применен к `condor01.internal`: `ok=3`, `changed=0`, `failed=0`. Nginx runtime-resolver fix применен live на `pxe01`, `nginx -t` OK, `/alma-cache/.../repomd.xml` отвечает `200`.
+
+Открыто: добавить HTCondor Ansible roles и проверить первый `condor_status`/test job.
+
+### 2026-08-06 — condor01/asus-r1 — первый рабочий HTCondor pool
+
+Через Ansible добавлены роли:
+- `htcondor_common`
+- `htcondor_manager`
+- `htcondor_submit`
+- `htcondor_execute`
+
+`condor01.internal` настроен как central manager + submit/access point. После DNS override в OPNsense `condor01.internal` резолвится в `10.10.80.20`, поэтому `CONDOR_HOST` возвращен к имени. `NETWORK_INTERFACE` оставлен явным IP, потому что HTCondor ожидает интерфейс/IP, а не hostname.
+
+ASUS первая рельса настроена как execute-ноды:
+- `asus-r1n1.internal` / `10.10.80.101`
+- `asus-r1n2.internal` / `10.10.80.102`
+- `asus-r1n3.internal` / `10.10.80.103`
+- `asus-r1n4.internal` / `10.10.80.104`
+
+Проверки:
+- `condor_status` на `condor01` видит 4 `Unclaimed Idle` слота.
+- `condor_status -schedd` видит `condor01.internal`.
+- `condor_q` работает и не падает на старый DHCP IP.
+- Повторный Ansible прогон manager/execute: `changed=0`, `failed=0`.
+- Smoke test: 4 jobs в cluster `1`, все завершились; log подтвердил запуск по одной job на каждой ASUS-ноде.
+
+Итог: минимальный HTCondor pool `condor01 + 4 ASUS` работает.
+
+Открыто: CVMFS/storage/monitoring.
+
+### 2026-08-07 — fw01/HTCondor — DNS override для `condor01`
+
+В OPNsense добавлен host override `condor01.internal -> 10.10.80.20`. Проверено:
+- `dig @10.10.10.1 condor01.internal A` → `10.10.80.20`.
+- `dig @10.10.80.1 condor01.internal A` → `10.10.80.20`.
+- ASUS-ноды резолвят `condor01.internal` в `10.10.80.20`.
+
+После перевода HTCondor с временного IP на имя обнаружено, что `NETWORK_INTERFACE = condor01.internal` невалиден: HTCondor не может определить IP по hostname для этой настройки. Исправлено:
+- `CONDOR_HOST = condor01.internal`.
+- `NETWORK_INTERFACE = 10.10.80.20` на `condor01`.
+- `NETWORK_INTERFACE = ansible_host` на ASUS execute-нодах.
+- Execute override перенесен в `99-npd-execute`, старый `00-npd-execute` удаляется Ansible.
+
+Итог: `condor_status` снова видит 4 ASUS slots, `condor_status -schedd` видит `condor01`, повторный Ansible прогон manager/execute: `changed=0`, `failed=0`.
+
+### 2026-08-07 — pve01 — добавлен cluster health-check
+
+Добавлен `scripts/cluster-health.sh` — единая быстрая проверка текущего минимального стека. Скрипт запускается с `pve01` из корня репозитория:
+
+```bash
+./scripts/cluster-health.sh
+```
+
+Проверяет:
+- Proxmox cluster quorum.
+- `fw01`, `condor01`, `pxe01` running.
+- `pxe01` nginx + `tftpd-hpa`.
+- HTTP PXE endpoint `/boot.ipxe`.
+- DNS `condor01.internal -> 10.10.80.20`.
+- Ansible reachability до `condor01` и ASUS.
+- HTCondor service/queue на `condor01`.
+- `condor_status` видит 4 ASUS execute slots.
+- HTCondor smoke job завершается с `Normal termination (return value 0)`.
+
+Итог: первый прогон после фиксов: `11 checks, 0 failed`.
+
+### 2026-08-07 — condor01/asus-r1 — CVMFS client
+
+Добавлена Ansible role `cvmfs_client` и playbook `ansible/playbooks/cvmfs_client.yml`.
+
+Настройки:
+- Repositories: `sft.cern.ch`, `unpacked.cern.ch`.
+- Proxy: `DIRECT`.
+- Cache base: `/var/lib/cvmfs`.
+- Quota: `8000` MB.
+
+Применено на:
+- `condor01.internal`
+- `asus-r1n1.internal`
+- `asus-r1n2.internal`
+- `asus-r1n3.internal`
+- `asus-r1n4.internal`
+
+Проверки:
+- `cvmfs_config probe sft.cern.ch` OK на всех 5 узлах.
+- `cvmfs_config probe unpacked.cern.ch` OK на всех 5 узлах.
+- Повторный Ansible прогон: `changed=0`, `failed=0`.
+- HTCondor smoke test cluster `7`: 4 jobs ушли на все ASUS-ноды и на каждой успешно прочитали `/cvmfs/sft.cern.ch` и `/cvmfs/unpacked.cern.ch`, return value `0`.
+
+Итог: CVMFS слой готов для первого HEP/software smoke test.
+
+### 2026-08-07 — pve02/squid01 — Squid proxy/cache для CVMFS
+
+Создан отдельный LXC `squid01` для локального HTTP proxy/cache CVMFS.
+
+Параметры:
+- Host: `pve02`.
+- CTID: `111`.
+- IP: `10.10.80.11/24`, gateway `10.10.80.1`.
+- VLAN: `80`.
+- OS: Debian 12 LXC.
+- Resources: 1 vCPU, 1G RAM, 64G rootfs.
+- Service: Squid, port `3128`.
+- ACL: разрешен `10.10.80.0/24`; management/VLAN10 не имеет доступа к proxy.
+- Cache: `/var/spool/squid`, `40960` MB, `maximum_object_size 1024 MB`.
+- Config snapshot: `work/squid01/squid.conf`.
+
+Исправление: CVMFS использует HTTP endpoints не только на 80, но и на `8000`, поэтому `Safe_ports` включает `80`, `443`, `8000`.
+
+CVMFS clients переключены на:
+
+```text
+CVMFS_HTTP_PROXY="http://10.10.80.11:3128|DIRECT"
+```
+
+Проверки:
+- `squid` active.
+- `curl -x http://10.10.80.11:3128 .../.cvmfspublished` с `condor01` → `200 OK`.
+- CVMFS probes на `condor01` и ASUS проходят.
+- `scripts/cluster-health.sh`: `15 checks, 0 failed`.
+
+Итог: CVMFS теперь ходит через локальный Squid proxy с direct fallback.
+
+### 2026-08-07 — pve01/JBOD — preflight перед созданием `/data`
+
+Пользователь подтвердил, что данные на JBOD можно полностью стереть, и разрешил создание storage layer. Перед destructive действиями выполнен preflight на `pve01`.
+
+Проверки:
+- `lsblk` показывает только два системных Micron SSD:
+  - `sda` `Micron_5200_MTFDDAK960TDD` `18031DBC5C7D` — Proxmox/LVM.
+  - `sdb` `Micron_5200_MTFDDAK960TDD` `18031DBC5C7C` — `rpool`.
+- Ожидаемые 24 JBOD-диска `TOSHIBA MG04ACA600E` сейчас не видны.
+- `lspci` видит оба LSI/Broadcom SAS HBA:
+  - `SAS3216`
+  - `SAS3224`
+- `mpt3sas` загружен, SCSI rescan выполнен, но новых дисков/expander/enclosure не появилось.
+- `zpool status` показывает только `rpool`; `zpool import` показывает старый/importable `zroot` на `zd0`, не JBOD.
+
+Итог: destructive storage step остановлен. Нельзя создавать ZFS pool, пока `pve01` не видит 24 JBOD-диска.
+
+Открыто: физически проверить питание JBOD, SAS cable, правильный внешний HBA/порт, индикацию link/activity на полке и HBA.
+
+### 2026-08-07 — pve01/JBOD — создан общий ZFS/NFS storage `/data`
+
+После включения JBOD `pve01` увидел 24 диска `TOSHIBA MG04ACA600E` по 5.5T
+(`sdc`-`sdz`). Перед созданием пула:
+- `blkid /dev/sd[c-z]` не показал существующих файловых сигнатур.
+- SMART health у всех 24 JBOD-дисков: `PASSED`.
+- Системные Micron SSD `sda`/`sdb` не использовались.
+
+Создан ZFS pool:
+- Name: `npddata`.
+- Layout: `2 x raidz2`, по 12 дисков в каждом vdev.
+- Properties: `ashift=12`, `compression=lz4`, `atime=off`,
+  `xattr=sa`, `acltype=posixacl`, `mountpoint=/data`.
+- Доступно после создания: примерно `99.6T`.
+
+Созданы datasets:
+- `/data/projects` — persistent project data, `2775`, owner/group `1000:1000`.
+- `/data/results` — persistent job outputs, sticky writable для HTCondor jobs.
+- `/data/scratch` — temporary shared job data, sticky writable.
+
+Сеть:
+- На `pve01` добавлен `vmbr2.80` с адресом `10.10.80.2/24`.
+- Старый маршрут `10.10.80.0/24 via 10.10.10.1` с `vmbr2.10` удален из
+  `/etc/network/interfaces`, потому что VLAN80 теперь directly connected.
+- Бэкап перед правкой: `/etc/network/interfaces.bak.20260807-190342`.
+
+NFS:
+- Установлен и включен `nfs-kernel-server`.
+- Export: `/data 10.10.80.0/24(rw,sync,no_subtree_check,root_squash,crossmnt)`.
+- `crossmnt` нужен, потому что `/data/projects`, `/data/results` и
+  `/data/scratch` являются отдельными ZFS datasets под родителем `/data`.
+
+Ansible:
+- Добавлен playbook `ansible/playbooks/storage_client.yml`.
+- Добавлена role `ansible/roles/storage_client`.
+- Применено к `condor01.internal` и `asus-r1n1.internal`-`asus-r1n4.internal`.
+
+Проверки:
+- Все клиенты монтируют `10.10.80.2:/data` как `nfs4`.
+- Все клиенты пишут в `/data/scratch`.
+- HTCondor smoke job ушел на `asus-r1n3.internal` и успешно записал результат
+  в `/data/results` на JBOD.
+
+Итог: первый общий storage layer для HTCondor работает end-to-end.
+
+### 2026-08-07 — condor01/asus-r1/JBOD — добавлен storage smoke test
+
+Добавлен `scripts/storage-smoke.sh` — быстрый end-to-end тест общего storage:
+- submit идет через `condor01.internal`;
+- jobs выполняются на HTCondor execute-нодах;
+- каждая job пишет результат в `/data/results/npd-storage-smoke` на JBOD.
+
+Проверки:
+- `./scripts/storage-smoke.sh 1` — OK, результат записан с
+  `asus-r1n3.internal`.
+- `./scripts/storage-smoke.sh 4` — OK, результаты записаны с
+  `asus-r1n1.internal`, `asus-r1n2.internal`, `asus-r1n3.internal`,
+  `asus-r1n4.internal`.
+- `./scripts/cluster-health.sh` теперь включает этот тест и показывает
+  `20 checks, 0 failed`.
+
+Итог: общий storage проверяется не только mount/write-командой, но и настоящей
+HTCondor job.
+
+### 2026-08-07 — pve01/JBOD — закреплена политика `/data`
+
+Закреплена структура общего storage:
+- `/data/projects/npd` — persistent datasets/configs/project inputs.
+- `/data/results/npd` — persistent job outputs.
+- `/data/scratch/condor` — temporary HTCondor job data.
+- `/data/scratch/users` — temporary manual/user work.
+
+Права:
+- `/data/projects` и `/data/projects/npd`: `2775`, owner/group `1000:1000`.
+- `/data/results`, `/data/results/npd`,
+  `/data/results/npd-storage-smoke`: sticky-writable.
+- `/data/scratch`, `/data/scratch/condor`, `/data/scratch/users`:
+  sticky-writable.
+
+Добавлены скрипты:
+- `scripts/apply-storage-policy.sh` — применяет директории/права/ZFS properties.
+- `scripts/clean-scratch.sh` — чистит только `/data/scratch`.
+
+На `pve01` установлен systemd timer:
+- `npd-scratch-clean.timer` — daily, `Persistent=true`,
+  `RandomizedDelaySec=30m`.
+- `npd-scratch-clean.service` запускает `/usr/local/sbin/npd-clean-scratch`.
+- Retention: `14` дней.
+
+Снимки live-конфигов:
+- `work/pve01/configs/2026-08-07-npd-scratch-clean.service`.
+- `work/pve01/configs/2026-08-07-npd-scratch-clean.timer`.
+- `work/pve01/logs/2026-08-07-storage-policy.log`.
+
+Итог: `/data` получил понятные зоны ответственности; автоочистка касается
+только scratch и не трогает projects/results. `cluster-health.sh` расширен до
+`21 checks, 0 failed`.
+
+### 2026-08-10 — pve02/monitor01 — поднят Prometheus monitoring phase 1
+
+Создан LXC `monitor01`:
+- Host: `pve02`.
+- CTID: `112`.
+- IP: `10.10.10.30/24`, gateway/DNS `10.10.10.1`.
+- VLAN: `10` management.
+- OS: Debian 12 LXC.
+- Resources: 2 vCPU, 2G RAM, 32G rootfs.
+- Services: `prometheus`, `prometheus-node-exporter`.
+
+Node exporter установлен:
+- Proxmox: `pve01` `10.10.10.11:9100`, `pve02` `10.10.10.12:9100`,
+  `pve03` `10.10.10.13:9100`.
+- Monitoring: `monitor01` `10.10.10.30:9100`.
+- Alma/HTCondor: `condor01` `10.10.80.20:9100`,
+  `asus-r1n1`-`asus-r1n4` `10.10.80.101`-`10.10.80.104:9100`.
+
+Для AlmaLinux узлов добавлена воспроизводимая Ansible role `node_exporter`.
+Используется официальный `node_exporter 1.12.1 linux-amd64` с SHA256:
+`b51d8a76aa2a9156a55d501aca6276fae09e262259a5e4e831d2c2222f084e63`.
+
+Prometheus config:
+- Snapshot/source: `work/monitor01/prometheus.yml`.
+- Live path внутри LXC: `/etc/prometheus/prometheus.yml`.
+- UI: `http://10.10.10.30:9090`.
+
+Проверки:
+- `scripts/monitoring-health.sh` видит `10/10` targets `up`.
+- `cluster-health.sh` расширен monitoring-проверками.
+
+Итог: минимальная наблюдаемость CPU/RAM/disk/network по Proxmox, monitor01,
+condor01 и первой ASUS-рельсе работает.
+
+### 2026-08-10 — pve02/bastion01 — создан SSH bastion phase 1
+
+Создан LXC `bastion01`:
+- Host: `pve02`.
+- CTID: `102`.
+- IP: `10.10.50.10/24`, gateway/DNS `10.10.50.1`.
+- VLAN: `50` DMZ.
+- OS: Debian 12 LXC.
+- Resources: 1 vCPU, 1G RAM, 16G rootfs.
+- Services: `ssh`, `fail2ban`, `prometheus-node-exporter`.
+
+SSH hardening:
+- `PermitRootLogin no`.
+- `PasswordAuthentication no`.
+- `KbdInteractiveAuthentication no`.
+- `PubkeyAuthentication yes`.
+- `AllowAgentForwarding no`.
+- `AllowTcpForwarding yes` для будущего `ProxyJump`.
+- `X11Forwarding no`.
+- `fail2ban` jail `sshd` включен через `backend = systemd`.
+
+Monitoring:
+- `bastion01` добавлен в Prometheus target list как role `bastion`.
+- `scripts/monitoring-health.sh` теперь ожидает `11` targets.
+
+Снимки live-конфигов:
+- `work/bastion01/configs/2026-08-10-pct-config`.
+- `work/bastion01/configs/2026-08-10-sshd-npd-bastion.conf`.
+- `work/bastion01/configs/2026-08-10-fail2ban-sshd.local`.
+- `work/bastion01/logs/2026-08-10-bastion-health.log`.
+- `work/monitor01/configs/2026-08-10-prometheus-with-bastion.yml`.
+
+Важно: WAN/NAT/port-forward для bastion **не создан**. Bastion пока поднят и
+защищен внутри DMZ, но не опубликован наружу до отдельного решения по способу
+публичного входа и списку SSH-ключей пользователей.
+
+Итог: пользовательский SSH entrypoint подготовлен. `cluster-health.sh` расширен
+до `27 checks, 0 failed`.
+
+## День 1 — 2026-07-01
+
+Сводка: `pve01` введён в строй (Proxmox на бывшем `head01`), собрана первая рабочая связка OPNsense-роутер + тестовая VM за NAT. Этапы 1–6 плана `today_plan` (в `archive/`) выполнены, этап 7 (свитч) — частично. `pve02/pve03` не трогались, Ceph/JBOD не подключались.
+
+### 2026-07-01 — pve01 — первичный ввод в строй Proxmox
+
+Установлен Proxmox VE 9.2 на 2× локальных SSD; бывший `head01` (Ubuntu) → `pve01.localdomain`. Т.к. на ноутбуке нет Ethernet, узел временно переведён в лабораторную сеть для удалённого доступа. Отключены enterprise-репозитории, добавлены no-subscription; установлен Tailscale.
+- Железо на установке: 2× Micron SSD ~894GB, 2×10GbE Intel X540, отдельный IPMI. Management-интерфейс при установке — `nic0`. После установки на `vmbr0` был `10.10.10.11/24`, затем переведён на лабораторный `192.168.31.50/24`, gw `192.168.31.1`, DNS → `192.168.31.1`.
+- **Tailscale:** IPv4 `100.110.23.10`, IPv6 `fd7a:115c:a1e0::ee3b:170b`. SSH (ключ, root) и web UI (`pveproxy *:8006`) работают.
+
+Итог: `pve01` загружается, доступен по SSH/Tailscale/web UI.
+Открыто: вернуть management на целевую `10.10.10.0/24`; зафиксировать постоянный DNS/NTP; проверить PSU (см. ниже).
+
+### 2026-07-01 — pve01 — наблюдения по железу и SEL
+
+- Оба SSD — SMART `PASSED`.
+- Виден внешний HBA → JBOD нужно отключать на время установки ОС.
+- В IPMI SEL зафиксирована ошибка **`Power Supply PS2 Status`** — перепроверить питание/БП при физическом доступе.
+
+### 2026-07-01 — pve01 — базовая проверка (Этап 1)
+
+Проверка стабильности перед сетевыми работами. Сырой вывод: `work/pve01/logs/2026-07-01-etap1-baseline-check.log`.
+- Tailscale active; `pveproxy`/`ssh` running; NTP active, зона Europe/Kyiv.
+- `vmbr0` = `192.168.31.50/24`; `nic0` UP без адреса (порт моста), `nic1` DOWN.
+- `pvecm status` — кластера ещё нет (ожидаемо, `pve02/03` не введены).
+- Вход под `ultron` не работает — ожидаемо, это старый юзер Ubuntu, на Proxmox его нет.
+
+### 2026-07-01 — switch1 (HP 3500yl) — бэкап конфигурации (Этап 7.1)
+
+Через serial/PuTTY сняты `show config/version/vlan/interfaces` → `work/switch1/configs/2026-07-01-show-config-baseline.txt`. Конфиг не менялся.
+- Легаси-состояние: `VLAN 1` без untagged, `VLAN 10 "PXE"` untagged на портах 1-48, IP свитча `10.10.0.254/24`, `snmp-server community public unrestricted` (убрать перед production).
+- Единственный `Up` порт — **26** (1000FDx) = IPMI `pve01`; порт 25 `Down` (LAN1 `pve01` тогда шёл напрямую в роутер, не через свитч).
+
+### 2026-07-01 — pve01 — создан vmbr1 (Этап 2)
+
+Добавлен внутренний bridge `vmbr1` (`bridge-ports none`, без IP) под LAN-сторону OPNsense, не трогая `vmbr0`. Бэкап: `work/pve01/configs/interfaces.before-vmbr1`. Применено `ifreload -a`.
+Итог: `vmbr1` UP, без порта и IPv4; `vmbr0`/Tailscale не пострадали.
+
+### 2026-07-01 — pve01 — инвентаризация железа (расхождение с паспортом)
+
+Полный вывод: `work/pve01/logs/2026-07-01-inventory-hardware.log`, `-network-storage.log`.
+- **Плата — `X10DRI-T`** (не `X10DRi`), 2× встроенных **10GbE Intel X540-AT2** (`03:00.0`/`03:00.1` → `nic0`/`nic1`). Старый паспорт (теперь в `archive/`) ошибочно писал «1GbE, нет 10G» — исправлено.
+- `nic0` согласуется только на **100Mb/s** (карта тянет до 10G) — причина в порту/кабеле лабораторного роутера, не в карте (позже подтверждено: `nic1` даёт честный гигабит).
+- Два SAS3 HBA: внутренний **`SAS9305-16i`** (02:00.0) и внешний **`SAS9305-16e`** (81:00.0) — узел готов подключить JBOD.
+- CPU 2× Xeon E5-2620 v4 (32 логических, VT-x есть), RAM 512GB DDR4 ECC. Оба SSD Micron 5200 — SMART `PASSED`.
+- `ipmitool` на свежей Proxmox/Debian 13 не установлен — SEL/сенсоры в этой сессии не снимались.
+
+### 2026-07-01 — pve01 — ISO OPNsense (Этап 3)
+
+Скачан `OPNsense-26.1.6-dvd-amd64.iso.bz2` с `pkg.opnsense.org`, `sha256sum -c` = OK, распакован. Зарегистрирован как `local:iso/OPNsense-26.1.6-dvd-amd64.iso`. Версия **OPNsense 26.1.6**.
+
+### 2026-07-01 — pve01 — создана VM fw01 (Этап 4)
+
+Через UI создана VM `fw01` (**VMID 100**): 1 socket/2 cores (x86-64-v2-AES), 4096 MiB, `scsi0` local-lvm 32G, `net0`→`vmbr0` (WAN), `net1`→`vmbr1` (LAN), VirtIO, `onboot 1`, `ostype other`, загрузка сначала с CD.
+
+### 2026-07-01 — fw01 — установлен и настроен OPNsense (Этап 5)
+
+Установка на ZFS (1 диск, stripe), после — правка boot order (`scsi0` перед `ide2`). Консольный мастер: WAN=`vtnet0` (DHCP), LAN=`vtnet1` статически **`10.10.40.1/24`**, DHCP `10.10.40.100-199`.
+- На WAN снята галка **«Block RFC1918 Private Networks»** (WAN намеренно в приватной сети роутера, двойной NAT).
+- Доступ к веб-GUI (LAN изолирован от ноутбука): временный `10.10.40.2/24` на `vmbr1` (не в конфиге) + SSH-туннель `ssh -L 8443:10.10.40.1:443 root@100.110.23.10 -N`, вход `https://localhost:8443`.
+- hostname `fw01`, domain `internal`, tz `Europe/Kyiv`.
+
+Итог: Dashboard — `fw01.internal`, OPNsense 26.1.6_2, WAN gw `192.168.31.1` active. Ping `1.1.1.1`/`8.8.8.8` 0% потерь.
+
+### 2026-07-01 — LXC test40 — тестовая VM за OPNsense (Этап 6)
+
+Создан лёгкий LXC `test40` (**VMID 101**, Alpine) только на `vmbr1`, nameserver `10.10.40.1`.
+- Получил `10.10.40.156/24` по DHCP от `fw01`; ping gw 0%; **ping `1.1.1.1` 0% — NAT подтверждён** (реальный клиент за firewall).
+- DNS сначала `SERVFAIL`: лабораторная сеть блокирует исходящий порт 53 к произвольным внешним IP. Фикс: `System→Settings→General` DNS = `192.168.31.1`; `Services→Unbound→Query Forwarding` = «Use System Nameservers». После — DNS резолвит.
+- Ложная тревога: Proxmox показывал память `fw01` 100% — это ZFS ARC, не проблема.
+Открыто: при появлении своего DNS-аплинка вернуть Unbound в рекурсию; удалить `test40` после PoC, если не нужен.
+
+---
+
+## День 2 — 2026-07-02
+
+Сводка: подключена и проверена первая JBOD-полка; switch1 полностью пересобран под целевую VLAN-схему; построен реальный транк `pve01 nic1`→порт 4→`vmbr2`; `fw01` (WAN/LAN + MGMT/IPMI/DMZ/HTCONDOR) и `test40` переведены на транк; настроена межсетевая firewall-политика; IPMI `pve01` переставлен на финальный порт 14; принято архитектурное решение о ZFS-репликации вместо Ceph. Пережили серьёзный сбой с перенумерацией `vtnetN` (устранён).
+
+### 2026-07-02 — pve01 — подключена JBOD-полка, инвентаризация дисков
+
+Пользователь физически подключил полку к внешнему `SAS9305-16e`. Сырьё: `work/pve01/logs/2026-07-01-jbod-check.log`, `-jbod-smart-summary.log`.
+- Полка **`Promise 4U-SAS-24-12G BP`** (24 слота, 12G backplane), enclosure `0x50001555fe256000`, через `end_device-1:0:24`.
+- 24 диска `sdc`–`sdz` (HCTL `1:0:0:0`…`1:0:23:0`), HBA видит каждый отдельно — **hardware RAID не включён** (то, что нужно для OSD/ZFS).
+- Все 24 — **`TOSHIBA MG04ACA600E`** 5.5TiB (~6TB). **SMART у всех `PASSED`**, `Reallocated`/`Pending`/`Uncorrectable`/`CRC` = 0. Наработка ~50 000 ч (~5.7 года), похоже на единую партию с CERN. В dmesg — без ошибок/ресетов SAS.
+- `lsscsi`/`sg3-utils`/`multipath-tools` не установлены — enclosure/slot mapping ещё не зафиксирован.
+
+### 2026-07-02 — switch1 + pve01 IPMI — полная пересборка VLAN
+
+Свитч пересобран с нуля под целевую схему (`cluster_lab_poc_plan.md` §4), IPMI `pve01` переведён с VLAN10 на VLAN30. Порт 4 выбран новым транком к `nic1`. Старый прямой кабель роутер→`nic0` оставлен как страховка; роутер также воткнут в порт 1.
+
+IPMI переставлен **локально с pve01 через KCS** (не по сети):
+```
+ipmitool lan set 1 ipsrc static
+ipmitool lan set 1 ipaddr 10.10.30.11
+ipmitool lan set 1 netmask 255.255.255.0
+ipmitool lan set 1 defgw ipaddr 10.10.30.1
+```
+
+Итоговое состояние свитча (после `write memory`, подтверждено `show config`):
+```
+vlan 1   DEFAULT_VLAN  no untagged 1-48
+vlan 10  MGMT          untagged 2-25,27-48   ip 10.10.10.2/24
+vlan 20  COROSYNC      tagged 4              no ip
+vlan 30  IPMI          untagged 26, tagged 4 no ip
+vlan 40  PRIVATE_VM    tagged 4              no ip
+vlan 50  DMZ           tagged 4              no ip
+vlan 80  HTCONDOR_PXE  tagged 4              no ip
+vlan 99  WAN_TEMP      untagged 1            no ip
+```
+Порт 4 = native VLAN10 + tagged 20/30/40/50/80/99. Порт 1 (роутер) = untagged VLAN99. Порт 26 (IPMI) = untagged VLAN30.
+Итог: `ipmitool lan print 1` подтвердил `10.10.30.11` static, gw `10.10.30.1`. IPMI временно недоступен по сети (путь к VLAN30 со стороны pve01 ещё не построен) — устранится в Фазах 3-4.
+
+### 2026-07-02 — pve01 — Фаза 3: nic1 + VLAN-aware мост vmbr2
+
+`nic1` физически в порт 4. Поднялся на **1000Mb/s Full** (подтверждает: 100Mb на `nic0` — порт/кабель роутера, не карта). Бэкап: `work/pve01/configs/interfaces.before-vmbr2`.
+- В `/etc/network/interfaces`: `auto nic1` + `bridge-pvid 10`; блок `vmbr2` (`bridge-ports nic1`, `bridge-vlan-aware yes`, `bridge-vids 10,20,30,40,50,80,99`).
+- Грабли: пользователь случайно вставил текст `nano ...` в начало файла (парсинг упал) — исправлено. Изначально забыли `bridge-pvid 10` → порт был native VLAN1 → добавлено.
+
+Итог (`bridge vlan show`): `nic1` = `10 PVID` + tagged `20/30/40/50/80/99`. Соответствует порту 4. `vmbr0`/Tailscale не пострадали.
+
+### 2026-07-02 — архитектура — Ceph отложен, основной путь = ZFS-репликация
+
+Пересмотр: Ceph больше не основной путь к HA-хранилищу VM; вместо него встроенная ZFS-репликация Proxmox. Причина — бюджет на сеть под Ceph 5000 грн (~$112) не покрывает выделенную 10GbE. Полное обоснование — **`storage_decision_zfs_replication.md`**; пометки-указатели проставлены в `cluster_architecture_rationale.md` §8, `_presentation.md` §4, `cluster_implementation_plan.md` (Этап C отложен), `production_port_plan.md` §4.1-4.2. Ceph-материалы не удалены, оставлены для возврата.
+
+### 2026-07-02 — fw01 — Фаза 4: тегированные интерфейсы на транке
+
+Итоговая проверка после фиксов (VLAN99 `tagged 4` на свитче; `net2` с `tag=10`).
+- **`WAN_TEST` (VLAN99) получил DHCP `192.168.31.90/24`, gw `192.168.31.1`** — весь путь `порт1→VLAN99→порт4 tagged→nic1→vmbr2→fw01` работает.
+- MGMT `10.10.10.1/24`, DMZ `10.10.50.1/24`, HTCONDOR `10.10.80.1/24` — статически. IPMI-интерфейс `10.10.30.1/24` задан, но связь с BMC не проверена (кабель IPMI отключён до финального порта). Private VM (VLAN40) отложен из-за конфликта `10.10.40.1/24` со старым `vmbr1`-LAN.
+- **Урок:** vNIC в Proxmox без `tag=` — это НЕ native VLAN физического порта, а access-порт **VLAN1** по умолчанию (net2 сначала попал в VLAN1, лечится `tag=10`).
+
+### 2026-07-02 — pve01/fw01 — Фаза 5: LAN и test40 на транк, вывод vmbr1
+
+- Роль **LAN** в OPNsense переключена с `vtnet1` (изолированный `vmbr1`) на `vtnet4` (тег VLAN40 на `vmbr2`) — IP `10.10.40.1/24` и DHCP переехали автоматически (привязка к логическому имени «LAN», не к устройству).
+- `test40` → `vmbr2` тег40 (`pct set 101 --net0 name=eth0,bridge=vmbr2,tag=40,ip=dhcp`); служба Dnsmasq перезапущена вручную (не подхватила смену интерфейса). DHCP/ping/интернет/DNS у `test40` подтверждены через настоящий транк.
+- `net1` удалён из `fw01` (`qm set 100 --delete net1`); `vmbr1` полностью убран из `/etc/network/interfaces`. `nic0`/`vmbr0`/Tailscale не тронуты.
+- **Ключевой урок (Linux VLAN-aware bridge):** VLAN-членство **порта** (`bridge vlan show dev nic1`) и «self»-трафика самого моста (`bridge vlan show dev vmbr2`) — две РАЗНЫЕ настройки. Диагностический `.VLAN`-подинтерфейс с хоста (напр. `vmbr2.40`) не пойдёт, пока не выполнить `bridge vlan add vid <N> dev vmbr2 self`, даже если тег порта верный. Это была причина нескольких ложных «не работает» ранее.
+- Для admin-доступа к GUI `fw01` с хоста используется временный `vmbr2.40` = `10.10.40.3/24` (**не в конфиге, пропадёт при перезагрузке `pve01`** — нужна постоянная схема или задокументированная команда восстановления).
+
+### 2026-07-02 — fw01 — переключение WAN на VLAN99 + сбой перенумерации vtnetN (устранён)
+
+Роль **WAN** переключена с `vtnet0` (прямой кабель) на VLAN99 через свитч. После этого — серьёзный сбой, разбор по шагам:
+1. Клиенты LAN потеряли интернет (DNS к самому firewall работал). `tcpdump` на транке: пакеты не выходили из `fw01`.
+2. Перезагрузка вскрыла причину: после удаления `net1` в Фазе 5 FreeBSD **перенумеровала все `vtnetN`** (сдвиг на 1 после дыры в списке). Консоль показала LAN/WAN на чужих устройствах.
+3. Переназначили интерфейсы через консоль **по MAC-адресу** (не по именам). Итоговое соответствие:
+
+```
+MGMT     bc:24:11:af:da:76 → vtnet1   10.10.10.1/24
+IPMI     bc:24:11:6c:f4:5c → vtnet2   10.10.30.1/24
+LAN      bc:24:11:16:a0:fc → vtnet3   10.10.40.1/24
+DMZ      bc:24:11:17:71:24 → vtnet4   10.10.50.1/24
+HTCONDOR bc:24:11:f3:16:e5 → vtnet5   10.10.80.1/24
+WAN      bc:24:11:9a:77:b1 → vtnet6   DHCP 192.168.31.90/24
+```
+4. MGMT/IPMI/DMZ/HTCONDOR сами подхватили верные `vtnetN` по MAC, но у них слетели Enable/IP — пришлось включить и вбить адреса заново.
+5. Даже после этого pf/NAT state-таблица осталась битой (пакет уходил и получал ответ на проводе, но не долетал до LAN-клиента). Помогла только **одна финальная чистая перезагрузка** со всеми 6 корректными интерфейсами.
+
+Итог: после финального ребута всё консистентно — LAN ping 0%, интернет через NAT (`test40`→1.1.1.1) 0%, DNS резолвит.
+**Главный урок:** не удалять сетевые карты из середины списка у FreeBSD-гостя, если планируются ещё изменения в сессии; после такого — переназначать интерфейсы по MAC, не по `vtnetN`.
+(На этот момент HTCONDOR показывал `/32` — исправлено позже, см. ниже.)
+
+### 2026-07-02 — fw01 — межсетевая firewall-политика по VLAN
+
+Правила Firewall→Rules по политике `cluster_lab_poc_plan.md` §9:
+- **MGMT** — `pass MGMT net → any` (было 0 правил, управление никуда не выходило).
+- **IPMI** — 0 правил = implicit deny (самостоятельный интернет запрещён).
+- **LAN (Private VM)** — `block → IPMI net` и `block → MGMT net` **выше** автосозданного `Default allow LAN to any` (порядок критичен — первое совпадение; сначала блоки попали ниже allow, переставлены).
+- **DMZ** — `block → MGMT/LAN/IPMI/HTCONDOR`, затем `pass → any`.
+- **HTCONDOR** — `block → MGMT/IPMI`, затем `pass → any`.
+- **WAN** — не менялся (дефолтный deny-all-inbound кроме явных port forward).
+- **Важно:** identifier «LAN» в OPNsense — единственный, кто автоматически получает anti-lockout/allow-all; у нас он привязан к VLAN40 (Private VM), а не VLAN10 → пришлось вручную расширить MGMT и ограничить LAN.
+
+Итог (проверено с `test40`, VLAN40): ping `1.1.1.1` 0% (интернет), `10.10.10.1` 100% потерь (MGMT закрыт), `10.10.30.1` 100% потерь (IPMI закрыт) — соответствует политике. MGMT/DMZ/HTCONDOR end-to-end не тестировались (нет тестовых устройств).
+
+### 2026-07-02 — switch1/fw01 — IPMI pve01 на финальный порт 14
+
+IPMI перенесён с временного порта 26 на **порт 14** (`production_port_plan.md`, диапазон 14-18 = IPMI `pve01`-`pve05`). На свитче: `vlan 30 / no untagged 26 / untagged 14`.
+Итог: `show vlan 30` — порт 14 `Untagged, Up` (100FDx), порт 26 `Down`. BMC `10.10.30.11` отвечает по L2. **Acceptance «Management видит IPMI» пройден:** OPNsense Diagnostics→Ping, src `10.10.10.1`→`10.10.30.11` = 20/20, 0% через `fw01` (маршрутизация + правило `pass MGMT` работают вместе). `switch1_port_map.md` обновлён (v1.1).
+
+### 2026-07-02 — fw01 — исправлена маска HTCONDOR
+
+Интерфейс HTCONDOR (`vtnet5`, VLAN80): `10.10.80.1/32` → `10.10.80.1/24` (как остальные внутренние). Исправлено пользователем.
+Итог: все 6 интерфейсов `fw01` подняты с корректными адресами/масками. `fw01` считается настроенным на текущем этапе; DMZ/HTCONDOR firewall-правила заведены, но end-to-end не проверены (нет устройств на этих VLAN — не блокирует).
+
+### Открыто на следующую сессию (по состоянию на конец дня 2)
+
+- Полный прогон acceptance-тестов `cluster_lab_poc_plan.md` §11 для DMZ/HTCondor (нужны тестовые VM на этих VLAN).
+- Явные NAT/port-forward на WAN — при появлении реальных DMZ-сервисов (bastion/reverse-proxy).
+- Судьба прямого кабеля роутер→`pve01 nic0` и перенос management-IP хоста `pve01` на VLAN10 — отложено как отдельная, более рискованная задача (совпадает с текущим каналом доступа).
+- ~~Постоянная схема admin-доступа к GUI `fw01` вместо временного `vmbr2.40`~~ — закрыто 2026-07-03, см. запись «pve01 — постоянный MGMT-доступ (VLAN10) + Tailscale subnet router» (День 3).
+- ASUS-инвентаризация (Shared LAN/NC-SI) — для `production_port_plan.md`.
+- JBOD Mgmt/serial-консоль порты — найдены физически, не подключены; зафиксировать enclosure/slot mapping до использования дисков; при необходимости поставить `lsscsi`/`sg3-utils`/`multipath-tools`.
+- Вернуться к SEL-ошибке `Power Supply PS2 Status` при физическом доступе.
+
+---
+
+## День 3 — 2026-07-03
+
+Сводка: наведён порядок в документации (архив, дедуп, индекс — детали не в этом журнале, а в самих файлах). Проверена совместимость райзера `pve01` с Tesla T4. Основное: первый физический ввод ASUS-рельсы — инвентаризация узла 1, восстановление root-доступа, находка BMC на выделенном порту (закрывает открытый вопрос Shared LAN/NC-SI — ответ отрицательный), подтверждено происхождение LHCb/CERN по имени BMC-аккаунта.
+
+### 2026-07-03 — pve01 — проверка райзера под Tesla T4
+
+`dmidecode -t slot` показал 3 свободных `PCI-E 3.0 x16 Long` (CPU1 Slot2, CPU2 Slot4, CPU2 Slot6) плюс 1 занятый x8 (внутренний HBA) и 1 занятый x8 (внешний HBA). Мануал `MNL-1575.pdf` (SUPERSERVER 6028R-TR/TRT) подтвердил: **все 6 слотов шасси — low-profile**, что совпадает с Tesla T4 (продаётся только с low-profile планкой, питание только со слота, доп. разъём не нужен). Пользователь физически проверил — **влезает 1 видеокарта, обдув хороший**.
+Итог: GPU-совместимость подтверждена, конкретное место — один из трёх свободных x16-слотов.
+
+### 2026-07-03 — asus01 (рельса, узел 1) — первый физический ввод, инвентаризация, доступ к BMC
+
+Рельса с 4 узлами ASUS физически на месте (питание/сеть не были разведены до этой сессии). Работали только с **узлом 1**, остальные не включались (пусковой ток).
+
+**Подключение:** LAN1 → switch1 порт 19 (untagged, временно VLAN40 для теста — на момент проверки план ещё не знал про необходимость 2 портов/узел). BMC (отдельный физический порт, обнаружен не сразу — на первом фото ошибочно принят за отсутствующий, на уточняющем фото пользователя виден явно, третий разъём над USB) → порт 20, тоже временно VLAN40.
+```
+show vlan 40    →  порт 19 Untagged/Up (1000FDx), порт 20 Untagged/Up (100FDx)
+```
+
+**Железо и шасси (по мануалу `e6512_RS72xQA-E6_RS12.pdf`, RS720QA-E6/RS12 / RS724QA-E6/RS12):**
+- Задняя панель: LAN1, LAN2, отдельный **выделенный** BMC-порт (третий разъём), USB×2, VGA, serial — не по одной карте `ASMB4-iKVM` (её физически нет), а через встроенный чип `ASPEED` с собственным dedicated-выходом (подтверждено `lspci`: `01:01.0 VGA/BMC controller: ASPEED Graphics Family`, отдельного PCI-устройства сетевой карты под BMC нет).
+- CPU: **AMD Opteron 6272**, 2 сокета × 16 ядер (32 потока, без SMT), max 2.1GHz, AMD-V есть. Чипсет AMD RD890S/SR5650 + SB7x0/8x0/9x0 (Family 15h, Bulldozer/Piledriver, ~2011-2012) — совсем другая платформа, чем Xeon E5 на Supermicro.
+- RAM: ~32GB.
+- NIC: 2× встроенных Intel 82574L GbE (`e1000e`) — `enp2s0` (LAN1, порт 19), `enp3s0` (LAN2, не подключен).
+- BMC: IPMI 2.0, Manufacturer ID `0x1043` (ASUSTeK), firmware 2.13.
+
+**IPMI/BMC — найден, взломан вход, найдена причина Shared-LAN-вопроса:**
+- BMC на дефолтном статическом `192.168.1.30` (не DHCP) — обнаружен не сканированием (он не в нашей подсети), а пассивным `tcpdump`/анализом периодического gratuitous ARP (`54:04:a6:f4:21:0a`, OUI ASUSTek). Открыты 80/443/22/623.
+- Заводские пароли (`admin`/`admin`, `ADMIN`/`ADMIN`, `admin`/`password`) не подошли — устройство уже настраивалось (вероятно, ещё в CERN).
+- Восстановлен доступ **не через BMC, а через ОС узла** (см. ниже) — локальный `ipmitool` (KCS-интерфейс) не требует пароля от веб-морды, тем же приёмом что и для `pve01` в день 1.
+- `ipmitool user list 1` вскрыл список аккаунтов:
+```
+ID  Name        Priv Limit
+1   (пусто)     ADMINISTRATOR
+2   root        CALLBACK (Link Auth: false)
+3   admin       ADMINISTRATOR
+4   lhcbadmin   ADMINISTRATOR   ← прямое подтверждение происхождения LHCb/CERN
+7   ipmimaster  ADMINISTRATOR
+```
+- Пароль сброшен на ID3 (`admin`) через `ipmitool user set password 3 <new>` — **вход в веб-GUI подтверждён рабочим**. `lhcbadmin`/`ipmimaster` (чужие аккаунты с неизвестными паролями) — намечены на `ipmitool user disable 4`/`7`, статус выполнения не подтверждён на момент записи.
+- **Главная находка для архитектуры:** BMC — dedicated, не Shared LAN. Закрывает открытый вопрос `production_port_plan.md` §1/§5 отрицательным ответом → бюджет портов для 48 ASUS требует 2 порта/узел, а не 1; документ помечен на пересчёт.
+
+**ОС узла (обходной путь без VGA сначала не сработал, потребовался физический доступ):**
+- На узле уже стоит **AlmaLinux 9.6 "Sage Margay"**, kernel `5.14.0-570.39.1.el9_6.x86_64`, hostname `localhost` (не кастомизирован) — не пустой узел, наследие CERN.
+- Root-пароль неизвестен → восстановлен стандартной процедурой `rd.break`: GRUB → `e` → добавить `rd.break` к строке `linux` → `mount -o remount,rw /sysroot` → `chroot /sysroot` → `passwd root` → `touch /.autorelabel` → `exit`×2 → реboot (SELinux relabel).
+- SSH: `systemctl enable --now sshd` — сработало сразу (firewalld уже разрешал `ssh` по умолчанию). Отдельная грабля: `PermitRootLogin` по умолчанию не позволяет пароль-логин root по SSH (в отличие от локальной консоли) — пришлось явно выставить `PermitRootLogin yes` и рестартовать `sshd`.
+- Сеть: `enp2s0` изначально на **статике `10.10.0.1/24` без gateway** — легаси-адрес из старой плоской VLAN10 "PXE" схемы (`10.10.0.0/24`), не имеет отношения к текущей схеме. `dhclient` в системе нет (NetworkManager) — переключено через `nmcli connection modify <profile> ipv4.method auto`, получен рабочий адрес **`10.10.40.74/24`** от `fw01` (DHCP), интернет и `dnf install ipmitool pciutils` — заработали.
+- Доступ с ноутбука пользователя — через прыжок по `pve01`: `ssh -J root@100.110.23.10 root@<ip>`; для веб-GUI BMC — SSH-туннель `-L <порт>:192.168.1.30:443/80` тем же способом, что и для `fw01` GUI.
+- **Найден баг доступа `pve01`↔VLAN40, не связанный со свитчом:** временный `vmbr2.40` (`bridge vlan add vid 40 dev vmbr2 self` + `ip link add ... type vlan id 40` + `ip addr add`) из дня 2 не пережил перезагрузку `pve01` — пришлось пересоздавать. Это не баг сегодняшней сессии, а ровно то, что было предсказано в дне 2 («не сохранён в конфиге, пропадёт при перезагрузке»).
+
+**Архитектурное решение по ОС:** решено **не оставлять** унаследованную инсталляцию AlmaLinux — переустановить через собственный процесс (PXE/kickstart, когда дойдём до Этапа F), а не наследовать чужие аккаунты/конфиги без проверки (принцип из `cluster_architecture_rationale.md` §3.3). Дистрибутив (AlmaLinux) как выбор можно оставить, конкретный образ — нет.
+
+Итог: железо узла 1 полностью подтверждено рабочим (CPU/RAM/NIC/BMC), доступ (root OS + BMC admin) восстановлен, физический layout понят. Остальные 3 узла рельсы не проверялись.
+
+Открыто:
+- Подтвердить `ipmitool user disable 4`/`7` реально выполнены (не подтверждено на момент записи).
+- Проверить оставшиеся 3 узла той же рельсы — тот же layout/железо/Shared-LAN вывод, или отличаются.
+- Пересчитать `production_port_plan.md` под 2 порта/ASUS-узел (LAN + IPMI dedicated) — текущий бюджет не сходится.
+- Модель шасси (RS720QA vs RS724QA, наличие InfiniBand) не определена — не проверяли DMI/шильдик на этот предмет в этой сессии.
+- Переустановка ОС узла — способ (PXE/kickstart vs ручной) не выбран, отложено до Этапа F.
+- **Команда финального переноса портов 19-26 на VLAN80(LAN)/VLAN30(IPMI) была продиктована, но выполнение не подтверждено** — на момент этой записи порты 19-26 предположительно ещё на временной VLAN40. Проверить фактическое состояние в следующей сессии (`show vlan 40/80/30` на switch1).
+
+### 2026-07-03 — asus01 (все 4 узла) — кабели проверены физически
+
+Пользователь развёл кабели LAN+IPMI на все 4 узла рельсы (порты 19-26 switch1). `show interfaces brief`: узел 4 (порты 25/26) первоначально показал LAN на `100FDx` вместо ожидаемых `1000FDx` — заменили/переставили кабель, после этого все 4 узла консистентны (LAN=1000FDx, IPMI=100FDx на портах 19/21/23/25 и 20/22/24/26 соответственно). Проблема была в кабеле, не в порту свитча или NIC.
+
+### 2026-07-03 — asus01 (узел 1) — попытка настроить постоянный DHCP, откат после ребута
+
+Цель — избавиться от необходимости лезть в каждую из 48 нод с монитором/клавиатурой при переустановке/перезагрузке. Решение (согласовано, не полностью реализовано): включить DHCP на VLAN80 (HTCONDOR) на `fw01` + DHCP static reservation по MAC на `fw01` (не на самой ноде) — тогда IP стабилен независимо от локального конфига ноды. Промежуточный факт: `nmcli connection modify enp2s0 ipv4.method auto` не сохранился как persistent-профиль — после ребута узла интерфейс откатился на старую статику `10.10.0.1/24`. Итог: DHCP на VLAN80 + reservation по MAC **не выполнены на момент записи** — открытый пункт.
+
+### 2026-07-03 — pve01 — замер потребления (idle/full load) и свитч
+
+По чеклисту `cluster_inventory_checklist.md` §9. Нагрузка — `stress-ng --cpu 32 --vm 4 --vm-bytes 75%`.
+```
+pve01 (Supermicro X10DRI-T, 2×E5-2620v4) — idle: 160W, full load (CPU+RAM): 240W
+switch1 (HP 3500yl-48G) — 130W при ~10 активных портах из 48 (не full load, скорее близко к baseline)
+```
+Оценка разумности: 240W full load ожидаемо для двух E5-2620v4 (85W TDP/сокет, не топовый чип) + 16×32GB RAM — совпадает с расчётной прикидкой, аномалий нет.
+
+### 2026-07-03 — pve01 — расследование медленного интернета (закрыто, не баг)
+
+Тест speedtest через `curl` на `proof.ovh.net` (Франция) и `hel1-speed.hetzner.com` (Финляндия) с `pve01` дал **~2-3 Mbit/s** на обоих путях (прямой кабель `nic0` и через `fw01`/`nic1`) — подозрение на проблему с сетью/роутером. Проверка по всем фронтам:
+- Тот же кабель роутера, подключённый не в роутер — даёт честный гигабит → кабель ни при чём.
+- Роутер определён как **Xiaomi Mi Router 3C (R3L)**, `192.168.31.1` — у этой модели **все Ethernet-порты (WAN+LAN) физически 100Mbps**, гигабита не может быть в принципе — не баг, характеристика модели.
+- WiFi-спидтест с телефона (через тот же роутер, сервер в Киеве) — 88.8/93.4 Mbit/s — показал, что реальный аплинк роутера быстрый.
+- Через MiWiFi API (реверс-инженерия логина: `sha1(nonce + sha1(pass+salt))`, эндпоинт `xqsystem/login`) залогинился и проверил `misystem/status` — у проводных устройств (`pve01`, `fw01`) нет полей лимита скорости в принципе (функция QoS в этой прошивке — только для WiFi) — гипотеза "лимит по MAC" не подтвердилась.
+- **Реальная причина: невезучие/зарезанные тестовые файлы** — тест на `ftp.ua.debian.org` (резолвится в Швецию) дал **43.8 Mbit/s**, а реальная загрузка Debian netinst ISO (755MB) с `cdimage.debian.org` — **~70-75 Mbit/s** за ~85 секунд, чексумма подтверждена.
+Итог: с интернетом `pve01` всё в порядке, чинить нечего.
+
+### 2026-07-03 — bastion01 — создание VM начато, установка не завершена
+
+Скачан и проверен `debian-13.5.0-amd64-netinst.iso` (чексумма подтверждена). Создана VM **bastion01** (VMID 102): 1 vCPU, 1024MB RAM, диск 16GB (`local-lvm`, iothread), сеть `vmbr2` тег **VLAN50 (DMZ)**. Установка Debian **не начата/не завершена** — отвлеклись на бенчмарки и новое оборудование. Открыто: пройти инсталлятор (minimal, только SSH server), статика `10.10.50.10/24`/gw `10.10.50.1`, затем SSH-hardening (`PermitRootLogin no`, только ключи, fail2ban).
+
+### 2026-07-03 — новое оборудование — принесены 2 доп. Supermicro + свитч Dell Force10 S60
+
+Пользователь физически принёс два дополнительных Supermicro (кандидаты на `pve02`/`pve03` — не инвентаризированы, только визуально подтверждено по фото) и один свитч другой модели — **не HP 3500yl**.
+
+### 2026-07-03 — switch (Dell Force10 S60) — идентификация, восстановление enable-доступа
+
+Консоль — через встроенный USB-B порт свитча (чип **Silicon Labs CP2102**, виртуальный COM-порт после установки официального VCP-драйвера), не через RS-232 (там нужен был бы rollover-кабель, которого не было под рукой). PuTTY, 9600 8N1.
+
+**Подтверждённая модель:** Dell Force10 **S60**, FTOS Application Software 8.3.3.5, control plane на **NetBSD** (PowerPC, CPU Freescale MPC8536E, 2GB RAM, 128MB boot flash), U-Boot 1.3.4. Порты: **48× GigabitEthernet + 2× TenGigabitEthernet** (`Te 0/48-49`, не 4×10G как предполагалось по фото) — на обоих 10G портах уже стоят SFP+ модули (warning "Non-qualified optics", т.е. не Dell-брендированные, но физически рабочие).
+
+**Сохранившийся конфиг вскрыл origin оборудования** (`show vlan` до восстановления enable):
+```
+VLAN 10 "uplinks to core DAQ"   — Te 0/48-49
+VLAN 11 "Farm DAQ"              — Gi 0/0-29,31 (31 порт)
+VLAN 30 "Storage"               — Gi 0/30
+```
+**"DAQ" (Data Acquisition)** — стандартный термин для сети считывания данных детектора в HEP-экспериментах (CERN/LHCb и т.п.) — ещё одно прямое подтверждение происхождения парка оборудования.
+
+**Восстановление enable-пароля** (заводские пароли и консольный логин без пароля — уже не защищены, но `enable` требовал неизвестный пароль):
+- Попытка через single-user-boot (`f10boot flash0 -s`, стандартный NetBSD-флаг) — не сработала (флаг просто игнорируется этой сборкой; ранее ошибочно принято за "краш" из-за собственного Ctrl+C пользователя).
+- Попытка через прямое чтение flash (`fatls`/`ext2ls`/`md.b`) — flash не имеет обычной ФС (сырые образы по фиксированным адресам), метод не дал результата, но был безопасным (только чтение).
+- Найденная в интернете процедура erase конкретных секторов flash через NetBSD DDB (`sysctl -w ddb.command="call flashStrataJ3CEraseSector(...)"`) — отклонена: адреса из статьи (для модели S50N) не совпадали с картой flash нашего S60 (`flinfo`), риск стереть загрузчик/ядро вместо конфига — счтено неприемлемым риском.
+- **Рабочее решение** (найдено через веб-поиск, кейс с идентичным `U-boot 1.3.4` на форуме Dell Community): в U-Boot —
+  ```
+  setenv stconfigignore true
+  saveenv
+  reset
+  ```
+  Заставляет FTOS загрузиться, **игнорируя старый startup-config** (только на уровне загрузки, ничего не стирается физически) → загрузка без пароля → `enable` прошёл без пароля (`%SEC-3-AUTHENTICATION_ENABLE_SUCCESS`).
+- В `Force10#`: установлен новый **`enable password level 15 <redacted, см. личный менеджер паролей>`**, сохранено (`copy running-config startup-config`, 4255 bytes). Затем **обязательно** вернули `stconfigignore` в `false` + `saveenv` в U-Boot — иначе новый сохранённый конфиг игнорировался бы при каждой следующей загрузке. После финальной перезагрузки: `%SYS-5-CONFIG_LOAD` подтвердил загрузку конфига, `enable` с новым паролем — подтверждён рабочим.
+- **Побочный эффект (ожидаемый и принятый):** старый конфиг (VLAN10/11/30, hostname `sw-d1a03-d1`) утрачен безвозвратно — устройство сейчас на чистом дефолте (hostname `Force10`). Это не потеря — мы планировали полностью переконфигурировать этот свитч под свою схему в любом случае.
+
+Итог: полный, постоянный, привилегированный доступ к Force10 S60 восстановлен. VLAN/IP/hostname под нашу архитектуру — **не настроены**, устройство физически ещё ни во что не включено (только консоль).
+
+Открыто на следующую сессию:
+- Настроить Force10 под нашу схему (hostname, VLAN, IP management) — с нуля, старого конфига нет.
+- Решить архитектурную роль этого свитча: третий LAN-свитч, или выделенный под 10G (Ceph public/replication VLAN60/61 — ровно 2 порта под 2 сети) — пересмотр решения по Ceph из `storage_decision_zfs_replication.md` теперь возможен (условие «появление б/у 10GbE» выполнено).
+- Инвентаризация 2 новых Supermicro (кандидаты `pve02`/`pve03`) — не начата.
+- Завершить установку `bastion01` (инсталлятор Debian не пройден).
+- Завершить перенос портов ASUS 19-26 на финальные VLAN (80/30) — не подтверждено выполнение.
+- DHCP + reservation на VLAN80 для ASUS — не выполнено.
+
+### 2026-07-03 — планирование топологии по шкафам, финальный `production_port_plan.md` v3.0
+
+Решено физическое размещение: 2 серверных шкафа, каждый со своим top-of-rack свитчом. **Force10 → шкаф Supermicro** (10G рядом с потенциальными Ceph-узлами), **switch1 (HP) → шкаф ASUS**. У каждого свитча — собственный аплинк к роутеру (иначе LAN2-избыточность Supermicro была бы иллюзорной — трафик к другому свитчу шёл бы через первый). Supermicro: LAN1+IPMI на Force10 (локально), LAN2 на switch1 (межшкафный кабель, реальный failover). ASUS LAN разделён между обоими свитчами (21+27=48 узлов, чтобы все получили LAN сразу), ASUS IPMI — временно только на switch1 (8 узлов, до покупки выделенного свитча). Полная раскладка — `production_port_plan.md` v3.0.
+
+Уточнение по физическим портам Force10 (по фото передней панели): `Gi 0/0-43` — обычная медь RJ45 (44 порта), `Gi 0/44-47` — SFP (оптика 1GbE, не медь, отдельно расположены на морде), `Te 0/48-49` — настоящие 10GbE SFP+ (ещё одна отдельная пара разъёмов, у консоли/USB). План использует только медные 0-43 для LAN/IPMI, 44-47 оставлены в резерве именно потому что не медные.
+
+**Важно, не сделано:** перенос кабеля `pve01` со switch1 на Force10 (текущий рабочий канал доступа к внутренним VLAN через `fw01` — трогать отдельным аккуратным шагом), bonding (active-backup LAN1/LAN2) на Proxmox не настроен ни на одном узле.
+
+### 2026-07-03 — Force10 S60 — настройка VLAN под целевую схему
+
+Консоль (`force10-sm#`, hostname задан). Настроены VLAN 10/20/30/40/50/80/99 на портах `Gi 0/0-43` под финальную схему шкафа Supermicro (см. `production_port_plan.md` §3): VLAN10 untagged 3-12, VLAN20/40/50 tagged 3-12, VLAN30 tagged 3-12 + untagged 13-22, VLAN80 tagged 3-12 + untagged 23-43, VLAN99 untagged 0. Подтверждено `show vlan` — точное совпадение с планом.
+
+**Грабли синтаксиса FTOS (пригодится на будущее, в т.ч. для повторной настройки этого же свитча):**
+- Порты по умолчанию в **Layer 3** режиме — перед VLAN-назначением нужно явно `switchport` (`interface range gi 0/X - Y` → `switchport` → `no shutdown`).
+- `interface range` синтаксис диапазона: `gi 0/X - Y` (пробелы вокруг тире, конец диапазона **без** `0/`, просто число) — например `gi 0/3 - 12`. Без пробелов или с `0/` на конце — `% Error: Invalid input`.
+- Команды `tagged`/`untagged` внутри `interface vlan N` **не принимают диапазон вообще** (ни тире, ни запятая) — только один порт за раз. Для 10-21 портов — 10-21 отдельных строк `tagged gi 0/X`.
+- Порт не может одновременно быть `untagged` в одном VLAN и `tagged` в другом, пока не переведён в **hybrid**-режим — иначе `% Error: Tagged flag mis-match`. Порядок обязателен: убрать порт из VLAN (`no untagged ...`) → `no switchport` → `portmode hybrid` → `switchport` → вернуть `untagged`/`tagged` заново.
+- Сохранение конфига — `copy running-config startup-config` (из top-level `force10-sm#`, не из `(conf)#`), **не** `write memory` (это команда HP ProCurve, на FTOS не существует).
+- `show vlan <N>` не существует — только `show vlan` целиком (весь список сразу).
+
+Итог: Force10 VLAN-конфиг соответствует плану, сохранён. Физически ничего ещё не подключено (только консоль) — линки на портах пока не активны (`Status: Inactive` у всех VLAN).
+
+Открыто: LACP port-channel между Force10 и switch1 (транк ещё не настроен, только зарезервированы порты 0/1-2); bonding (active-backup LAN1/LAN2) на `pve01`.
+
+### 2026-07-03 — pve01 → Force10 — перенос физического подключения (LAN + IPMI)
+
+Довели до конца пункт «перенести `pve01` на Force10» из предыдущей записи. Порядок действий (безопасный, с проверкой на каждом шаге):
+
+1. Доделан пропущенный тег VLAN99 на транковых портах Force10 (`tagged gi 0/3` … `0/12`) — без этого `fw01` не получил бы WAN через Force10 после переноса.
+2. Физически: новый кабель роутер → Force10 порт `0` (свой собственный аплинк, отдельно от switch1); кабель `pve01` LAN (`nic1`) → Force10 порт `3`; кабель IPMI `pve01` → Force10 порт `13`.
+3. На `pve01` в `/etc/network/interfaces` — **изменений не потребовалось**: `nic1`/`vmbr2` определяются по PCI/железу, не зависят от того, в какой физический свитч воткнут кабель.
+
+**Инцидент по пути:** первая попытка проверки показала все внутренние VLAN недоступны (IPMI, интернет) — `show interfaces status` на Force10 обнаружил: `Gi 0/3` (ожидаемый порт `pve01` LAN) был `Down`, а `Gi 0/2` (не наш, из диапазона под будущий LACP-транк) — неожиданно `Up, 1000Mbit` в VLAN1 (дефолт). Кабель физически попал на один порт левее целевого. Более ранние «успешные» пинги (MGMT, `test40`) до обнаружения — оказались на устаревшем ARP-кеше с **до** переноса кабеля, не реальным трафиком. После перестановки на правильный порт `3` — всё заработало.
+
+**Итоговая проверка (после исправления):**
+```
+ping 10.10.10.1 (MGMT)         — 0% потерь
+ping 10.10.30.11 (IPMI pve01)  — 0% потерь
+ping 10.10.40.140 (test40)     — 0% потерь
+интернет из test40 (1.1.1.1)   — 0% потерь  ← через собственный аплинк Force10 (порт 0), не через switch1
+DNS из test40 (nslookup)       — сначала SERVFAIL, исправлено перезапуском службы Unbound через GUI (тот же паттерн, что и раньше: смена WAN-пути требует ручного restart службы)
+ping 10.10.30.1 (сам IPMI-интерфейс fw01) — 100% потерь, но это **ожидаемо**: implicit deny на IPMI-интерфейсе блокирует непрошенный внешний трафик именно к адресу самого firewall; более ранний пройденный тест "MGMT видит IPMI" пинговал устройство *за* интерфейсом (10.10.30.11) через встроенный Diagnostics-инструмент OPNsense (трафик, сгенерированный самим firewall, не подчиняется входному фильтру так же, как внешний) — это не одно и то же, и не регрессия.
+```
+
+Итог: `pve01` полностью и штатно работает через Force10 (LAN, MGMT, IPMI, WAN/DNS) — миграция завершена и проверена. Старые порты switch1 (4 — LAN, 14 — IPMI) теперь свободны.
+
+Открыто: пересобрать VLAN-схему switch1 под его новую роль (шкаф ASUS, см. `production_port_plan.md` §3) — порты 4/14 освободились, порты 19-26 (ASUS-рельса-1, ещё на старой схеме) предстоит перекабелировать на новые 14(LAN)+41(IPMI); настроить LACP-транк между свитчами; bonding LAN1/LAN2 на `pve01`.
+
+### 2026-07-03 — switch1 — пересборка VLAN под роль шкафа ASUS
+
+Полностью пересобрана VLAN-схема switch1 под `production_port_plan.md` v3.0 (HP ProCurve CLI). Итог, подтверждено `show vlan <N>` по каждому VLAN:
+```
+VLAN 10 (MGMT)         untagged 4-13 (native)
+VLAN 20 (COROSYNC)     tagged 4-13
+VLAN 30 (IPMI)         untagged 41-48 (очищено от старого хвоста — тег на порту 4 остался от самой первой настройки трака pve01, убран)
+VLAN 40 (PRIVATE_VM)   tagged 4-13
+VLAN 50 (DMZ)          tagged 4-13
+VLAN 80 (HTCONDOR_PXE) tagged 4-13, untagged 14-40 (добор портов 5-13 — тоже был только порт 4 от старого хвоста)
+```
+Старые ASUS-назначения (`untagged 19,21,23,25` в VLAN80, `untagged 20,22,24,26` в VLAN30) — сняты. Порты 2-3 (под будущий LACP-транк к Force10) намеренно не трогали — их VLAN-теги настроим при создании самой trunk-группы, чтобы не переделывать.
+
+Итог: `show vlan` подтверждает полное соответствие плану. Порты 14-17 неожиданно показали `Up` в VLAN80 — похоже на начало перекабелирования ASUS-рельсы-1 на новые порты, требует подтверждения у пользователя (см. `switch1_port_map.md`).
+
+Подтверждено пользователем и `show vlan 30`: ASUS-рельса-1 перекабелирована на новые порты — узел1-4 → LAN 14-17 + IPMI 41-44 (`show vlan 80`/`show vlan 30` показывают все Up). Карта портов обновлена (`switch1_port_map.md` v2.1).
+
+Открыто: создать LACP-транк к Force10 (VLAN-теги на портах 2-3 здесь и 0/1-2 на Force10); bonding LAN1/LAN2 на `pve01`; инвентаризация `pve02`/`pve03`.
+
+### 2026-07-03 — Force10 ↔ switch1 — настроен LACP-транк между шкафами
+
+Межшкафный транк (`production_port_plan.md` §2-3: Force10 `Gi 0/1-2` ↔ switch1 порты 2-3). Кабели проведены по одному за раз, с проверкой согласования LACP перед добавлением второго — чтобы не словить L2-петлю до полного согласования.
+
+**Force10 (FTOS):**
+```
+interface port-channel 1
+ no ip address
+ portmode hybrid
+ switchport
+ no shutdown
+interface gi 0/1
+ no switchport
+ port-channel-protocol lacp
+  port-channel 1 mode active
+interface gi 0/2
+ no switchport
+ port-channel-protocol lacp
+  port-channel 1 mode active
+```
+**Грабли:** `port-channel-protocol lacp` требует, чтобы порт был в **дефолтном** (L3, не switchport) состоянии — эти порты уже были переведены в switchport при первоначальной настройке VLAN, отсюда `% Error: Port is not in default mode.`. Фикс — `no switchport` перед входом в LACP-субрежим. Сама команда `port-channel-protocol lacp` заводит в под-режим (`conf-if-ge-0/N-lacp`), где уже вводится `port-channel 1 mode active` — попытка ввести её сразу после проваленной `port-channel-protocol lacp` даёт `% Error: Invalid input`, т.к. остаёшься на уровень выше.
+
+**switch1 (HP ProCurve):**
+```
+trunk 2 trk1 lacp
+trunk 2-3 trk1 lacp
+```
+
+**VLAN-теги на транке** (10, 20, 30, 40, 50, 80 — без 99/WAN, у каждого свитча свой аплинк):
+```
+# Force10
+interface vlan 10/20/30/40/50/80
+ tagged port-channel 1
+
+# switch1
+vlan 10/20/30/40/50/80
+ tagged trk1
+```
+
+**Итог проверки:**
+```
+Force10: show interfaces port-channel 1 → Po1 up, line protocol up, Members: Gi 0/1(U) Gi 0/2(U), LineSpeed 2000 Mbit
+HP:      show lacp → порты 2 и 3, Status Up, Partner Yes, LACP Status Success
+Force10: show vlan → все VLAN 10/20/30/40/50/80 несут T Po1(Gi 0/1-2)
+HP:      show vlan <N> по каждому → Trk1 Tagged Up во всех шести
+```
+Побочная находка: при проверке VLAN80 порт 14 (ASUS узел1, LAN) неожиданно показал `Down` — пользователь проверил физически, кабель был отходил, переподключил, устранено.
+
+Сохранено: Force10 `copy running-config startup-config`, switch1 `write memory`.
+
+Итог: LACP-транк между Force10 и switch1 полностью настроен, согласован (2 Гбит/с суммарно) и сохранён. Открыто: bonding LAN1/LAN2 на `pve01`; инвентаризация `pve02`/`pve03`.
+
+### 2026-07-03 — pve01 — постоянный MGMT-доступ (VLAN10) + Tailscale subnet router (закрывает давний открытый пункт)
+
+**Шаг 1 (сделано, персистентно):** добавлен `vmbr2.10` в `/etc/network/interfaces` (`address 10.10.10.11/24`) поверх уже работающего `nic1`/`vmbr2` (Force10-транка) — параллельный management-путь через VLAN10, не трогая старый прямой кабель `nic0`→роутер. Проверено: `ping -I vmbr2.10 10.10.10.1` (шлюз `fw01` MGMT) — 0% потерь.
+
+**Шаг 2 (сделано, закрывает пункт «Постоянная схема admin-доступа к GUI fw01» из дня 2):** вместо временного, не переживающего перезагрузку `vmbr2.40` + SSH-туннеля — настроен **Tailscale subnet router** на `pve01`:
+```
+sysctl net.ipv4.ip_forward = 1   (персистентно, /etc/sysctl.d/99-tailscale.conf)
+tailscale up --advertise-routes=10.10.40.0/24
+```
+Маршрут одобрен в консоли Tailscale (`AllowedIPs`/`PrimaryRoutes` подтвердили `10.10.40.0/24`).
+
+**Грабли:** после одобрения маршрута GUI всё равно был недоступен (`ping 10.10.40.1` не проходил с ноутбука) — причина в том, что у `pve01` не было **локального интерфейса** в VLAN40 (старый `vmbr2.40` не пережил сессию/перезагрузку), поэтому пересылать пакеты Tailscale было некуда (`ip route` не показывал маршрут к `10.10.40.0/24` вообще). Фикс — тот же `vmbr2.40`, но теперь **персистентно** через `/etc/network/interfaces`:
+```
+auto vmbr2.40
+iface vmbr2.40 inet static
+        address 10.10.40.3/24
+```
+`ifreload -a` → маршрут появился → `ping 10.10.40.1` с ноутбука 0% потерь → GUI `fw01` открывается напрямую по `https://10.10.40.1`, без SSH-туннеля.
+
+Итог: **закрыт открытый с Дня 2 пункт** «постоянная схема admin-доступа к GUI `fw01`». Побочный итог: параллельный MGMT-путь (VLAN10) на `pve01` тоже персистентен и проверен — задел для Этапа B (bonding), но старый прямой кабель `nic0`→роутер (`vmbr0`, Tailscale) пока не трогали.
+
+Открыто: Этап B — перенести `nic0` с прямого кабеля в роутер на switch1 (LAN2), собрать `bond0` (active-backup, `nic1` primary) — после того, как VLAN10-путь будет ещё раз проверен на переживание перезагрузки `pve01`.
+
+### 2026-07-03 — решение — Этап B (bonding LAN1/LAN2 pve01) отложен осознанно
+
+Пользователь поднял верный вопрос: если убрать `nic0` (прямой кабель в роутер, независимый от свитчей) и полностью перевести доступ на bonding через Force10+switch1, а параллельно ещё предстоит много ручной настройки самих свитчей/VLAN (полный ASUS-роллаут, выделенный IPMI-свитч и т.д.) — при ошибке в свитче/VLAN можно потерять вообще весь удалённый доступ к `pve01`, останется только монитор+клавиатура.
+
+**Дополнительный аргумент против:** IPMI `pve01` (`10.10.30.11`) тоже не независим от `vmbr2`/`pve01` — `fw01` (роутер между VLAN, в т.ч. до IPMI) сам является VM, работающей через `vmbr2` на этом же хосте. Если `vmbr2`/`nic1` сломается — упадёт разом и хост, и путь к IPMI, и все VLAN.
+
+**Решение:** `nic0` остаётся на прямом кабеле в роутер как единственный по-настоящему независимый путь к `pve01`, пока сетевая инфраструктура (свитчи/VLAN) не станет стабильнее. Bonding LAN1/LAN2 — отложено, не забыто, пересмотреть после того как основной объём hands-on работы по свитчам завершится (дедик. IPMI-свитч куплен, ASUS полностью разведён и т.д.).
+
+### 2026-07-03 — Force10 S60 — настоящий out-of-band доступ через ManagementEthernet 0/0
+
+Вместо/в дополнение к риску Этапа B — обнаружен и настроен **физически отдельный** management-порт на Force10 (виден на фото панели рядом с `USB-B`/`RS-232`, не в общей нумерации `Gi 0/0-47`). Управляется control-plane CPU напрямую, не завязан на коммутационную матрицу/VLAN — то есть остаётся доступным, даже если данные-порты/VLAN полностью сломаны.
+
+Физически подключён через отдельный неуправляемый TP-Link TL-SG1005D (5 портов): порт1=роутер, порт2=аплинк Force10 (`Gi 0/0`, VLAN99), порт3=аплинк switch1, порт4=Force10 `ManagementEthernet 0/0`. Общая точка отказа (TP-Link/роутер) не нарушает изначальную цель избыточности (защита от отказа именно одного из свитчей) — риск отказа самого роутера и так уже есть, не увеличивается.
+
+**Конфигурация:**
+```
+interface ManagementEthernet 0/0
+ ip address 192.168.31.60/24
+ no shutdown
+management route 0.0.0.0/0 192.168.31.1
+crypto key generate rsa
+ip ssh server enable
+username admin password <redacted, см. личный менеджер паролей> privilege 15
+copy running-config startup-config
+```
+
+**Грабли:** современный OpenSSH-клиент по умолчанию отключает старые алгоритмы, которые предлагает FTOS SSH-сервер — потребовалось явно разрешить:
+```
+ssh -oKexAlgorithms=+diffie-hellman-group14-sha1 -oHostKeyAlgorithms=+ssh-rsa -oCiphers=+3des-cbc admin@192.168.31.60
+```
+(без этого — сначала `no matching key exchange method`, затем `no matching cipher found`, только с обоими флагами подключение прошло).
+
+Итог: `ping 192.168.31.60` — 0% потерь, `ssh admin@192.168.31.60` (с флагами выше) — подключение подтверждено, `force10-sm#` доступен. **Полностью независимый от VLAN/`fw01`/`pve01` удалённый CLI-доступ к Force10 настроен.**
+
+Открыто: проверить, есть ли аналогичный выделенный management-порт у switch1 (HP 3500yl) — по имеющимся данным, вероятно нет (только VLAN-based management на этой модели), уточнить отдельно.
+
+### 2026-07-03 — switch1 — подтверждено: нет выделенного OOB-порта, включён SSH через VLAN10 (in-band)
+
+По фото задней панели подтверждено: у HP 3500yl-48G **нет** отдельного Ethernet management-порта — только `Auxiliary Port` (последовательный, для модема, не Ethernet) и разъёмы резервного питания (`RPS`/`PoE EPS Input` — это питание самого свитча, не сетевые порты). Значит, remote-доступ к switch1 возможен только in-band, через уже назначенный `10.10.10.2/24` на VLAN10 — с той же оговоркой про зависимость от `fw01`/`pve01`/`vmbr2`, что и у IPMI (не полная независимость, но Force10 её уже обеспечивает — не нужно на каждом устройстве).
+
+**Конфигурация:**
+```
+configure
+crypto key generate ssh
+ip ssh
+```
+
+**Проверка (с `pve01`, через `vmbr2.10` в той же MGMT-подсети):**
+```
+ssh -oKexAlgorithms=+diffie-hellman-group14-sha1 -oHostKeyAlgorithms=+ssh-rsa manager@10.10.10.2
+```
+Тот же паттерн старых алгоритмов, что и на Force10 (сначала `no matching key exchange method`, затем `no matching host key type` — оба флага понадобились). Логин — `manager` (стандартный полнодоступный аккаунт HP ProCurve), пароль — тот же, что `enable`/консоль.
+
+Итог: SSH-доступ к switch1 подтверждён рабочим. Обе платформы теперь управляются удалённо: Force10 — полностью независимо (`ManagementEthernet 0/0`, `192.168.31.60`), switch1 — in-band через VLAN10 (`10.10.10.2`). Серийная консоль остаётся fallback на случай полного отказа VLAN-инфраструктуры у switch1.
+
+### 2026-07-03 — switch1 → переименован в `hp3500`
+
+Хостнейм свитча и алиас в `~/.ssh/config` на `pve01` синхронизированы под новое имя (симметрично `force10-sm` — модель+роль): `hostname hp3500` + `write memory`. Грабли по пути: в `~/.ssh/config` был мешающий глобальный `Ciphers`-стейтмент без привязки к `Host` (перебивал per-host `Ciphers +3des-cbc` для `force10` из-за правила «первое совпадение побеждает» в ssh_config) — удалён; также убран дублирующий блок `Host switch1` после переименования.
+
+### 2026-07-03 — pve02 — инвентаризация, установка Proxmox, базовая настройка
+
+Второй из принесённых Supermicro (кандидат `pve02`) введён в строй. Проведено физическое подключение LAN1→Force10 порт 4, IPMI→Force10 порт 14 (одновременно с `pve03`, чьи кабели тоже видны на `Gi 0/5`/`Gi 0/15` — второй узел вводится параллельно).
+
+**Инвентаризация (по SSH, после установки):**
+- Плата **`X10DRI-T`** — та же платформа, что и `pve01` (одна партия из CERN).
+- CPU: 2× Xeon E5-2620 v4, 32 потока — идентично `pve01`.
+- HBA: внутренний `SAS3224` (02:00.0), внешний `SAS3216` (81:00.0) — тот же класс SAS3, что у `pve01` (там `SAS9305-16i/16e`), но другие конкретные чипы — под JBOD должны подойти так же.
+- Сеть: 2× Intel X540-AT2 10GbE (`nic0`/`nic1`) — идентично `pve01`. `nic0` (LAN1) Up через Force10, `nic1` (LAN2, будущее подключение к switch1) пока не подключен — по аналогии с отложенным Этапом B на `pve01`.
+- Диски: 2× Micron ~894GB — при установке ошибочно показался только один (`/dev/sda`) в первом экране инсталлятора, второй нашёлся через "Advanced options" (там стрелкой `>`/`<` можно выбрать между дисками) — установлено на **ZFS RAID1** (не единичный диск), в отличие от первого впечатления.
+- Серийники платы — дефолтные ("123456789"/"Default string"), не так явно палят происхождение как `lhcbadmin` на ASUS, но платформа идентична подтверждённому CERN-узлу `pve01`.
+
+**Установка Proxmox VE 9.2-1:** hostname `pve02.localdomain`, сеть настроена сразу правильно (не через легаси-костыль, как у `pve01`) — `vmbr0` = `10.10.10.12/24`, gw `10.10.10.1`, напрямую в MGMT через Force10-транк. `ping 10.10.10.1`/`ping 1.1.1.1` — 0% потерь сразу после установки.
+
+**IPMI:** DHCP/`0.0.0.0` по умолчанию → переставлен на статику `10.10.30.12/24`, gw `10.10.30.1` (тот же приём `ipmitool lan set`, что и на `pve01`/`asus01`). Подтверждено `ping 10.10.30.12` с `pve01` — 0% потерь.
+
+**Важно — смена режима работы:** пользователь явно разрешил выполнять инфраструктурные команды напрямую (в отличие от установленного ранее в этой сессии "ручного режима"), чтобы parallel работать над `pve03` за консолью. Доступ настроен через SSH-ключ `pve01`→`pve02` (публичный ключ добавлен пользователем в `authorized_keys` вручную за консолью `pve02`, дальше — автоматизировано с `pve01`): апстрим-репозитории (enterprise→no-subscription, тот же фикс, что и в День 1 на `pve01`), `ipmitool` установлен, IPMI настроен — всё выполнено напрямую, без диктовки команд пользователю.
+
+**Замечание по безопасности:** пользователь сообщил, что использует один и тот же пароль (`<redacted, см. личный менеджер паролей>`, тот же что на `enable` Force10) везде при установке ОС — предупреждён о риске (компрометация одного узла = доступ ко всем). Пароль не понадобился и не использовался (SSH настроен через ключ), нигде не записан.
+
+Итог: `pve02` полностью введён в строй (LAN, MGMT, IPMI, интернет), готов к присоединению в Proxmox-кластер. Открыто: `pve03` (параллельно вводится пользователем), LAN2/`nic1` не подключен (отложено как и на `pve01`), сборка кластера (`pvecm`).
+
+### 2026-07-03 — pve03 — инвентаризация, установка, настройка (тем же способом, что и pve02)
+
+Третий узел, введён пользователем параллельно с `pve02`. Полностью идентичное железо: плата `X10DRI-T` (серийник платы `NM186S012749` — соседний с `pve02`'s `NM186S012892`, подтверждает одну партию), 2× Xeon E5-2620 v4, **512GB RAM** (16×32GB DDR4, `2667 MT/s`/сконфигурировано `2133 MT/s` — впервые явно зафиксирован объём RAM для узла этой партии), HBA `SAS3224`+`SAS3216`, 2× Intel X540-AT2, 2× Micron ~894GB (ZFS RAID1). Установка Proxmox VE 9.2-1, hostname `pve03.localdomain`, сеть сразу на `10.10.10.13/24` через Force10 (LAN1). `nic1` (LAN2) не подключен — то же осознанное решение, что и на `pve01`/`pve02`.
+
+**Грабли по пути (SSH-ключ pve01→pve03):** первая попытка вставить публичный ключ вручную в консоль `pve03` обрывалась на одном и том же месте несколько раз подряд — оказалось, ограничение буфера вставки в консоли пользователя, не ошибка команды. Решено через `ssh-copy-id root@10.10.10.13` (пользователь ввёл пароль узла интерактивно, не в тексте команды — попытка сделать то же через `sshpass`/пароль-в-командной-строке была заблокирована классификатором как утечка credential в shell history/process list, справедливо). После `ssh-copy-id` — ключ встал корректно; заодно почищены задвоенные обрезанные строки в `authorized_keys`, оставшиеся от неудачных вставок.
+
+Репозитории (enterprise→no-subscription), `ipmitool`, IPMI статика `10.10.30.13/24` (gw `10.10.30.1`) — тем же способом, что на `pve02`. `ping 10.10.10.1`/`ping 1.1.1.1`/`ping 10.10.30.13` (с `pve01`) — везде 0% потерь.
+
+Итог: `pve01`/`pve02`/`pve03` — все три узла в сети (LAN1+MGMT+IPMI), готовы к сборке Proxmox-кластера (`pvecm`). Открыто: LAN2/`nic1` на всех трёх (отложено), кластеризация — следующий шаг.
+
+### 2026-07-03 — Proxmox-кластер `npd` собран (3 узла), Corosync переведён на выделенную VLAN20
+
+**Подготовка (выполнена напрямую, с явного разрешения пользователя):** на всех трёх узлах добавлен VLAN20-интерфейс под Corosync — `pve01` (`vmbr2.20`, `10.10.20.11`, поверх уже VLAN-aware `vmbr2`), `pve02`/`pve03` (`vmbr0.20`, `10.10.20.12`/`.13` — здесь пришлось сначала сделать сам `vmbr0` VLAN-aware, `bridge-vlan-aware yes` + `bridge-vids 10,20,30,40,50,80,99`, т.к. у этих узлов только один физический линк на Force10-транк, в отличие от `pve01` с отдельным `vmbr2`). Проверено: все три узла пингуют друг друга по VLAN20 напрямую через Force10 (L2, без захода в `fw01` — минимальная задержка для Corosync).
+
+**Сборка кластера — сделано пользователем через GUI**, как он и хотел: `Datacenter → Cluster → Create Cluster` на `pve01` (имя `npd`), `Join Cluster` на `pve02`/`pve03`. Расширен Tailscale subnet router (`--advertise-routes=10.10.40.0/24,10.10.10.0/24`) для прямого доступа к GUI `pve02`/`pve03` с ноутбука.
+
+**Грабли:** при создании кластера через GUI Corosync-сеть по умолчанию встала на MGMT (`10.10.10.x`), а не на подготовленную VLAN20 (`10.10.20.x`) — видимо, выбор сети в мастере не был явным. Исправлено официальной процедурой Proxmox (без пересборки кластера):
+```
+cp /etc/pve/corosync.conf /etc/pve/corosync.conf.new
+# правка ring0_addr на 10.10.20.x для каждого узла + config_version +1
+mv /etc/pve/corosync.conf.new /etc/pve/corosync.conf   # атомарный mv триггерит pmxcfs разослать всем
+```
+**Важный нюанс, не описанный явно в доках:** одной правки конфига оказалось недостаточно — `corosync-cfgtool -s` продолжал показывать привязку к старому адресу (`10.10.10.11`), пока не выполнен явный `systemctl restart corosync` **на каждом узле по очереди** (не одновременно — с 3 узлами по 1 голосу кворум 2/3 переживает рестарт одного). После рестарта по очереди (`pve01`→`pve02`→`pve03`, с проверкой `connected` между шагами) — все три вышли на `10.10.20.x` и увидели друг друга.
+
+**Разделение ответственности:** правку `corosync.conf` и рестарт службы пользователь сначала пытался делегировать мне (уже была активна расширенная автономия для `pve02`/`pve03`), но классификатор дважды заблокировал прямое применение (`mv` в `/etc/pve/corosync.conf` и `systemctl restart corosync`) как вмешательство в общий кластерный конфиг после того, как пользователь явно сказал «я сам через GUI это сделаю» — команды выполнил пользователь сам, я только готовил черновик конфига и диагностировал.
+
+**Итог проверки (`pvecm status` + `corosync-cfgtool -s`):**
+```
+Quorate: Yes, Quorum: 2, Total votes: 3
+Membership: 10.10.20.11 (pve01, local), 10.10.20.12 (pve02), 10.10.20.13 (pve03)
+LINK ID 0 udp, addr = 10.10.20.11, все nodeid connected
+```
+
+Итог: Proxmox-кластер `npd` полностью собран, здоров, Corosync изолирован на VLAN20. Открыто: LAN2/bonding на всех трёх узлах (отложено), HA/репликация storage (ZFS-replication путь из `storage_decision_zfs_replication.md`) ещё не настроены.
+
+### 2026-07-03 — аудит персистентности конфигурации после сегодняшних изменений
+
+Пользователь спросил прямо — переживёт ли вся сегодняшняя настройка перезагрузку узлов/свитчей. Проверено:
+- **`pve01`/`pve02`/`pve03`:** все VLAN-интерфейсы (`vmbr2.10/20/40`, `vmbr0.20`) — в `/etc/network/interfaces`, персистентны. `ip_forward` — в `/etc/sysctl.d/`, персистентно. `corosync.service` — `enabled` на всех трёх. IPMI IP — в NVRAM BMC, не зависит от ОС хоста.
+- **Найдена и исправлена дыра:** маршрут к IPMI-сети на `pve01` (`10.10.30.0/24 via 10.10.10.1`) был добавлен ранее в сессии голой командой `ip route add` — runtime-only, не пережил бы перезагрузку. Исправлено — добавлена строка `up ip route add ...` в блок `vmbr2.10` в `/etc/network/interfaces`, применено `ifreload -a`, подтверждено.
+- **Force10:** SSH/`ManagementEthernet`/`username` сохранены явным `copy running-config startup-config` в рамках той же сессии, когда настраивались — должно быть в порядке.
+- **`hp3500`:** LACP/VLAN сохранены `write memory` в момент настройки. Хостнейм (`hp3500`) и SSH (`crypto key`/`ip ssh`) настраивались **позже**, без явного подтверждения повторного сохранения — пользователь попрошен перепроверить и пересохранить (`write memory`) на всякий случай. Заодно найден старый хвост `snmp-server community "public" unrestricted` (ещё с Дня 1, помечен на удаление перед production, не тронут в моменте).
+
+Итог: не полагаться на "должно быть ок" при инфраструктурных изменениях — правило на будущее: после любой правки конфига свитча/сети явно спрашивать/проверять факт сохранения, а не считать это самоочевидным.
+
+### 2026-07-03 — VM `fw01`/`test40` перенесены на `pve02` (ZFS), настроена репликация pve02→pve03
+
+**Цель:** включить ZFS-репликацию для отказоустойчивости VM. Обнаружено препятствие: **`pve01` стоит на LVM-thin (`local-lvm`), а не на ZFS** — установлен в День 1 без явного выбора ZFS в инсталляторе; `pve02`/`pve03` (ставились сегодня) — на ZFS RAID1. Встроенная репликация Proxmox работает **только между ZFS-хранилищами**. Решение (согласовано с пользователем): перенести все VM с `pve01` на `pve02`, освободив `pve01` (переустановка на ZFS — отдельная будущая задача).
+
+**Регистрация ZFS-хранилища:** пул `rpool` физически был, но не зарегистрирован в Proxmox вообще. Добавлено: `pvesm add zfspool local-zfs --pool rpool/data --content images,rootdir --nodes pve02,pve03` (ограничено этими двумя узлами — у `pve01` пула нет, там показывает `disabled`, это норма).
+
+**Грабли миграции — `lvmthin` → `zfspool` напрямую невозможно:** `qm migrate --targetstorage` и `pct migrate` падают с `cannot migrate from storage type 'lvmthin' to 'zfspool'` (несовместимые механизмы экспорта тома). Обход — через **backup/restore**:
+- `bastion01` (102) — пустой (установка не начиналась), просто удалён (пересоздадим на ZFS позже).
+- `test40` (101, LXC) — `vzdump --mode stop` → `scp` архива на pve02 → `pct destroy` на pve01 (освободить VMID) → `pct restore ... --storage local-zfs`.
+- `fw01` (100, роутер) — так же через `vzdump`/`qmrestore` (реальный простой ~22 сек на снятие снапшота бэкапа; на время cutover — выключен/восстановлен). ISO OPNsense пришлось отцепить (`--ide2 none` — образ жил на per-node `local` хранилище pve01, на pve02 его нет).
+- **Важно:** классификатор дважды заблокировал `qm/pct destroy` источника (необратимо, не было явного подтверждения удачной копии) — правильно; удаление делал пользователь вручную после подтверждения, что бэкап на pve02 цел.
+- После restore на каждой VM/CT — правка сетевых мостов: у pve01 транк-мост зовётся `vmbr2`, у pve02 — `vmbr0`; исправлено `qm set --netN ...bridge=vmbr0` / `pct set --net0 ...bridge=vmbr0`.
+
+**СЕРЬЁЗНЫЙ сетевой инцидент по ходу (разобран, устранён):** после запуска `fw01` на pve02 его MGMT (VLAN10) не работал. Причина — **фундаментальный VLAN-gotcha для узлов с одним физическим линком** (pve02/pve03, в отличие от pve01 с отдельным `nic0`+`nic1`): порт Force10 отдаёт VLAN10 **untagged (native)**, а VLAN-aware мост без `bridge-pvid 10` на `nic0` гоняет VLAN10 **tagged** → несовпадение. Попытка добавить `bridge-pvid 10` привела к **потере доступа к самому хосту pve02**: `bridge-pvid` на стойке моста `vmbr0` НЕ переносит надёжно сам мост (где висел IP хоста) в VLAN10 в ifupdown2 — хост остался на внутренней VLAN1, `nic0` ушёл на PVID10 → рассогласование → хост изолирован (IPMI при этом жив — отдельный физический порт). `ifreload -a` на аплинк-порту оборвал и SSH-сессию (таймаут команды).
+
+**Правильное решение (проверенный паттерн pve01):** IP хоста НЕ на голом мосту, а на VLAN-подинтерфейсе — `vmbr0.10` (`10.10.10.12/24` + gw), сам `vmbr0` без IP (`inet manual`), `nic0` с `bridge-pvid 10`, `vmbr0.20` (Corosync) остаётся. Итоговая раскладка `nic0`: `PVID 10 untagged` + tagged `20,30,40,50,80,99` — точно совпадает с портом свитча.
+- Восстановление доступа: пользователь на консоли (out-of-band) откатил `bridge-pvid` (`sed -i '/bridge-pvid 10/d'` — вернулся к рабочему состоянию хоста), затем полный фикс сделан **по SSH с автооткатом** (`nohup` фоном: применить → ждать 90с флага `/tmp/net-commit` → если не пришёл, вернуть бэкап и `ifreload`). Так лечится риск lockout при правках сети по SSH.
+- Тот же фикс применён к pve03 (он не был тронут ранее — цикл оборвался на pve02; хост работал, но с той же скрытой проблемой, критичной для будущего failover `fw01` туда).
+
+**Настройка репликации:** `pvesr create-local-job 100-0 pve03 --schedule '*/15'` (fw01) и `101-0` (test40) — pve02→pve03, каждые 15 минут. Первая полная синхронизация запущена вручную (`pvesr run`): fw01 (32ГБ) — 227с, test40 — 3с, обе `State OK`, `FailCount 0`. Тома подтверждены на pve03 (`rpool/data/vm-100-disk-0` zvol; test40 rootfs — ZFS-subvol).
+
+**Итоговая сверка:** кластер `Quorate` (3/3, Corosync на VLAN20), IPMI всех трёх узлов OK, `fw01` running на pve02, `test40` интернет OK, MGMT `fw01`/хостов на всех узлах OK.
+
+Открыто:
+- **Автоматический HA-failover (`ha-manager`) — НЕ включён**, отдельное решение: при отказе pve02 `fw01`/`test40` не переедут на pve03 сами (только ручной старт из реплики, потеря ≤15 мин данных). HA с fencing может вызывать неожиданные ребуты узлов при потере кворума во время сетевых работ — рискованно включать, пока идёт активная hands-on настройка. Обсудить отдельно.
+- ~~**`pve01` на LVM, не ZFS**~~ — решено без переустановки, см. следующую запись.
+- `bastion01` пересоздать на ZFS (pve02/pve03) при возврате к его установке.
+
+### 2026-07-03 — pve01 подключён к репликации через ZFS на свободном диске (без переустановки)
+
+Пользователь спросил, что важного на `pve01` перед переустановкой. Инвентаризация показала, что **переустановка не нужна и была бы вредна** — `pve01` это операторский хаб, не пустой узел:
+- **Tailscale subnet router** (advertised `10.10.10.0/24`, `10.10.40.0/24`) — единственный путь ноутбука пользователя к внутренним VLAN/GUI.
+- **Окружение Claude Code / cursor-server / codex / rustup** (~1.5ГБ+ в `/root`) — рабочая среда, из которой ведётся вся работа.
+- Член кластера (nodeid 1), git-репозиторий документации (`/root/server-npd`), SSH-ключи (`id_rsa` → доступ к pve02/03/свитчам), git-токен (`/root/git.env`), прямой кабель `nic0`→роутер (независимый резервный доступ).
+
+**Ключевая находка:** у `pve01` два SSD — `sda` (система, LVM) и **`sdb` (894G Micron 5200, пустой** — только `lost+found`, не в fstab, не примонтирован). Репликации Proxmox нужен ZFS только для **дисков VM**, не для корневой ФС хоста. Значит достаточно поднять ZFS на `sdb`:
+```
+wipefs -a /dev/sdb
+zpool create -f -o ashift=12 rpool /dev/disk/by-id/ata-Micron_5200_MTFDDAK960TDD_18031DBC5C7C
+zfs create rpool/data
+```
+Пул назван **`rpool`** намеренно (как boot-пул на pve02/03) — хранилище `local-zfs` в Proxmox задаётся одним путём `rpool/data` на весь кластер, для работы репликации путь должен существовать одинаково на всех узлах. У pve01 корень на LVM (`sda`), так что `rpool` на `sdb` — чисто data-пул, с загрузкой не конфликтует. Затем `pvesm set local-zfs --nodes pve01,pve02,pve03` — хранилище стало `active` на всех трёх (раньше на pve01 было `disabled`).
+
+**Компромисс (осознанный):** VM-хранилище на pve01 — single-disk (без локального зеркала, в отличие от pve02/03 RAID1). Приемлемо: VM всё равно реплицируются на зеркальный pve02/03, при отказе sdb — restore из реплики.
+
+**Важно про модель управления репликацией** (ответ на вопрос пользователя «могу ли сам выбирать что куда копируется»): да, полный granular-контроль — репликация пообъектная и opt-in. По умолчанию не копируется ничего. Каждое задание = одна VM → один целевой узел → свой график; можно на несколько узлов (несколько заданий), можно пропускать отдельные диски VM (галка «Skip replication»). Единственное условие — у целевого узла должно быть ZFS-хранилище с тем же ID (`local-zfs`), что теперь выполнено на всех трёх.
+
+Итог: все три узла — полноценные peer'ы репликации. Текущие задания (fw01, test40 → pve03) работают инкрементально. Открыто: решить топологию репликации критичных VM (напр. fw01 на ОБА других узла для failover на любой) — за пользователем.
+
+### 2026-07-08 — контрольная точка после паузы: кластер жив, репликация `fw01` уже на два запасных узла
+
+После возврата к работе выполнен read-only аудит с `pve01` (операторский узел). Цель — понять точную точку остановки, не трогая сеть, VM placement, Corosync и HA.
+
+**Проверка кластера (`pvecm status`):**
+```
+Name: npd
+Nodes: 3
+Quorate: Yes
+Total votes: 3
+Quorum: 2
+Membership:
+  10.10.20.11 (pve01, local)
+  10.10.20.12 (pve02)
+  10.10.20.13 (pve03)
+```
+Corosync по-прежнему использует выделенную VLAN20 (`10.10.20.x`), config version `4`.
+
+**Текущий workload:** `fw01` (VM 100) и `test40` (CT 101) запущены на `pve02`. HA auto-failover не включён: `ha-manager status` показывает `quorum OK`, `fencing standby`, HA-ресурсов нет.
+
+**Репликация (`pvesr status` на `pve02`):**
+```
+100-0  pve02 -> pve03  schedule */15  State OK  FailCount 0
+100-1  pve02 -> pve01                State OK  FailCount 0
+101-0  pve02 -> pve03  schedule */15  State OK  FailCount 0
+```
+Важное уточнение к предыдущему открытому пункту: для `fw01` топология уже расширена до двух запасных узлов (`pve03` и `pve01`). `test40` пока реплицируется только на `pve03`.
+
+**Storage:** на `pve01` ZFS-пул `rpool` на отдельном Micron SSD online, ошибок нет; `local-zfs` active. В `/etc/pve/storage.cfg` всё ещё есть общий `local-lvm`, из-за чего на `pve02`/`pve03` `pvesm status` печатает `no such logical volume pve/data` (у них ZFS-инсталляция, LVM-thin нет). Это не блокирует работу `local-zfs` и репликации, но стоит отдельно подчистить, чтобы GUI/CLI не шумели.
+
+**Следующие безопасные шаги:**
+- выполнить контролируемый ручной failover-test `fw01` на узел с репликой, но только после отдельного согласования сценария, потому что это затрагивает роутинг;
+- решить, нужна ли репликация `test40` также на `pve01`;
+- пересоздать `bastion01` на `local-zfs`;
+- не включать HA/fencing для `fw01` до завершения активных сетевых работ и отдельного обсуждения риска неожиданных перезапусков.
+
+Подготовлен отдельный черновик runbook для согласования: `fw01_manual_failover_runbook.md`. Важное правило из него: после запуска `fw01` на `pve03` диск на `pve03` становится актуальным, поэтому возврат на `pve02` должен идти миграцией/копированием актуального диска, а не простым переносом VM config обратно.
+
+### 2026-07-08 — выполнен planned migration test `fw01`: `pve02` → `pve03` → `pve02`
+
+По явному согласию пользователя выполнен только безопасный Вариант A из `fw01_manual_failover_runbook.md`: online migration живой VM `fw01` между узлами и возврат обратно. HA/fencing не включались, replica-failover с ручным переносом config не выполнялся.
+
+**Preflight:** `pvecm status` — `Quorate: Yes`, 3/3 узла; `fw01` running на `pve02`; реплика `rpool/data/vm-100-disk-0` на `pve03` есть; config VM 100 на `pve03` отсутствовал (как и должен до миграции); шлюзы `10.10.10.1` и `10.10.40.1` отвечали.
+
+**Найденный нюанс:** первая попытка
+```
+qm migrate 100 pve03 --online --targetstorage 1
+```
+остановилась безопасно на pre-check:
+```
+can't live migrate attached local disks without with-local-disks option
+```
+VM не была затронута, осталась running на `pve02`. Правильная команда для текущей схемы local ZFS + replicated disk:
+```
+qm migrate 100 pve03 --online --targetstorage 1 --with-local-disks
+```
+
+**Результат `pve02` → `pve03`:** миграция успешна, длительность задачи ~3:30, в логе Proxmox downtime `131 ms`, VM-state передано ~2.1 GiB. После миграции `fw01` running на `pve03`, config VM 100 на `pve02` отсутствовал, quorum 3/3. Проверки: `10.10.10.1`, `10.10.30.1`, `10.10.40.1` отвечали; `test40` из VLAN40 пинговал `1.1.1.1` без потерь.
+
+**Наблюдение:** `10.10.80.1` не отвечал на ping (100% loss) во время проверки после миграции. Это не сломало текущий тест (основной MGMT/IPMI/Private routing был жив), но VLAN80/HTCondor gateway стоит отдельно проверить перед PXE/HTCondor работами.
+
+**Возврат `pve03` → `pve02`:** выполнен той же командой с `--with-local-disks`, успешно, длительность задачи ~3:18, downtime `189 ms`, VM-state передано ~1.9 GiB. После возврата `fw01` снова running на `pve02`, config VM 100 на `pve03` отсутствует, quorum 3/3, `10.10.10.1`/`10.10.40.1` отвечают, `test40` пингует `1.1.1.1`.
+
+**Финализация:** вручную запущены `pvesr run --id 100-0` и `pvesr run --id 100-1`; обе реплики свежие и `State OK`, `FailCount 0`:
+```
+100-0  pve02 -> pve03  LastSync 2026-07-08_15:43:22  OK
+100-1  pve02 -> pve01  LastSync 2026-07-08_15:43:26  OK
+```
+
+Итог: planned migration `fw01` между `pve02` и `pve03` проверена успешно на текущей ZFS-replication схеме. Это подтверждает переносимость VM при живом исходном узле, но ещё не заменяет отдельный test настоящего replica failover при отказе исходного узла.
+
+### 2026-07-08 — pve01: исправлен доступ к VLAN80 gateway (`10.10.80.1`)
+
+После planned migration test было замечено, что `10.10.80.1` не отвечает на ping с `pve01`, хотя с `pve02`/`pve03` отвечает. Проверка показала:
+```
+pve02 -> 10.10.80.1: OK
+pve03 -> 10.10.80.1: OK
+pve01 -> 10.10.80.1: fail
+ip route get 10.10.80.1 на pve01 -> via 192.168.31.1 dev vmbr0
+```
+
+Причина: это не firewall `fw01` и не VLAN80 как таковой, а отсутствие маршрута на `pve01`. У `pve01` default route всё ещё ведёт в лабораторный роутер (`192.168.31.1`) по независимому прямому кабелю, поэтому внутренние VLAN за `fw01` должны быть добавлены явно. Ранее так уже был закреплён маршрут к IPMI (`10.10.30.0/24`), но для HTCondor/PXE VLAN80 маршрута не было.
+
+Сделано:
+```
+ip route add 10.10.80.0/24 via 10.10.10.1 dev vmbr2.10   # runtime check
+```
+После этого `ping 10.10.80.1` с `pve01` — 0% loss. Затем маршрут закреплён в `/etc/network/interfaces` в блоке `vmbr2.10`; существующий IPMI route заменён с `ip route add` на `ip route replace`, чтобы future `ifreload` был idempotent:
+```
+up ip route replace 10.10.30.0/24 via 10.10.10.1 dev vmbr2.10
+up ip route replace 10.10.80.0/24 via 10.10.10.1 dev vmbr2.10
+```
+
+Проверено:
+```
+ip route get 10.10.80.1 -> via 10.10.10.1 dev vmbr2.10 src 10.10.10.11
+ping -c 3 10.10.80.1 -> 0% loss
+ifquery --check vmbr2.10 -> pass
+```
+
+Итог: gateway VLAN80 жив; проблема была локальной маршрутизацией `pve01` из-за его особой роли с независимым default route через внешний роутер.
+
+### 2026-07-08 — создан `pxe01` LXC в VLAN80, подняты HTTP/TFTP основы PXE
+
+Пользователь создал и запустил LXC `pxe01` на `pve02`. Предварительно на `pve02` был скачан Debian LXC template:
+```
+local:vztmpl/debian-12-standard_12.12-1_amd64.tar.zst
+```
+Первое скачивание упёрлось в timeout внешней SSH-команды, но сам download был медленным (~410 KB/s), повторный запуск `pveam download` завершился успешно, checksum verified.
+
+**Конфигурация контейнера:**
+```
+VMID: 110
+hostname: pxe01
+node: pve02
+rootfs: local-zfs:subvol-110-disk-0,size=16G
+net0: eth0, bridge=vmbr0, tag=80, ip=10.10.80.10/24, gw=10.10.80.1
+nameserver: 10.10.80.1
+```
+Сначала DNS внутри контейнера был унаследован как `10.10.10.1` и `apt update` не резолвил Debian mirrors. Исправлено через `pct set 110 --nameserver 10.10.80.1 --searchdomain internal` и перезапуск контейнера; после этого `apt update` прошёл.
+
+**Установлено внутри `pxe01`:**
+```
+nginx
+tftpd-hpa
+ipxe
+curl
+```
+Назначение:
+- `nginx` — HTTP-раздача больших файлов/меню (`http://10.10.80.10/`);
+- `tftpd-hpa` — TFTP-раздача первого маленького PXE/iPXE загрузчика (`/srv/tftp`);
+- `ipxe` — готовые binary-файлы `ipxe.efi`, `snponly.efi`, `undionly.kpxe`.
+
+**Текущие файлы:**
+```
+/srv/tftp/ipxe.efi
+/srv/tftp/snponly.efi
+/srv/tftp/undionly.kpxe
+/srv/tftp/undionly.kkpxe
+/srv/pxe/http/boot.ipxe
+/srv/pxe/http/index.html
+/srv/pxe/http/ipxe/*
+```
+`boot.ipxe` пока минимальный: показывает меню "NPD PXE boot menu" и умеет boot local disk / drop to iPXE shell. Автоустановки Ubuntu/Proxmox ещё не добавлены.
+
+**Проверки:**
+```
+ping 10.10.80.10 с pve01 -> OK
+pxe01 -> 10.10.80.1 -> OK
+pxe01 -> 1.1.1.1 -> OK
+curl http://10.10.80.10/boot.ipxe -> OK
+nginx active
+tftpd-hpa active
+curl tftp://127.0.0.1/ipxe.efi внутри pxe01 -> OK
+```
+TFTP-проверка с `pve02`/`pve01` через `tftp://10.10.80.10/ipxe.efi` timeout'ится из-за routed test path из VLAN10 в VLAN80 и особенностей обратного UDP-порта TFTP; tcpdump показывает, что `tftpd` отвечает. Это не финальный критерий: настоящий PXE-клиент будет находиться в той же VLAN80, и его нужно проверить физической нодой.
+
+**Открыто для первого настоящего PXE-теста:** настроить DHCP/PXE options на `fw01` для VLAN80:
+```
+next-server: 10.10.80.10
+UEFI boot file: ipxe.efi или snponly.efi
+Legacy BIOS boot file: undionly.kpxe
+после chainload iPXE: boot script http://10.10.80.10/boot.ipxe
+```
+Если OPNsense позволяет условие по user-class `iPXE`, лучше сделать двухшаговую схему: обычный PXE получает `ipxe.efi`/`undionly.kpxe`, а уже iPXE-клиент получает `http://10.10.80.10/boot.ipxe`, чтобы не уйти в chainload loop.
+
+### 2026-07-08 — pxe01/fw01 — DHCP/PXE boot подтвержден, добавлено iPXE-меню AlmaLinux 9
+
+После настройки OPNsense Dnsmasq на интерфейс `HTCONDOR` DHCP в VLAN80 подтвержден тестовым клиентом из netns на `pve02`:
+```
+DHCP server: 10.10.80.1
+leased IP: 10.10.80.164/24
+router: 10.10.80.1
+dns: 10.10.80.1
+domain: internal
+boot server / next-server: 10.10.80.10
+boot file: ipxe.efi
+```
+В tcpdump видны PXE-поля:
+```
+Server-IP 10.10.80.10
+sname "10.10.80.10"
+file "ipxe.efi"
+```
+
+На `pxe01` обновлен HTTP iPXE entrypoint:
+```
+/srv/pxe/http/boot.ipxe
+/srv/pxe/http/menu.ipxe
+/srv/pxe/http/profiles/alma9-manual.ipxe
+/srv/pxe/http/profiles/alma9-condor-sm-execute.ipxe
+/srv/pxe/http/profiles/alma9-asus-execute.ipxe
+```
+Старый минимальный `boot.ipxe` сохранен в:
+```
+/srv/pxe/http/backups/boot.ipxe.20260708-175702
+```
+
+Текущий режим безопасный: меню запускает AlmaLinux 9 installer в manual mode без Kickstart/wipe. Пункты:
+```
+AlmaLinux 9 installer - manual
+Supermicro execute VM - AlmaLinux 9 manual install
+ASUS execute node - AlmaLinux 9 manual install
+Boot from local disk
+iPXE shell
+```
+AlmaLinux netboot тянется по HTTP, чтобы избежать проблем iPXE с HTTPS/CA:
+```
+http://repo.almalinux.org/almalinux/9/BaseOS/x86_64/os/images/pxeboot/vmlinuz
+http://repo.almalinux.org/almalinux/9/BaseOS/x86_64/os/images/pxeboot/initrd.img
+```
+
+Проверено из тестового клиента в VLAN80:
+```
+curl http://10.10.80.10/boot.ipxe -> OK
+curl http://10.10.80.10/menu.ipxe -> OK
+curl http://10.10.80.10/profiles/alma9-asus-execute.ipxe -> OK
+curl -I http://repo.almalinux.org/.../vmlinuz -> HTTP 200
+```
+
+Итог: DHCP/PXE/iPXE menu готовы для первого загрузочного теста. Автоматический Kickstart с wipe disk ещё не включен; это следующий отдельный шаг после проверки, что AlmaLinux installer стартует через iPXE на VM/железе.
+
+### 2026-07-08 — pxe01/pve02 — тестовая PXE VM и исправление iPXE chainload loop
+
+На `pve02` создана временная тестовая VM `pxe-alma-test`:
+```
+VMID: 120
+name: pxe-alma-test
+machine: q35
+bios: OVMF
+boot: order=net0
+memory: 2048
+cores: 2
+net0: virtio=BC:24:11:FB:09:B8,bridge=vmbr0,tag=80
+disk: только efidisk0, системного OS-диска нет
+onboot: 0
+```
+
+Первый запуск выявил loop: UEFI PXE получал `ipxe.efi`, затем уже сам iPXE снова делал DHCP и OPNsense снова отдавал `ipxe.efi`, а не HTTP script. Поэтому HTTP-запросов к `/boot.ipxe` не было.
+
+Исправление: на `pxe01` собран собственный `ipxe.efi` с embedded script:
+```
+#!ipxe
+
+dhcp
+chain http://10.10.80.10/boot.ipxe || shell
+```
+Source/script зафиксирован в репозитории:
+```
+work/pxe01/build/npd-boot.ipxe
+```
+Сборка выполнена из upstream iPXE source внутри `pxe01`; build tools временно установлены в контейнер:
+```
+git
+build-essential
+mtools
+```
+Новый binary установлен:
+```
+/srv/tftp/ipxe.efi
+/srv/pxe/http/ipxe/ipxe-embedded.efi
+```
+Debian package original сохранен как backup:
+```
+/srv/tftp/ipxe.efi.debian-backup-<timestamp>
+```
+
+Повторный тест VM `120` прошел нужную цепочку:
+```
+DHCP -> boot file ipxe.efi
+TFTP -> /srv/tftp/ipxe.efi
+embedded iPXE -> GET /boot.ipxe
+boot.ipxe -> GET /menu.ipxe
+```
+Nginx access log:
+```
+10.10.80.143 "GET /boot.ipxe HTTP/1.1" 200 ... "iPXE/2.0.0+ (g6ba01)"
+10.10.80.143 "GET /menu.ipxe HTTP/1.1" 200 ... "iPXE/2.0.0+ (g6ba01)"
+```
+
+Итог: UEFI PXE chainload до iPXE menu подтвержден на тестовой VM. VM `120` остановлена и оставлена для повторных PXE-тестов. Следующий шаг — временно выбрать installer-пункт через консоль или сделать отдельный auto-test profile, чтобы проверить загрузку AlmaLinux kernel/initrd.
+
+### 2026-07-09 — pxe01/pve02 — local stage2 и разделение PXE basic install / Ansible roles
+
+Для AlmaLinux 9 stage2 добавлен локальный cache на `pxe01`:
+```
+/srv/pxe/http/alma/9/BaseOS/x86_64/os/.treeinfo
+/srv/pxe/http/alma/9/BaseOS/x86_64/os/images/install.img
+/srv/pxe/http/alma/9/BaseOS/x86_64/os/images/pxeboot/vmlinuz
+/srv/pxe/http/alma/9/BaseOS/x86_64/os/images/pxeboot/initrd.img
+```
+
+`install.img` перенесен с рабочего ПК через `pve02` в LXC `pxe01`; checksum совпал с `.treeinfo`:
+```
+539f423b5456aa36877b255b1fd2486d86fff9bfafc34ecb83282b72a93b70a2
+```
+
+Тестовая VM `120` при 2GB RAM обрывала загрузку stage2 примерно на половине `install.img`. После увеличения RAM до 4GB VM успешно получила:
+```
+/boot.ipxe
+/profiles/alma9-pxe-test-autoinstall.ipxe
+/alma/9/BaseOS/x86_64/os/.treeinfo
+/alma/9/BaseOS/x86_64/os/images/install.img
+/kickstart/alma9-pxe-test.ks
+```
+Anaconda стартовала в automated install, приняла Kickstart, создала disk label/EFI/XFS/LVM и начала установку пакетов. Пакеты всё ещё качаются из внешнего AlmaLinux repo, потому что локальный mirror `BaseOS + AppStream` ещё не сделан.
+
+Архитектурное решение для первых ASUS/Supermicro execute nodes: PXE/Kickstart ставит только базовую AlmaLinux с SSH/admin user, а HTCondor/CVMFS/Geant4/monitoring/storage mounts применяются позднее через Ansible.
+
+На `pxe01` добавлен новый явный destructive menu item:
+```
+AlmaLinux 9 BASIC autoinstall - wipes disk
+```
+Файлы:
+```
+/srv/pxe/http/profiles/alma9-basic-autoinstall.ipxe
+/srv/pxe/http/kickstart/alma9-basic.ks
+```
+Default в iPXE menu оставлен `Boot from local disk`, чтобы не переустановить узел случайно.
+
+В репозитории создан базовый Ansible scaffold:
+```
+ansible/README.md
+ansible/inventory/hosts.yml
+ansible/playbooks/base.yml
+ansible/playbooks/htcondor_execute.yml
+ansible/roles/base/tasks/main.yml
+```
+
+Открыто:
+- дождаться/повторить финальную проверку VM `120` до SSH login;
+- перед массовой установкой решить, достаточно ли внешнего repo для 4-8 ASUS или сразу делать локальный mirror/cache;
+- после первой ASUS basic install добавить её в `ansible/inventory/hosts.yml` и прогнать `playbooks/base.yml`.
+
+### 2026-07-10 — pve01/pve02/pve03 — snapshot network/Tailscale after server-room move
+
+После переноса оборудования в серверную и исправления WAN `fw01` сделан snapshot сетевого состояния всех трех Proxmox-нод:
+```
+work/network-snapshots/2026-07-10-after-server-room-move/
+```
+
+Сохранено по каждой ноде:
+```
+/etc/network/interfaces
+/etc/network/interfaces.d/
+/etc/hosts
+/etc/resolv.conf
+ip addr / route / rule
+bridge link / bridge vlan
+pvecm status
+tailscaled status
+tailscale status / status --json / ip / debug prefs / netcheck
+```
+
+Секретный Tailscale state (`/var/lib/tailscale/tailscaled.state`) намеренно не копировался, чтобы не сохранять device keys в репозитории.
+
+Краткое состояние snapshot:
+```
+pve01: MGMT 10.10.10.11, Corosync 10.10.20.11, direct/router 192.168.31.50, Tailscale 100.110.23.10
+pve02: MGMT 10.10.10.12, Corosync 10.10.20.12, default via fw01 10.10.10.1, Tailscale 100.100.173.60
+pve03: MGMT 10.10.10.13, Corosync 10.10.20.13, default via fw01 10.10.10.1, Tailscale 100.86.225.123
+```
+
+### 2026-07-10 — pve01/pve02/pve03 — server-room power and thermal baseline
+
+Перед месяцем удаленной работы сняты базовые аппаратные показания и CPU-нагрузочные замеры:
+```
+work/measurements/2026-07-10-server-room-baseline/
+work/measurements/2026-07-10-server-room-load/
+```
+
+Собрано:
+- IPMI sensors / SEL / DCMI power readings;
+- CPU/RAM/storage/network inventory;
+- SMART summary, ZFS status, Proxmox status;
+- 5-minute `stress-ng --cpu 32` per node;
+- 3-minute simultaneous CPU load across all three nodes.
+
+Краткие результаты:
+```
+Idle IPMI total: ~340-394 W for 3 nodes
+CPU-only simultaneous peak: ~692 W for 3 nodes
+Max CPU temp under test: 43 C
+Max MB_10G temp under test: 61 C
+```
+
+Важная аппаратная находка: все три Supermicro показывают `PS2 Status = 0xb`, при `PS1 Status = 0x1`. Нужно физически проверить второй PSU/кабель/линию питания на каждой ноде перед тем, как считать питание резервированным.
+
+### 2026-07-10 — pxe01 / ASUS rail 1 — legacy PXE install-once stabilized
+
+Настроен рабочий PXE flow для первой ASUS-рельсы со старым Intel Boot Agent:
+
+- DHCP в OPNsense оставлен с boot file `ipxe.efi`, но на TFTP это legacy embedded iPXE (`undionly.kpxe` payload), потому что UEFI `ipxe.efi` был слишком большим для этих BIOS и давал `PXE-E79`.
+- Embedded iPXE цепляет `http://10.10.80.10/boot.ipxe`.
+- `boot.ipxe` знает MAC первой ASUS-рельсы и запускает destructive install только при наличии `/srv/pxe/http/install-once/<mac>.ipxe`.
+- Если install-once файла нет, iPXE делает `exit`, а BIOS продолжает boot order.
+- `sanboot --drive 0x80` для этих ASUS не используется: на практике зависал на `Booting from SAN device 0x80`.
+
+Правильный BIOS order для install-once режима:
+
+```text
+1st: Network: IBA GE Slot 0200
+2nd: AHCI/SATA disk
+3rd: Network: IBA GE Slot 0300
+```
+
+Избегать порядка, где обе сетевые карты стоят перед SATA: после выхода из iPXE BIOS уйдет во второй PXE и покажет `PXE-E61`.
+
+Инвентарь первой рельсы:
+
+```text
+asus-r1n1  LAN 20:cf:30:72:52:ae  OS 10.10.80.101  IPMI 54:04:a6:f4:21:0a  10.10.30.101  switch1 14/41
+asus-r1n2  LAN c8:60:00:31:8c:13  OS 10.10.80.102  IPMI c8:60:00:8b:d5:8b  10.10.30.102  switch1 15/42
+asus-r1n3  LAN 20:cf:30:7c:98:f2  OS 10.10.80.103  IPMI c8:60:00:ea:3b:9e  10.10.30.103  switch1 16/43
+asus-r1n4  LAN c8:60:00:39:1e:fb  OS 10.10.80.104  IPMI c8:60:00:ea:3b:a6  10.10.30.104  switch1 17/44
+```
+
+`asus-firstboot.sh` применяет hostname, static OS IP и in-band IPMI IP из `/srv/pxe/http/asus-r1-map.csv`.
+
+Фикс install-once watcher: старый watcher grep-ал весь nginx access log и мог удалить свежий флаг из-за старой записи `200`. Новый watcher стартует с текущего byte offset access log и реагирует только на новые строки.
+
+### 2026-08-05 — pxe01 — добавлен локальный AlmaLinux repo cache для ускорения массового PXE
+
+После возврата к работе проверено состояние первой ASUS-рельсы:
+
+```text
+asus-r1n2 -> 10.10.80.102 SSH OK, firstboot_done
+asus-r1n3 -> 10.10.80.103 SSH OK, firstboot_done
+asus-r1n4 -> 10.10.80.104 SSH OK, firstboot_done
+asus-r1n1 -> переустановка запущена заново после исправления LAN/PXE
+```
+
+На `r1n1` подтвержден свежий PXE install:
+
+```text
+10.10.80.117 GET /install-once/20:cf:30:72:52:ae.ipxe -> 200
+10.10.80.117 GET /profiles/alma9-basic-autoinstall.ipxe -> 200
+10.10.80.117 GET /alma/9/BaseOS/x86_64/os/images/pxeboot/vmlinuz -> 200
+10.10.80.117 GET /alma/9/BaseOS/x86_64/os/images/pxeboot/initrd.img -> 200
+10.10.80.117 GET /alma/9/BaseOS/x86_64/os/images/install.img -> 200
+10.10.80.117 GET /kickstart/alma9-basic.ks -> 200
+```
+
+Проблема скорости: `install.img`/kernel/initrd уже локальные, но RPM-пакеты в kickstart тянулись с `repo.almalinux.org`, из-за чего каждая новая нода могла ждать внешний интернет.
+
+Сделано:
+
+- rootfs `pxe01` увеличен с 16G до 60G;
+- добавлен nginx proxy cache `/alma-cache/` с backend `repo.almalinux.org`;
+- cache storage: `/srv/pxe/cache/nginx/alma`, лимит `40g`;
+- `alma9-basic.ks`, `alma9-pxe-test.ks` и iPXE profiles переключены на:
+
+```text
+http://10.10.80.10/alma-cache/almalinux/9/BaseOS/x86_64/os
+http://10.10.80.10/alma-cache/almalinux/9/AppStream/x86_64/os
+```
+
+Это не полный mirror: первый запрос конкретного RPM может скачать его через интернет, но все следующие ноды получают этот RPM локально с `pxe01`.
+
+### 2026-08-05 — ASUS rail 1 — OS install checkpoint 4/4
+
+После исправления физического LAN/PXE для `asus-r1n1` выполнена повторная install-once установка. Firstboot отработал:
+
+```text
+asus-r1n1.internal -> 10.10.80.101 SSH OK, firstboot_done, IPMI 10.10.30.101 ping OK
+asus-r1n2.internal -> 10.10.80.102 SSH OK, firstboot_done, IPMI 10.10.30.102 ping OK
+asus-r1n3.internal -> 10.10.80.103 SSH OK, firstboot_done, IPMI 10.10.30.103 ping pending
+asus-r1n4.internal -> 10.10.80.104 SSH OK, firstboot_done, IPMI 10.10.30.104 ping pending
+```
+
+Итог: первая ASUS-рельса готова как base AlmaLinux fleet для Ansible и будущего HTCondor execute role. IPMI на `r1n3/r1n4` не блокирует следующий этап и отложен.
+
+Добавлен batch-helper на `pxe01`:
+
+```sh
+/usr/local/sbin/create-install-once-batch.sh --dry-run r1
+/usr/local/sbin/create-install-once-batch.sh r1
+```
+
+Он читает CSV inventory, создает install-once files для выбранной рельсы/hostname и запускает watcher один раз. Следующий практический PXE шаг: добавить inventory для `asus-r2n1` ... `asus-r2n4`, добавить их MAC в `boot.ipxe`, затем прогнать batch install на одной новой рельсе.
+
+### 2026-08-11 — Force10 / Supermicro rack — сверка портов после подключения новых нод
+
+Пользователь физически поправил trunk `pve01` и подключил две новые Supermicro
+ноды в шкаф Supermicro. Проверка с `pve01`:
+
+```text
+pve01 nic1 -> Up, 1000Mb/s Full
+cluster-health --skip-storage -> 21 checks, 0 failed, 6 skipped
+```
+
+JBOD сознательно отложен, поэтому storage-проверки пропущены через новый режим
+`./scripts/cluster-health.sh --skip-storage`.
+
+По выводу Force10:
+
+```text
+Gi 0/6  Up 1000 Full trunk VLAN 10,20,30,40,50,80,99
+        MAC VLAN10 ac:1f:6b:4c:d7:ca  -> future pve04 LAN1
+Gi 0/7  Up 1000 Full trunk VLAN 10,20,30,40,50,80,99
+        MAC VLAN10 ac:1f:6b:4c:d7:c8  -> future pve05 LAN1
+Gi 0/16 Up 1000 Full VLAN30
+        MAC ac:1f:6b:4c:ce:80        -> future pve04 IPMI
+Gi 0/17 Up 1000 Full VLAN30
+        MAC ac:1f:6b:4c:ce:7f        -> future pve05 IPMI
+```
+
+Вывод: физическое подключение будущих `pve04`/`pve05` на уровне Force10
+выглядит корректно. Ноды пока не введены в Proxmox-кластер и не отвечают на
+ожидаемые management IP.
+
+Найденная текущая проблема:
+
+```text
+Force10 Gi 0/1 -> Down
+Force10 Gi 0/2 -> Up, member of Po1
+```
+
+То есть межшкафный LACP Force10 <-> switch1 временно деградировал до одного
+линка. Нужно проверить кабель `Force10 Gi 0/1` ↔ `switch1 port 2`.
+
+Документация обновлена:
+
+- добавлен `force10_port_map.md` как фактическая карта портов Force10;
+- `production_port_plan.md` очищен от устаревшего пункта про перенос `pve01`;
+- README теперь указывает оба port-map документа: Force10 и switch1.
+
+### 2026-08-12 — bastion/HTCondor — end-to-end user access validation
+
+Проверен полный пользовательский путь SSH-only доступа:
+
+```text
+Internet/Tailscale Funnel :10000
+  -> bastion01 10.10.50.10:22
+  -> ProxyJump
+  -> condor01 10.10.80.20:22
+  -> HTCondor submit
+  -> ASUS execute node
+```
+
+Создан временный тестовый пользователь `npdtest` (UID `20000`) на `bastion01`
+и `condor01` через штатный `scripts/create-cluster-user.py --accounts-only`.
+Пользователь key-only, без sudo. Временный private key после проверки удалён с
+`/tmp`.
+
+Найден и исправлен недостающий firewall-проход: на OPNsense в правилах `DMZ`
+добавлено narrow pass rule выше `Block DMZ to HTCONDOR`:
+
+```text
+source:      10.10.50.10   # bastion01
+destination: 10.10.80.20   # condor01
+protocol:    TCP/22
+```
+
+ICMP из DMZ в HTCONDOR остаётся заблокирован, но SSH `bastion01 -> condor01:22`
+открыт, чего достаточно для ProxyJump.
+
+Результат пользовательского smoke job:
+
+```text
+npdtest -> condor01 -> HTCondor cluster 35
+execute host: asus-r1n1.internal
+exit code: 0
+output: hello from asus-r1n1.internal
+```
+
+Замечание: job на execute-ноде выполнилась как `nobody` (UID 65534), потому что
+`npdtest` пока создан только на `bastion01`/`condor01`, не на ASUS execute
+нодах. Для простых file-transfer job это работает. Для production `/data` и
+нормальных POSIX-прав нужно решить модель идентичности: создавать пользователей
+на execute-нодах через Ansible либо изменить HTCondor identity policy.
+
+### 2026-08-12/13 — power characterization — первые реальные замеры потребления
+
+Создан файл замеров:
+
+```text
+work/measurements/2026-08-12-power-characterization/README.md
+```
+
+Ключевые измеренные значения:
+
+```text
+pve01 Supermicro idle:                 111 W
+pve01 Supermicro boot peak:            180 W
+pve01 Supermicro CPU-only:             226 W
+pve01 Supermicro heavy RAM 256 GiB:    221 W stable / 238 W peak
+pve01 Supermicro mixed heavy:          230 W stable / 240 W peak
+
+ASUS rail 1 idle, 4 nodes:             320 W
+ASUS rail 1 boot peak, 4 nodes:        870 W
+ASUS rail 1 CPU load, 4 nodes:        1300 W stable
+
+Force10 S60 idle/max observed:         120 W / 200 W
+HP 3500yl idle/max observed:           120 W / 200 W
+
+JBOD shelf startup/idle:               350 W / 230 W
+Expected JBOD estate:                  roughly 8-12 shelves in docs,
+                                       current planning range 8-10 shelves
+```
+
+Планировочный вывод:
+
+```text
+10 Supermicro heavy:                  ~2.4 kW
+48 ASUS heavy:                       ~15.6 kW
+2 switches max:                       ~0.4 kW
+8-10 JBOD idle:                       ~1.8-2.3 kW
+Full measured heavy + JBOD idle:      ~20.2-20.7 kW
+With 30% reserve:                     ~26.3-26.9 kW
+```
+
+Итог: ASUS-парк является главным потребителем. До подтверждения PDU/линий и
+охлаждения нельзя включать/нагружать все ASUS-рельсы одновременно.
+
+### 2026-08-13 — monitoring — повторная проверка `pve03:9100`
+
+После вчерашней ASUS CPU-нагрузки один health-check показал
+`pve03:9100 down`. Повторная проверка 2026-08-13:
+
+```text
+pve03 prometheus-node-exporter: active, listening on *:9100
+monitoring-health.sh: 11/11 up
+cluster-health.sh --skip-storage: 21 checks, 0 failed, 6 skipped
+```
+
+Итог: постоянной поломки monitoring не найдено; вероятно, кратковременный
+scrape/down во время перезапуска или нагрузки. Текущий минимальный стек снова
+зелёный.
+
+### 2026-08-13 — user access — HTCondor запускает jobs под реальным UID
+
+Закрыта проблема из предыдущего smoke test, где пользовательский job доходил до
+ASUS execute-ноды, но выполнялся как `nobody` / UID `65534`.
+
+Что изменено:
+
+```text
+scripts/create-cluster-user.py
+  --execute-nodes  создать locked POSIX identity на ASUS вместе с новым user
+  --execute-only   досинхронизировать identity для уже существующего user
+
+HTCondor config on condor01 + ASUS:
+  UID_DOMAIN = internal
+  TRUST_UID_DOMAIN = True
+  FILESYSTEM_DOMAIN = per-host FQDN, пока /data не считается постоянным
+```
+
+Для `npdtest` UID `20000` создан на `condor01` и `asus-r1n1`-`asus-r1n4`.
+На execute-нодах SSH-ключи не ставятся: эти аккаунты нужны только для
+POSIX/HTCondor identity, вход пользователей остаётся через
+`bastion01 -> condor01`.
+
+Проверка:
+
+```text
+HTCondor cluster 42
+execute host: asus-r1n3.internal
+whoami: npdtest
+id -u: 20000
+exit code: 0
+
+Final smoke check:
+HTCondor cluster 45
+JobStatus: 4 completed
+ExitCode: 0
+whoami/id: npdtest / 20000
+```
+
+Также исправлен `scripts/user-access-health.sh`: проверка
+`authorized_keys` на `condor01` теперь идёт через `sudo -n test`, потому что
+домашние каталоги пользователей закрыты правами `700`.
+
+### 2026-08-13 — pve02 — Funnel автоподъём после ребута
+
+После ребута `npd-tailscale-funnel.service` мог падать, если `tailscaled` ещё
+не успел выйти из `NoState`. На `pve02` добавлен systemd drop-in:
+
+```text
+/etc/systemd/system/npd-tailscale-funnel.service.d/retry.conf
+```
+
+Локальная копия сохранена в репозитории:
+
+```text
+work/pve02/npd-tailscale-funnel-retry.conf
+```
+
+Проверенное текущее состояние:
+
+```text
+npd-tailscale-funnel.service      active
+npd-bastion-ssh-forward.service   active
+tailscaled.service                active
+
+tcp://pve02.taile43d6d.ts.net:10000 -> 127.0.0.1:10022
+https://pve02.taile43d6d.ts.net     -> 127.0.0.1:18080
+```
+
+Быстрые проверки после фикса:
+
+```text
+user-access-health.sh npdtest:        6 checks, 0 failed
+cluster-health.sh --skip-storage:    21 checks, 0 failed, 6 skipped
+```
+
+### 2026-08-28 — vpn-npd — primary public gateway через Azure + WireGuard
+
+Создан отдельный внешний gateway `vpn-npd`, чтобы пользовательский доступ не
+зависел от Tailscale как единственной публичной двери.
+
+Текущая схема:
+
+```text
+Internet user
+  -> 20.215.200.4:10000
+  -> vpn-npd wg0 10.255.80.1
+  -> WireGuard UDP/51820
+  -> pve02 wg0 10.255.80.2:10022
+  -> bastion01 10.10.50.10:22
+  -> ProxyJump to condor01 10.10.80.20
+```
+
+Хосты и сервисы:
+
+```text
+vpn-npd:
+  OS: Ubuntu 24.04.4 LTS
+  public IP: 20.215.200.4
+  wg0: 10.255.80.1/30
+  services:
+    wg-quick@wg0
+    npd-public-bastion-ssh-forward.service
+
+pve02:
+  wg0: 10.255.80.2/30
+  services:
+    wg-quick@wg0
+    npd-vpn-bastion-ssh-forward.service
+```
+
+Azure NSG inbound rules:
+
+```text
+UDP 51820  allow-wireguard-51820
+TCP 10000  allow-npd-bastion-10000
+```
+
+Проверка после открытия правил:
+
+```text
+20.215.200.4:10000 open
+20.215.200.4:51820 udp reachable
+pve02 -> 10.255.80.1 ping: 0% loss, ~31 ms
+vpn-npd -> 10.255.80.2 ping: 0% loss, ~31 ms
+WireGuard latest handshake: present
+20.215.200.4:10000 banner: SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u10
+user-access-health.sh npdtest: 8 checks, 0 failed
+```
+
+Локальные service snapshots сохранены без приватных WireGuard ключей:
+
+```text
+work/vpn-npd/npd-public-bastion-ssh-forward.service
+work/pve02/npd-vpn-bastion-ssh-forward.service
+```
+
+Tailscale Funnel остаётся как admin/fallback channel, но primary user-facing
+endpoint теперь `ssh -p 10000 <username>@20.215.200.4`.
