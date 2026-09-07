@@ -28,8 +28,8 @@ monitoring, DNS и storage. Планового простоя нет. Запус
 ./scripts/cluster-health.sh
 ```
 
-Если JBOD намеренно отключён и это отражено в
-[open issues](../project/open-issues.md), допускается:
+Пока JBOD намеренно отключён и это отражено в
+[open issues](../project/open-issues.md), используется:
 
 ```bash
 ./scripts/cluster-health.sh --skip-storage

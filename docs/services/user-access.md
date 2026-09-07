@@ -64,10 +64,10 @@ FILESYSTEM_DOMAIN = each host's own FQDN
 
 ## Storage boundary
 
-Недоступность JBOD/NFS не блокирует маленькие тестовые job из home directory.
-В этом режиме provisioning не создаёт каталоги `/data`, а health-check явно
-запускается с `--skip-storage`. После восстановления storage применяется
-режим `--storage-only` из provisioning runbook.
+Намеренно отключённые JBOD/NFS не блокируют маленькие тестовые job из home
+directory. В этом режиме provisioning не создаёт каталоги `/data`, а
+health-check явно запускается с `--skip-storage`. После решения владельца о
+возврате storage применяется режим `--storage-only` из provisioning runbook.
 
 ## Repository configuration
 

@@ -88,7 +88,11 @@ CVMFS_HTTP_PROXY="http://10.10.80.11:3128|DIRECT"
 
 Shared JBOD storage:
 
-- pve01 exports the JBOD ZFS pool as NFS at `10.10.80.2:/data`.
+- Current state: JBOD shelves are intentionally powered off after the move and
+  wait for a separate rack, mounting rails, and related physical purchases.
+  Do not apply the storage role until the owner schedules their return.
+- When the owner returns the storage to service, the accepted design has pve01
+  export the JBOD ZFS pool as NFS at `10.10.80.2:/data`.
 - Pool name: `npddata`.
 - Datasets: `/data/projects` for persistent project data, `/data/results`
   for job outputs, and `/data/scratch` for temporary shared job data.
@@ -121,7 +125,7 @@ Cluster health check:
 
 ```bash
 cd /root/server-npd
-./scripts/cluster-health.sh
+./scripts/cluster-health.sh --skip-storage
 ```
 
 Monitoring health check:

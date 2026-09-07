@@ -1,8 +1,9 @@
 # JBOD SAS Topology Plan
 
 - Статус: draft/target, не разрешает физическое переподключение
-- Последняя редакция исходного плана: 2026-08-11
-- Живая проверка при переносе: не выполнялась
+- Последняя редакция: 2026-09-07
+- Живая проверка при редакции: не выполнялась; intentional-offline состояние
+  подтверждено владельцем кластера
 - Источник истины для: предлагаемой SAS topology; не для online-состояния pool
 
 ## Terms
@@ -43,9 +44,11 @@ From the existing inventory and logs:
 - `pve02` and `pve03` have the same HBA class (`SAS3224` + `SAS3216`) in the
   inventory notes.
 
-Current caveat: after the latest physical changes `pve01` currently sees only
-its system SSDs. The old `npddata` JBOD pool is not online at the time of this
-draft. Before changing storage topology, confirm shelf power and SAS cabling.
+Current state: после переезда JBOD намеренно выключены. `pve01` видит только
+локальные SSD, и отсутствие `npddata` ожидаемо. Для возврата полок нужны
+отдельный шкаф, направляющие и сопутствующая физическая инфраструктура. До
+закупок и отдельного решения владельца не нужно диагностировать SAS path или
+пытаться импортировать pool.
 
 ## Design Rules
 
@@ -62,7 +65,10 @@ draft. Before changing storage topology, confirm shelf power and SAS cabling.
    Do not run SAS across the ASUS rack unless there is no alternative.
 6. Label both ends of every cable before scaling.
 
-## Recommended First Production Layout
+## Layout после решения о возврате JBOD
+
+Этот раздел не задаёт текущий приоритет. Он применяется только после того, как
+владелец завершит необходимые закупки и отдельно запланирует подключение.
 
 Use `pve01` as the first storage head because the current `/data` design already
 expects:
@@ -156,13 +162,12 @@ Before connecting all shelves:
 - whether all shelf management ports can be cabled to a management switch;
 - enclosure/slot mapping with `lsscsi` and `sg_ses`.
 
-## My Current Recommendation
+## Условная последовательность будущего подключения
 
-Заголовок ниже сохранён из исходного draft. Под словом current понимается
-рекомендация на 2026-08-11, а не подтверждённое состояние 2026-09-05.
-
-Do not scale JBOD cabling yet. First restore and document the single-shelf
-connection that used to provide `npddata`, then expand in short chains.
+Не масштабировать JBOD cabling до подготовки физической инфраструктуры. Когда
+владелец решит вернуть storage, сначала подключить и документировать одну полку,
+которая ранее предоставляла `npddata`, и только затем расширять короткими
+цепочками.
 
 The preferred growth path is:
 
@@ -183,4 +188,4 @@ HTCondor nodes consume /data over network
 
 Перед применением свериться с [storage policy](storage.md),
 [current state](../current-state.md) и задачей
-[STO-001](../project/open-issues.md#sto-001--определить-фактическое-состояние-jbodnfs).
+[STO-001](../project/open-issues.md#sto-001--вернуть-jbodnfs-после-подготовки-физической-инфраструктуры).

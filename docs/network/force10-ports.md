@@ -10,6 +10,8 @@
 
 Документ не подтверждает состояние позднее 2026-08-11. После изменения кабелей
 или VLAN его нужно обновить вместе с current state и исторической записью.
+Со стороны HP 2026-09-07 подтверждён один активный member link; владелец знает
+об ограничении и восстановит второй отдельно. Это не основной текущий блокер.
 
 ## Management
 
@@ -25,7 +27,7 @@
 | Порт | Устройство | Untagged/native | Tagged | Статус 2026-08-11 |
 |---:|---|---:|---|---|
 | `Gi 0/0` | Аплинк к роутеру | 99 | — | Up, 1000 Full |
-| `Gi 0/1` | LACP-транк к switch1 / `Po1` | — | 10,20,30,40,50,80 | **Down**, требует проверки кабеля |
+| `Gi 0/1` | LACP-транк к switch1 / `Po1` | — | 10,20,30,40,50,80 | **Down**, известное временное состояние |
 | `Gi 0/2` | LACP-транк к switch1 / `Po1` | — | 10,20,30,40,50,80 | Up, 1000 Full |
 | `Gi 0/3` | `pve01` LAN1 trunk, MAC `ac:1f:6b:4c:d7:43` | 10 | 20,30,40,50,80,99 | Up, 1000 Full |
 | `Gi 0/4` | `pve02` LAN1 trunk, MAC `ac:1f:6b:41:93:a4` | 10 | 20,30,40,50,80,99 | Up, 1000 Full |
@@ -59,8 +61,10 @@
 ## Current Findings
 
 - `pve04`/`pve05` physical LAN and IPMI cabling looks correct at switch level.
-- Inter-switch LACP is degraded: `Po1` is up only through `Gi 0/2`;
-  `Gi 0/1` is down. Expected state is both `Gi 0/1` and `Gi 0/2` up.
+- Последнее полное состояние Force10 от 2026-08-11: `Po1` работал через
+  `Gi 0/2`, а `Gi 0/1` был down. Проверка со стороны HP 2026-09-07 подтверждает
+  один активный member link. Ограничение известно владельцу и не назначается
+  этим документом как первоочередная работа.
 - Existing cluster health without JBOD passed after `pve01 nic1` was restored:
   `21 checks, 0 failed, 6 skipped`.
 

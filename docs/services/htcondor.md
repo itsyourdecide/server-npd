@@ -45,8 +45,9 @@ Execute-node identity не получает SSH keys. Provisioning выполн�
 ## Storage and file transfer
 
 - Малые jobs могут использовать HTCondor file transfer и home на `condor01`.
-- `/data` используется только когда NFS подтверждён online на всех нужных
-  nodes.
+- `/data` сейчас не используется: JBOD намеренно выключены до подготовки
+  физической инфраструктуры и закупок. До решения владельца jobs используют
+  HTCondor file transfer и home на `condor01`.
 - Per-host `FILESYSTEM_DOMAIN` сохраняется, пока shared filesystem не считается
   постоянно доступной.
 
@@ -69,7 +70,7 @@ cd /root/server-npd
 - нет Supermicro execute VM;
 - automatic power management не реализован;
 - quota/fair-share policy не описана как production-ready;
-- `/data` availability требует новой проверки.
+- `/data` intentionally offline до решения владельца о возврате JBOD.
 
 ## Related
 
