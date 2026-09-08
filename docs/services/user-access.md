@@ -99,6 +99,7 @@ Repository copy не доказывает deployment; live-состояние п
 
 ## Связанные документы
 
+- [Целевой план Azure edge и WireGuard](../network/azure-edge-vpn-plan.md).
 - [Current state](../current-state.md).
 - [Firewall](firewall.md).
 - [HTCondor](htcondor.md).

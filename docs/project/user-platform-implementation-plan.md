@@ -613,6 +613,7 @@ runbook. Обычный CI использует fake adapters.
 ## Связанные документы
 
 - [Продуктовый план](user-platform-plan.md).
+- [План Azure edge и WireGuard](../network/azure-edge-vpn-plan.md).
 - [Пользовательский доступ](../services/user-access.md).
 - [HTCondor](../services/htcondor.md).
 - [Выдача пользователя](../runbooks/provision-user.md).

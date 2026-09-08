@@ -27,6 +27,8 @@
 - [Обзор архитектуры](docs/architecture/overview.md).
 - [Адреса и VLAN](docs/network/addressing.md) и
   [топология сети](docs/network/topology.md).
+- [План Azure edge и WireGuard](docs/network/azure-edge-vpn-plan.md) — целевой
+  внешний вход, routed VPN и безопасная миграция со старого TCP relay.
 - [Реестр оборудования](docs/inventory/hardware.md) и
   [реестр сервисов](docs/inventory/services.md).
 - [История операций](docs/history/README.md).
