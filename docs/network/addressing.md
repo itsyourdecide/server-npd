@@ -1,8 +1,9 @@
 # Адресация и VLAN
 
 - Статус: current, основан на последнем документированном состоянии
-- Последняя редакция: 2026-09-07
-- Живая проверка при редакции: частичная; состояние JBOD подтверждено владельцем
+- Последняя редакция: 2026-09-09
+- Живая проверка при редакции: частичная; адреса `wg-site` проверены,
+  состояние JBOD подтверждено владельцем
 - Источник истины для: VLAN ID, подсетей, gateway и зарезервированных адресов
 
 ## VLAN
@@ -50,17 +51,23 @@ VLAN 60/61 нельзя считать действующими Ceph-сетям�
 | `asus-r1n3.internal` | `10.10.80.103` | `10.10.30.103` | OS verified, IPMI pending |
 | `asus-r1n4.internal` | `10.10.80.104` | `10.10.30.104` | OS verified, IPMI pending |
 
-## Внешний пользовательский доступ
+## Внешний доступ и VPN transit
 
-| Компонент | Адрес |
-|---|---|
-| `vpn-npd` public endpoint | `20.215.200.4:10000/tcp` |
-| `vpn-npd` WireGuard | `10.255.80.1/30` |
-| `pve02` WireGuard | `10.255.80.2/30` |
-| Tailscale fallback | `pve02.taile43d6d.ts.net:10000` |
+| Компонент | Адрес | Состояние |
+|---|---|---|
+| `vpn-npd` public endpoint | `20.215.200.4:10000/tcp` | legacy user path, verified 2026-08-28 |
+| `vpn-npd` legacy WireGuard | `10.255.80.1/30` | deployed |
+| `pve02` legacy WireGuard | `10.255.80.2/30` | deployed |
+| `vpn-npd wg-site` | `10.255.82.1/30`, public UDP `51822` | handshake verified 2026-09-09 |
+| `fw01 wg-site` | `10.255.82.2/30`, local UDP `51823` | handshake verified 2026-09-09 |
+| Tailscale fallback | `pve02.taile43d6d.ts.net:10000` | retained fallback |
 
 Публичный endpoint подтверждался 2026-08-28. Его дальнейшая доступность должна
 проверяться `scripts/user-access-health.sh`.
+
+`10.255.82.0/30` является WireGuard transit network, а не VLAN или Azure VNet
+subnet. На checkpoint 2026-09-09 она не предоставляет routed access во
+внутренние VLAN.
 
 ## Правила изменения
 

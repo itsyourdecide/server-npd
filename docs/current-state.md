@@ -1,10 +1,11 @@
 # Текущее документированное состояние кластера
 
 Статус: current
-Последняя редакция: 2026-09-07
+Последняя редакция: 2026-09-09
 Живая проверка при редакции: частично выполнена для Proxmox, HTCondor,
-monitoring, LACP, PSU sensors и локальных ZFS pool; физические ограничения
-после переезда подтверждены владельцем кластера
+monitoring, LACP, PSU sensors, локальных ZFS pool и нового WireGuard tunnel
+`vpn-npd` ↔ `fw01`; физические ограничения после переезда подтверждены
+владельцем кластера
 Источник истины для: последнего документированного состояния компонентов и известных проблем
 
 ## Как читать статусы
@@ -33,6 +34,7 @@ monitoring, LACP, PSU sensors и локальных ZFS pool; физически
 | CVMFS | `sft.cern.ch` и `unpacked.cern.ch`, Squid-first с direct fallback | Verified | 2026-08-07 |
 | Monitoring | Prometheus на `monitor01`, 11/11 targets up | Verified | 2026-09-07 |
 | User access | Azure/WireGuard → `pve02` → `bastion01` → `condor01` | Verified | 2026-08-28 |
+| Azure site tunnel | Параллельный `wg-site` между `vpn-npd` и `fw01` имеет handshake; routing во VLAN и service cutover не выполнены | Verified | 2026-09-09 |
 | Shared storage | JBOD намеренно выключены после переезда; для возврата нужны отдельный шкаф, направляющие и сопутствующая физическая инфраструктура | Intentionally offline / procurement-dependent | подтверждено владельцем 2026-09-07 |
 | Inter-switch LACP | Работает через один линк; второй линк известен владельцу и будет восстановлен отдельно | Known temporary limitation | 2026-09-07 |
 | PVE power redundancy | `pve01`–`pve03` сейчас подключены без A/B redundancy из-за нехватки PDU и силовых кабелей | Intentionally limited / procurement-dependent | подтверждено владельцем 2026-09-07 |
@@ -87,6 +89,24 @@ Force10 на уровне LAN/IPMI, но не были введены в Proxmox
 - фактическая VLAN summary в старой карте `switch1` содержит внутреннее
   расхождение и требует сверки с `show vlan`;
 - LAN2/bonding Supermicro остаётся незавершённым.
+
+### Параллельный Azure site tunnel
+
+Проверка 2026-09-09 подтвердила WireGuard handshake между:
+
+- `vpn-npd`: `wg-site`, `10.255.82.1/30`, public UDP `51822`;
+- `fw01`/OPNsense: instance `wg-site`, `10.255.82.2/30`, local UDP
+  `51823`, peer endpoint `20.215.200.4:51822`;
+- Azure NSG: inbound UDP `51822`, source `Any`, priority `340`.
+
+OPNsense находится за внешним NAT и использует `PersistentKeepalive = 25`.
+Azure изучает фактический внешний endpoint OPNsense из аутентифицированных
+WireGuard packets; постоянный адрес или port OPNsense на Azure не задан.
+
+На этой стадии разрешены только tunnel addresses `/32`. Routes во внутренние
+VLAN, отдельный firewall interface, `wg-admin`, public HTTPS и перевод SSH на
+новый tunnel ещё не выполнены. Действующий legacy `wg0` и Tailscale fallback
+не отключались.
 
 ## HTCondor, PXE и scientific software
 

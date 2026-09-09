@@ -2,7 +2,7 @@
 
 Статус: draft
 Дата создания: 2026-09-08
-Последняя проверка исходного состояния: 2026-09-08
+Последняя проверка исходного состояния: 2026-09-09
 Назначение: спроектировать независимый внешний вход через `vpn-npd` и
 безопасную миграцию с текущего TCP relay на routed WireGuard
 Источник истины для: целевой схемы Azure edge/VPN и этапов её внедрения; не для
@@ -61,6 +61,32 @@
 [user access](../services/user-access.md). Этот план не переводит перечисленные
 target-компоненты в deployed state.
 
+## Checkpoint реализации 2026-09-09
+
+Подтверждено владельцем и live output:
+
+- резервные копии OPNsense и legacy VPN configuration созданы вне Git;
+- на `vpn-npd` создан и включён после reboot интерфейс `wg-site` с адресом
+  `10.255.82.1/30` и public listen port UDP `51822`;
+- Azure NSG разрешает inbound UDP `51822` от `Any`, priority `340`;
+- на `fw01`/OPNsense создана instance `wg-site` с адресом
+  `10.255.82.2/30`, local listen port UDP `51823` и `PersistentKeepalive = 25`;
+- peers ограничены tunnel addresses `10.255.82.1/32` и
+  `10.255.82.2/32`;
+- handshake и двусторонние counters между Azure и OPNsense получены;
+- legacy `wg0`, TCP/10000 и Tailscale не изменялись и не отключались.
+
+Во время диагностики packets с OPNsense source/destination port `51822`
+покидали `fw01` и физический `nic0` на `pve02`, но не наблюдались на Azure.
+Raw UDP с `pve02` до Azure проходил. После смены local listen port OPNsense на
+`51823` handshake установился; внешний NAT перевёл его в динамический source
+port. Это указывает на NAT state/port handling по пути, но не доказывает,
+какое именно upstream устройство выполняло проблемную обработку.
+
+Checkpoint не завершает V1 или V2: `wg-admin`, Azure forwarding policy,
+routes во внутренние VLAN, назначенный firewall interface/rules и
+application flows ещё не созданы.
+
 ## Целевая схема
 
 ```text
@@ -94,11 +120,11 @@ target-компоненты в deployed state.
 
 Разделение site и admin traffic упрощает routing, firewall и отзыв peers.
 
-| Контур | Роль | Предлагаемая сеть | Предлагаемый endpoint |
+| Контур | Роль | Сеть | Endpoint / состояние |
 |---|---|---|---|
-| legacy `wg0` | действующий Azure ↔ `pve02` fallback | `10.255.80.0/30` | UDP `51820` |
-| `wg-admin` | Windows/администраторы ↔ Azure | `10.255.81.0/24` | UDP `51821` |
-| `wg-site` | Azure ↔ `fw01`/OPNsense | `10.255.82.0/30` | UDP `51822` |
+| legacy `wg0` | действующий Azure ↔ `pve02` fallback | `10.255.80.0/30` | UDP `51820`, deployed |
+| `wg-admin` | Windows/администраторы ↔ Azure | `10.255.81.0/24` | UDP `51821`, proposed |
+| `wg-site` | Azure ↔ `fw01`/OPNsense | `10.255.82.0/30` | Azure UDP `51822`, handshake verified |
 
 Предлагаемые адреса:
 
@@ -106,11 +132,12 @@ target-компоненты в deployed state.
 |---|---|---|
 | `vpn-npd` | `wg-admin` | `10.255.81.1/24` |
 | первый Windows admin | WireGuard client | `10.255.81.10/32` |
-| `vpn-npd` | `wg-site` | `10.255.82.1/30` |
-| `fw01`/OPNsense | `wg-site` | `10.255.82.2/30` |
+| `vpn-npd` | `wg-site` | `10.255.82.1/30` (deployed) |
+| `fw01`/OPNsense | `wg-site` | `10.255.82.2/30` (deployed) |
 
-Эти сети не найдены в текущей документации и live routes, но перед внедрением
-их нужно повторно проверить в OPNsense, Azure и на client devices.
+`wg-admin` network остаётся предложением и перед внедрением повторно
+проверяется в OPNsense, Azure и на client devices. `wg-site` transit network
+подтверждена handshake, но не считается маршрутом во внутренние VLAN.
 
 ## Потоки трафика
 

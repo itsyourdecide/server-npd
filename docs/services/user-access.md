@@ -38,6 +38,17 @@ ssh -p 10000 <username>@20.215.200.4
 Tailscale endpoint `pve02.taile43d6d.ts.net:10000` оставлен как
 административный fallback и не требуется обычному пользователю.
 
+## Параллельный tunnel в разработке
+
+Проверка 2026-09-09 подтвердила handshake отдельного `wg-site` между
+`vpn-npd` (`10.255.82.1`) и `fw01` (`10.255.82.2`). Он пока переносит только
+служебный traffic tunnel endpoints и не заменяет описанный выше public
+TCP/10000 path.
+
+Через новый tunnel ещё не опубликованы `bastion01`, `portal-dev01` или другие
+внутренние endpoints. `wg-admin`, routing во VLAN и правила OPNsense остаются
+следующими этапами [плана Azure edge](../network/azure-edge-vpn-plan.md).
+
 ## Security boundary
 
 - Нет shared password, anonymous login и публичного Proxmox.
@@ -93,9 +104,12 @@ Repository copy не доказывает deployment; live-состояние п
 - 2026-08-12 — ProxyJump и первый job временного пользователя;
 - 2026-08-13 — запуск job под реальным UID на ASUS execute node;
 - 2026-08-28 — публичный Azure/WireGuard gateway.
+- 2026-09-09 — handshake параллельного Azure ↔ OPNsense `wg-site`; без
+  service cutover.
 
-Подробности сохранены в [истории за август](../history/operations-2026-08.md).
-Состояние после 2026-08-28 без новой проверки не предполагается.
+Подробности сохранены в [истории за август](../history/operations-2026-08.md) и
+[истории за сентябрь](../history/operations-2026-09.md). Проверка нового
+tunnel не продлевает автоматически статус старого пользовательского пути.
 
 ## Связанные документы
 
