@@ -47,3 +47,33 @@ routed tunnel, не отключая действующий пользовате
 Evidence: live CLI output и GUI screenshots предоставлены владельцем в ходе
 операции; raw artifacts с network identifiers и key configuration в Git не
 сохранялись.
+
+### 2026-09-09 — vpn-npd/fw01 — проверен routed TCP path до portal-dev01
+
+Причина: до развёртывания reverse proxy проверить data plane через `wg-site`
+на одном destination, не открывая всю VLAN40.
+
+Изменено:
+
+- WireGuard device назначен отдельным OPNsense interface `WG_SITE`;
+- в Azure peer `AllowedIPs` добавлен `10.10.40.107/32`;
+- Linux route на `vpn-npd` направляет `10.10.40.107` через `wg-site` с source
+  `10.255.82.1`;
+- на `WG_SITE` добавлено временное pass rule от `10.255.82.1` к
+  `10.10.40.107` для TCP с любым destination port.
+
+Проверка:
+
+- ping `10.255.82.2 -> 10.255.82.1`: 14/14 packets, 0% loss, average около
+  31 ms;
+- route lookup на Azure: `10.10.40.107 dev wg-site src 10.255.82.1`;
+- WireGuard handshake оставался активным;
+- ping и TCP/22 `vpn-npd -> portal-dev01` прошли end-to-end.
+
+Результат: Azure достигает одной private VM через OPNsense; public reverse
+proxy ещё не развёрнут. Временное `any TCP` rule должно быть заменено точными
+application и admin rules после определения upstream port и создания
+`wg-admin`.
+
+Evidence: live CLI results подтверждены владельцем; private keys и raw configs
+в Git не добавлялись.

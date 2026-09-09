@@ -41,13 +41,15 @@ Tailscale endpoint `pve02.taile43d6d.ts.net:10000` оставлен как
 ## Параллельный tunnel в разработке
 
 Проверка 2026-09-09 подтвердила handshake отдельного `wg-site` между
-`vpn-npd` (`10.255.82.1`) и `fw01` (`10.255.82.2`). Он пока переносит только
-служебный traffic tunnel endpoints и не заменяет описанный выше public
-TCP/10000 path.
+`vpn-npd` (`10.255.82.1`) и `fw01` (`10.255.82.2`), а затем ping и TCP/22 до
+`portal-dev01` (`10.10.40.107`) по отдельному `/32` route. Это test path, он не
+заменяет описанный выше public TCP/10000 path.
 
-Через новый tunnel ещё не опубликованы `bastion01`, `portal-dev01` или другие
-внутренние endpoints. `wg-admin`, routing во VLAN и правила OPNsense остаются
-следующими этапами [плана Azure edge](../network/azure-edge-vpn-plan.md).
+На `WG_SITE` действует временное правило `vpn-npd -> portal-dev01` для любого
+TCP destination port; после выбора web upstream оно должно быть сужено.
+`portal-dev01` ещё не опубликован в Internet, а `bastion01`, `wg-admin` и
+production service flows остаются следующими этапами
+[плана Azure edge](../network/azure-edge-vpn-plan.md).
 
 ## Security boundary
 
@@ -106,6 +108,8 @@ Repository copy не доказывает deployment; live-состояние п
 - 2026-08-28 — публичный Azure/WireGuard gateway.
 - 2026-09-09 — handshake параллельного Azure ↔ OPNsense `wg-site`; без
   service cutover.
+- 2026-09-09 — проверены `/32` route, ICMP и TCP/22 от `vpn-npd` до
+  `portal-dev01`; public endpoint не создавался.
 
 Подробности сохранены в [истории за август](../history/operations-2026-08.md) и
 [истории за сентябрь](../history/operations-2026-09.md). Проверка нового

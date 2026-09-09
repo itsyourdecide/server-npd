@@ -83,9 +83,15 @@ Raw UDP с `pve02` до Azure проходил. После смены local list
 port. Это указывает на NAT state/port handling по пути, но не доказывает,
 какое именно upstream устройство выполняло проблемную обработку.
 
-Checkpoint не завершает V1 или V2: `wg-admin`, Azure forwarding policy,
-routes во внутренние VLAN, назначенный firewall interface/rules и
-application flows ещё не созданы.
+После проверки tunnel device был назначен отдельным OPNsense interface
+`WG_SITE`. На Azure добавлен host route `10.10.40.107/32` через OPNsense, а на
+`WG_SITE` — временное правило `10.255.82.1 -> 10.10.40.107`, TCP any. Ping и
+TCP/22 от `vpn-npd` прошли. Правило предназначено только для bring-up и должно
+быть сужено до выбранного application port; административный SSH в target
+будет разрешён отдельному `wg-admin` peer.
+
+Checkpoint не завершает V1 или V2: `wg-admin`, Azure forwarding policy для
+admin traffic, production firewall policy и application flows ещё не созданы.
 
 ## Целевая схема
 

@@ -39,9 +39,20 @@ Handshake и двусторонние WireGuard counters подтвержден�
 внешний NAT. Точный upstream NAT/router, который не пропускал исходный поток
 `51822 -> 51822`, не идентифицирован.
 
-Этот checkpoint подтверждает только encrypted transfer network. WireGuard
-device ещё не считается разрешённой административной зоной: rules/routes во
-VLAN, доступ к GUI/VM, `wg-admin` и public service flows не настроены.
+WireGuard device назначен отдельным интерфейсом `WG_SITE`. Для первого
+end-to-end test добавлены route и временное pass rule:
+
+```text
+source:       10.255.82.1 (vpn-npd)
+destination:  10.10.40.107 (portal-dev01)
+protocol:     TCP
+port:         any (temporary)
+```
+
+Ping и TCP/22 от `vpn-npd` до `portal-dev01` подтверждены 2026-09-09. Правило
+не открывает другие адреса VLAN40, но его destination ports должны быть сужены
+после выбора application upstream. `wg-admin` и public service flows ещё не
+настроены.
 
 ## User access exception
 

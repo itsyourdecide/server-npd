@@ -34,7 +34,7 @@ monitoring, LACP, PSU sensors, локальных ZFS pool и нового WireG
 | CVMFS | `sft.cern.ch` и `unpacked.cern.ch`, Squid-first с direct fallback | Verified | 2026-08-07 |
 | Monitoring | Prometheus на `monitor01`, 11/11 targets up | Verified | 2026-09-07 |
 | User access | Azure/WireGuard → `pve02` → `bastion01` → `condor01` | Verified | 2026-08-28 |
-| Azure site tunnel | Параллельный `wg-site` между `vpn-npd` и `fw01` имеет handshake; routing во VLAN и service cutover не выполнены | Verified | 2026-09-09 |
+| Azure site tunnel | Параллельный `wg-site` между `vpn-npd` и `fw01`; test route и TCP path до `portal-dev01` проверены, service cutover не выполнен | Verified | 2026-09-09 |
 | Shared storage | JBOD намеренно выключены после переезда; для возврата нужны отдельный шкаф, направляющие и сопутствующая физическая инфраструктура | Intentionally offline / procurement-dependent | подтверждено владельцем 2026-09-07 |
 | Inter-switch LACP | Работает через один линк; второй линк известен владельцу и будет восстановлен отдельно | Known temporary limitation | 2026-09-07 |
 | PVE power redundancy | `pve01`–`pve03` сейчас подключены без A/B redundancy из-за нехватки PDU и силовых кабелей | Intentionally limited / procurement-dependent | подтверждено владельцем 2026-09-07 |
@@ -103,10 +103,16 @@ OPNsense находится за внешним NAT и использует `Per
 Azure изучает фактический внешний endpoint OPNsense из аутентифицированных
 WireGuard packets; постоянный адрес или port OPNsense на Azure не задан.
 
-На этой стадии разрешены только tunnel addresses `/32`. Routes во внутренние
-VLAN, отдельный firewall interface, `wg-admin`, public HTTPS и перевод SSH на
-новый tunnel ещё не выполнены. Действующий legacy `wg0` и Tailscale fallback
-не отключались.
+Дополнительно проверен узкий route `vpn-npd` → `portal-dev01`
+(`10.10.40.107/32`). WireGuard device назначен интерфейсом `WG_SITE` в
+OPNsense; временное правило разрешает TCP с `10.255.82.1` только на
+`10.10.40.107`. Ping и TCP/22 проходят end-to-end.
+
+Правило пока намеренно шире конечной policy по destination port и должно быть
+разделено после выбора upstream port: Azure edge получит только application
+port, а SSH администратора позже будет разрешён от отдельного `wg-admin` peer.
+Другие routes во VLAN, `wg-admin`, public HTTPS и service cutover ещё не
+выполнены. Действующий legacy `wg0` и Tailscale fallback не отключались.
 
 ## HTCondor, PXE и scientific software
 

@@ -37,9 +37,10 @@ wg-site 10.255.82.1/30  <---------->  wg-site 10.255.82.2/30
                                         local UDP 51823
 ```
 
-Handshake проверен 2026-09-09. Эта связь пока не маршрутизирует внутренние
-VLAN и не переносит production HTTPS/SSH; подробный checkpoint и следующие
-этапы находятся в [плане Azure edge](azure-edge-vpn-plan.md).
+Handshake проверен 2026-09-09. Для диагностики добавлен только `/32` route до
+`portal-dev01` (`10.10.40.107`); ping и TCP/22 проходят. Route ко всей VLAN40
+и production HTTPS/SSH не создавались. Подробный checkpoint и следующие этапы
+находятся в [плане Azure edge](azure-edge-vpn-plan.md).
 
 ## Deployed и reserved
 

@@ -66,8 +66,8 @@ VLAN 60/61 нельзя считать действующими Ceph-сетям�
 проверяться `scripts/user-access-health.sh`.
 
 `10.255.82.0/30` является WireGuard transit network, а не VLAN или Azure VNet
-subnet. На checkpoint 2026-09-09 она не предоставляет routed access во
-внутренние VLAN.
+subnet. На checkpoint 2026-09-09 на Azure добавлен только host route
+`10.10.40.107/32` через OPNsense; route ко всей VLAN40 не создавался.
 
 ## Правила изменения
 
