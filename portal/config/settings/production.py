@@ -21,11 +21,15 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
-LOCAL_AUTH_ENABLED = False
+LOCAL_AUTH_ENABLED = True
 OIDC_ENABLED = True
 AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
     "apps.accounts.oidc.PortalOIDCAuthenticationBackend",
 ]
+
+OIDC_PROVIDER_NAME = "Google"
+OIDC_PROVIDER_SLUG = "google"
 
 OIDC_OP_ISSUER = required("OIDC_OP_ISSUER")
 OIDC_OP_AUTHORIZATION_ENDPOINT = required("OIDC_OP_AUTHORIZATION_ENDPOINT")

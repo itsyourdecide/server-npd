@@ -26,6 +26,8 @@ PORTAL_BUILD_COMMIT = env("PORTAL_BUILD_COMMIT", default="unknown")
 
 LOCAL_AUTH_ENABLED = False
 OIDC_ENABLED = False
+OIDC_PROVIDER_NAME = "Single sign-on"
+OIDC_PROVIDER_SLUG = "oidc"
 AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "/"

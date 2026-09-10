@@ -41,11 +41,11 @@ jobs:
         env:
           DJANGO_SECRET_KEY: ci-only-secret-key-with-at-least-fifty-characters-123456789
           DJANGO_ALLOWED_HOSTS: portal.example.test
-          OIDC_OP_ISSUER: https://identity.example.test
-          OIDC_OP_AUTHORIZATION_ENDPOINT: https://identity.example.test/authorize
-          OIDC_OP_TOKEN_ENDPOINT: https://identity.example.test/token
-          OIDC_OP_USER_ENDPOINT: https://identity.example.test/userinfo
-          OIDC_OP_JWKS_ENDPOINT: https://identity.example.test/jwks
+          OIDC_OP_ISSUER: https://accounts.google.com
+          OIDC_OP_AUTHORIZATION_ENDPOINT: https://accounts.google.com/o/oauth2/v2/auth
+          OIDC_OP_TOKEN_ENDPOINT: https://oauth2.googleapis.com/token
+          OIDC_OP_USER_ENDPOINT: https://openidconnect.googleapis.com/v1/userinfo
+          OIDC_OP_JWKS_ENDPOINT: https://www.googleapis.com/oauth2/v3/certs
           OIDC_RP_CLIENT_ID: portal-ci
           OIDC_RP_CLIENT_SECRET: ci-only-client-secret
         run: python manage.py check --settings=config.settings.production

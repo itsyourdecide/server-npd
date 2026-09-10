@@ -15,7 +15,7 @@ cluster_login_validator = RegexValidator(
 
 
 class UserProfile(models.Model):
-    """Portal identity and its optional provisioned cluster identity."""
+    """Portal user data and its optional provisioned cluster identity."""
 
     class ProvisioningStatus(models.TextChoices):
         NOT_REQUESTED = "not_requested", "Not requested"
@@ -30,8 +30,6 @@ class UserProfile(models.Model):
         on_delete=models.CASCADE,
         related_name="profile",
     )
-    oidc_issuer = models.URLField(max_length=512)
-    oidc_subject = models.CharField(max_length=255)
     cluster_login = models.CharField(
         max_length=32,
         null=True,
@@ -60,10 +58,6 @@ class UserProfile(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(
-                fields=["oidc_issuer", "oidc_subject"],
-                name="accounts_profile_unique_oidc_identity",
-            ),
             models.CheckConstraint(
                 condition=(
                     models.Q(cluster_uid__isnull=True)
@@ -88,3 +82,32 @@ class UserProfile(models.Model):
 
     def __str__(self) -> str:
         return self.user.get_username()
+
+
+class ExternalIdentity(models.Model):
+    """An OIDC identity owned by one portal user."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="external_identities",
+    )
+    provider = models.SlugField(max_length=50)
+    issuer = models.URLField(max_length=512)
+    subject = models.CharField(max_length=255)
+    email = models.EmailField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["issuer", "subject"],
+                name="accounts_identity_unique_issuer_subject",
+            ),
+        ]
+        indexes = [models.Index(fields=["provider"], name="accounts_identity_provider_idx")]
+
+    def __str__(self) -> str:
+        return f"{self.provider}: {self.user.get_username()}"

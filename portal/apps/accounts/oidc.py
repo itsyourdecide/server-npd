@@ -39,6 +39,7 @@ class PortalOIDCAuthenticationBackend(OIDCAuthenticationBackend):
             claims = VerifiedOIDCClaims.from_mapping(
                 issuer=payload.get("iss"),
                 claims=user_info,
+                provider=settings.OIDC_PROVIDER_SLUG,
             )
         except InvalidOIDCClaims as exc:
             raise SuspiciousOperation("Required OIDC claims are invalid") from exc

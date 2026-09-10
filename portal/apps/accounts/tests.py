@@ -11,7 +11,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from .identity import InvalidOIDCClaims, VerifiedOIDCClaims, sync_user_from_oidc
-from .models import UserProfile
+from .models import ExternalIdentity, UserProfile
 from .oidc import PortalOIDCAuthenticationBackend
 from .roles import (
     SystemRole,
@@ -25,17 +25,8 @@ class UserProfileModelTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="alice")
 
-    def make_profile(self, **overrides):
-        values = {
-            "user": self.user,
-            "oidc_issuer": "https://identity.example.edu",
-            "oidc_subject": "oidc-subject-alice",
-        }
-        values.update(overrides)
-        return UserProfile.objects.create(**values)
-
     def test_profile_has_public_uuid_and_safe_initial_state(self):
-        profile = self.make_profile()
+        profile = self.user.profile
 
         self.assertIsInstance(profile.id, uuid.UUID)
         self.assertEqual(
@@ -45,44 +36,27 @@ class UserProfileModelTests(TestCase):
         self.assertIsNone(profile.cluster_login)
         self.assertIsNone(profile.cluster_uid)
 
-    def test_oidc_issuer_and_subject_pair_is_unique(self):
-        self.make_profile()
-        second_user = get_user_model().objects.create_user(username="bob")
-
-        with self.assertRaises(IntegrityError), transaction.atomic():
-            UserProfile.objects.create(
-                user=second_user,
-                oidc_issuer="https://identity.example.edu",
-                oidc_subject="oidc-subject-alice",
-            )
-
     def test_cluster_login_uses_provisioning_script_format(self):
-        profile = UserProfile(
-            user=self.user,
-            oidc_issuer="https://identity.example.edu",
-            oidc_subject="oidc-subject-alice",
-            cluster_login="Alice.Invalid",
-            cluster_uid=20_000,
-        )
+        profile = self.user.profile
+        profile.cluster_login = "Alice.Invalid"
+        profile.cluster_uid = 20_000
 
         with self.assertRaises(ValidationError):
             profile.full_clean()
 
     def test_cluster_uid_must_be_in_allocated_range(self):
-        profile = UserProfile(
-            user=self.user,
-            oidc_issuer="https://identity.example.edu",
-            oidc_subject="oidc-subject-alice",
-            cluster_login="alice",
-            cluster_uid=19_999,
-        )
+        profile = self.user.profile
+        profile.cluster_login = "alice"
+        profile.cluster_uid = 19_999
 
         with self.assertRaises(ValidationError):
             profile.full_clean()
 
     def test_cluster_login_and_uid_are_stored_together(self):
         with self.assertRaises(IntegrityError), transaction.atomic():
-            self.make_profile(cluster_login="alice")
+            UserProfile.objects.filter(pk=self.user.profile.pk).update(
+                cluster_login="alice"
+            )
 
 
 class OIDCIdentityTests(TestCase):
@@ -102,8 +76,10 @@ class OIDCIdentityTests(TestCase):
 
         self.assertFalse(user.has_usable_password())
         self.assertEqual(user.email, "alice@example.edu")
-        self.assertEqual(user.profile.oidc_issuer, "https://identity.example.edu")
-        self.assertEqual(user.profile.oidc_subject, "subject-123")
+        identity = user.external_identities.get()
+        self.assertEqual(identity.issuer, "https://identity.example.edu")
+        self.assertEqual(identity.subject, "subject-123")
+        self.assertEqual(identity.provider, "oidc")
 
     def test_repeated_login_updates_mutable_claims_without_changing_identity(self):
         first_user = sync_user_from_oidc(self.claims())
@@ -116,6 +92,11 @@ class OIDCIdentityTests(TestCase):
         self.assertEqual(second_user.email, "alice.renamed@example.edu")
         self.assertEqual(second_user.first_name, "Alicia")
         self.assertEqual(UserProfile.objects.count(), 1)
+        self.assertEqual(ExternalIdentity.objects.count(), 1)
+        self.assertEqual(
+            second_user.external_identities.get().email,
+            "alice.renamed@example.edu",
+        )
 
     def test_same_subject_from_different_issuer_is_a_different_identity(self):
         first_user = sync_user_from_oidc(self.claims())
@@ -125,6 +106,22 @@ class OIDCIdentityTests(TestCase):
 
         self.assertNotEqual(second_user.pk, first_user.pk)
         self.assertEqual(UserProfile.objects.count(), 2)
+        self.assertEqual(ExternalIdentity.objects.count(), 2)
+
+    def test_local_and_oidc_users_with_same_email_are_not_merged(self):
+        local_user = get_user_model().objects.create_user(
+            username="alice",
+            email="alice@example.edu",
+            password="local-password",
+        )
+
+        oidc_user = sync_user_from_oidc(self.claims())
+
+        self.assertNotEqual(oidc_user.pk, local_user.pk)
+        self.assertEqual(
+            get_user_model().objects.filter(email="alice@example.edu").count(),
+            2,
+        )
 
     def test_claim_mapping_requires_subject(self):
         with self.assertRaises(InvalidOIDCClaims):
@@ -141,6 +138,7 @@ class OIDCIdentityTests(TestCase):
     OIDC_RP_CLIENT_SECRET="test-secret-at-least-32-bytes-long",
     OIDC_RP_SIGN_ALGO="HS256",
     OIDC_OP_ISSUER="https://identity.example.edu",
+    OIDC_PROVIDER_SLUG="example-idp",
 )
 class PortalOIDCBackendTests(TestCase):
     def token(self, **overrides):
@@ -204,6 +202,26 @@ class LocalAuthenticationTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Sign in")
+
+    def test_login_page_offers_google_without_hiding_local_login(self):
+        response = self.client.get(reverse("login"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Continue with Google")
+        self.assertContains(response, "use your portal account")
+
+    def test_local_user_can_sign_in_with_username_and_password(self):
+        get_user_model().objects.create_user(
+            username="alice",
+            password="correct-password",
+        )
+
+        response = self.client.post(
+            reverse("login"),
+            {"username": "alice", "password": "correct-password"},
+        )
+
+        self.assertRedirects(response, reverse("dashboard"))
 
     def test_authenticated_user_can_open_dashboard(self):
         user = get_user_model().objects.create_user(username="alice")
