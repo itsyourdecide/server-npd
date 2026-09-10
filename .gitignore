@@ -12,3 +12,4 @@ portal/db.sqlite3
 *.egg-info/
 portal/build/
 portal/dist/
+portal/staticfiles/

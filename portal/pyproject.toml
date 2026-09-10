@@ -12,6 +12,7 @@ dependencies = [
     "psycopg[binary]==3.3.5",
     "django-environ==0.14.0",
     "mozilla-django-oidc==5.0.2",
+    "gunicorn==26.2.0",
 ]
 
 [tool.setuptools.packages.find]
