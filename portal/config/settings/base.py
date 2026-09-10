@@ -21,6 +21,9 @@ DEBUG = False
 
 ALLOWED_HOSTS = []
 
+PORTAL_BUILD_VERSION = env("PORTAL_BUILD_VERSION", default="development")
+PORTAL_BUILD_COMMIT = env("PORTAL_BUILD_COMMIT", default="unknown")
+
 
 # Application definition
 
