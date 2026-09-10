@@ -37,6 +37,19 @@ jobs:
       - name: Check Django configuration
         run: python manage.py check --settings=config.settings.test
 
+      - name: Check production configuration contract
+        env:
+          DJANGO_SECRET_KEY: ci-only-secret-key-with-at-least-fifty-characters-123456789
+          DJANGO_ALLOWED_HOSTS: portal.example.test
+          OIDC_OP_ISSUER: https://identity.example.test
+          OIDC_OP_AUTHORIZATION_ENDPOINT: https://identity.example.test/authorize
+          OIDC_OP_TOKEN_ENDPOINT: https://identity.example.test/token
+          OIDC_OP_USER_ENDPOINT: https://identity.example.test/userinfo
+          OIDC_OP_JWKS_ENDPOINT: https://identity.example.test/jwks
+          OIDC_RP_CLIENT_ID: portal-ci
+          OIDC_RP_CLIENT_SECRET: ci-only-client-secret
+        run: python manage.py check --settings=config.settings.production
+
       - name: Check model migrations
         run: python manage.py makemigrations --check --dry-run --settings=config.settings.test
 

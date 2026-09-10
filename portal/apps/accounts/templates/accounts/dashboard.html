@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard · NPD Portal</title>
+  </head>
+  <body>
+    <main>
+      <h1>NPD Portal</h1>
+      <p>Signed in as {{ request.user.get_username }}.</p>
+      {% if profile and profile.cluster_login %}
+        <p>Cluster login: {{ profile.cluster_login }}</p>
+      {% else %}
+        <p>Cluster identity has not been provisioned.</p>
+      {% endif %}
+      <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Sign out</button>
+      </form>
+    </main>
+  </body>
+</html>

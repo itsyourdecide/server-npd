@@ -24,12 +24,23 @@ ALLOWED_HOSTS = []
 PORTAL_BUILD_VERSION = env("PORTAL_BUILD_VERSION", default="development")
 PORTAL_BUILD_COMMIT = env("PORTAL_BUILD_COMMIT", default="unknown")
 
+LOCAL_AUTH_ENABLED = False
+OIDC_ENABLED = False
+AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+
 
 # Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'mozilla_django_oidc',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
