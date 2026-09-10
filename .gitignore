@@ -10,3 +10,5 @@ portal/db.sqlite3
 .mypy_cache/
 .ruff_cache/
 *.egg-info/
+portal/build/
+portal/dist/

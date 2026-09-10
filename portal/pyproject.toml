@@ -12,3 +12,6 @@ dependencies = [
     "psycopg[binary]==3.3.5",
     "django-environ==0.14.0",
 ]
+
+[tool.setuptools.packages.find]
+include = ["apps*", "config*"]
