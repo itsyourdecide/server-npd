@@ -4,11 +4,15 @@ from django.contrib.auth.views import LoginView
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import render
 
-from apps.notifications.models import Notification
+from apps.projects.authorization import visible_projects_for
+from apps.requests.models import ServiceRequest
+
+from .forms import PortalAuthenticationForm
 
 
 class PortalLoginView(LoginView):
     template_name = "registration/login.html"
+    authentication_form = PortalAuthenticationForm
     redirect_authenticated_user = True
 
     def get_context_data(self, **kwargs):
@@ -30,14 +34,20 @@ class PortalLoginView(LoginView):
 
 @login_required
 def dashboard(request):
+    own_requests = ServiceRequest.objects.filter(author=request.user)
     return render(
         request,
         "accounts/dashboard.html",
         {
             "profile": getattr(request.user, "profile", None),
-            "unread_notification_count": Notification.objects.filter(
-                recipient=request.user,
-                read_at__isnull=True,
+            "project_count": visible_projects_for(request.user).count(),
+            "request_count": own_requests.count(),
+            "open_request_count": own_requests.exclude(
+                state__in=(
+                    ServiceRequest.State.ACTIVE,
+                    ServiceRequest.State.FAILED,
+                    ServiceRequest.State.REJECTED,
+                )
             ).count(),
         },
     )

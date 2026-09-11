@@ -15,6 +15,15 @@ class IdempotentForm(forms.Form):
         super().__init__(*args, **kwargs)
         if not self.is_bound and "idempotency_key" not in self.initial:
             self.initial["idempotency_key"] = uuid.uuid4()
+        for field in self.visible_fields():
+            css_class = (
+                "form-select"
+                if isinstance(field.field.widget, forms.Select)
+                else "form-control"
+            )
+            field.field.widget.attrs["class"] = css_class
+            if isinstance(field.field.widget, forms.Textarea):
+                field.field.widget.attrs.setdefault("rows", 4)
 
 
 class RequestCreateForm(IdempotentForm):

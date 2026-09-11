@@ -202,6 +202,11 @@ class LocalAuthenticationTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Sign in")
+        self.assertContains(
+            response,
+            "/static/vendor/tabler/css/tabler.min.css",
+        )
+        self.assertNotContains(response, "cdn.")
 
     def test_login_page_offers_google_without_hiding_local_login(self):
         response = self.client.get(reverse("login"))

@@ -1,51 +1,14 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Requests · NPD Portal</title>
-  </head>
-  <body>
-    <main>
-      <p><a href="{% url 'dashboard' %}">Dashboard</a></p>
-      <h1>Requests</h1>
-      <p><a href="{% url 'requests:create' %}">Create request</a></p>
-
-      <h2>My requests</h2>
-      <ul>
-        {% for item in own_requests %}
-          <li>
-            <a href="{% url 'requests:detail' item.id %}">{{ item.title }}</a>
-            — {{ item.get_state_display }} — {{ item.project.name }}
-          </li>
-        {% empty %}
-          <li>No requests yet.</li>
-        {% endfor %}
-      </ul>
-
-      {% if review_queue %}
-        <h2>Review queue</h2>
-        <ul>
-          {% for item in review_queue %}
-            <li>
-              <a href="{% url 'requests:detail' item.id %}">{{ item.title }}</a>
-              — {{ item.get_state_display }} — {{ item.author.get_username }}
-            </li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-
-      {% if operator_queue %}
-        <h2>Operator queue</h2>
-        <ul>
-          {% for item in operator_queue %}
-            <li>
-              <a href="{% url 'requests:detail' item.id %}">{{ item.title }}</a>
-              — {{ item.get_state_display }} — {{ item.author.get_username }}
-            </li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    </main>
-  </body>
-</html>
+{% extends "base.html" %}
+{% block title %}Requests · NPD Portal{% endblock %}
+{% block page_title %}Requests{% endblock %}
+{% block page_actions %}<a class="btn btn-primary" href="{% url 'requests:create' %}">Create request</a>{% endblock %}
+{% block content %}
+  <div class="card mb-4">
+    <div class="card-header"><h3 class="card-title">My requests</h3></div>
+    {% if own_requests %}<div class="table-responsive"><table class="table table-vcenter card-table"><thead><tr><th>Request</th><th>Project</th><th>Status</th><th>Updated</th><th></th></tr></thead><tbody>
+      {% for item in own_requests %}<tr><td><a class="fw-semibold" href="{% url 'requests:detail' item.id %}">{{ item.title }}</a><div class="text-secondary small">{{ item.get_kind_display }}</div></td><td>{{ item.project.name }}</td><td><span class="badge bg-{{ item.state_color }}-lt">{{ item.get_state_display }}</span></td><td class="text-secondary">{{ item.updated_at|date:"Y-m-d H:i" }}</td><td class="text-end"><a href="{% url 'requests:detail' item.id %}">Open</a></td></tr>{% endfor %}
+    </tbody></table></div>{% else %}<div class="empty"><p class="empty-title">No requests yet.</p><p class="empty-subtitle text-secondary">Create a request for cluster access or resources.</p><div class="empty-action"><a class="btn btn-primary" href="{% url 'requests:create' %}">Create request</a></div></div>{% endif %}
+  </div>
+  {% if review_queue %}<div class="card mb-4"><div class="card-header"><h3 class="card-title">Review queue</h3><span class="badge bg-yellow-lt ms-2">{{ review_queue|length }}</span></div><div class="table-responsive"><table class="table table-vcenter card-table"><thead><tr><th>Request</th><th>Author</th><th>Project</th><th>Status</th><th></th></tr></thead><tbody>{% for item in review_queue %}<tr><td><a class="fw-semibold" href="{% url 'requests:detail' item.id %}">{{ item.title }}</a></td><td>{{ item.author.get_username }}</td><td>{{ item.project.name }}</td><td><span class="badge bg-{{ item.state_color }}-lt">{{ item.get_state_display }}</span></td><td class="text-end"><a href="{% url 'requests:detail' item.id %}">Review</a></td></tr>{% endfor %}</tbody></table></div></div>{% endif %}
+  {% if operator_queue %}<div class="card"><div class="card-header"><h3 class="card-title">Operator queue</h3><span class="badge bg-orange-lt ms-2">{{ operator_queue|length }}</span></div><div class="table-responsive"><table class="table table-vcenter card-table"><thead><tr><th>Request</th><th>Author</th><th>Project</th><th>Status</th><th></th></tr></thead><tbody>{% for item in operator_queue %}<tr><td><a class="fw-semibold" href="{% url 'requests:detail' item.id %}">{{ item.title }}</a></td><td>{{ item.author.get_username }}</td><td>{{ item.project.name }}</td><td><span class="badge bg-{{ item.state_color }}-lt">{{ item.get_state_display }}</span></td><td class="text-end"><a href="{% url 'requests:detail' item.id %}">Open</a></td></tr>{% endfor %}</tbody></table></div></div>{% endif %}
+{% endblock %}

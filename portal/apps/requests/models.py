@@ -82,6 +82,19 @@ class ServiceRequest(models.Model):
             ),
         ]
 
+    @property
+    def state_color(self):
+        return {
+            self.State.DRAFT: "secondary",
+            self.State.SUBMITTED: "azure",
+            self.State.UNDER_REVIEW: "yellow",
+            self.State.APPROVED: "green",
+            self.State.REJECTED: "red",
+            self.State.EXECUTING: "orange",
+            self.State.ACTIVE: "green",
+            self.State.FAILED: "red",
+        }.get(self.state, "secondary")
+
     def save(self, *args, **kwargs):
         if not self._state.adding:
             original = ServiceRequest.objects.only(

@@ -1,0 +1,117 @@
+:root {
+  --portal-brand-start: #206bc4;
+  --portal-brand-end: #6f42c1;
+}
+
+.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.portal-brand-link,
+.portal-auth-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: .75rem;
+  color: inherit;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  text-decoration: none;
+}
+
+.portal-auth-brand {
+  font-size: 1.35rem;
+}
+
+.portal-brand-mark {
+  display: inline-grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: .6rem;
+  color: #fff;
+  background: linear-gradient(135deg, var(--portal-brand-start), var(--portal-brand-end));
+  box-shadow: 0 .35rem 1rem rgba(32, 107, 196, .25);
+}
+
+.portal-brand-mark-lg {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: .8rem;
+  font-size: 1.25rem;
+}
+
+.portal-stat-icon,
+.stat-icon {
+  display: inline-grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border-radius: .75rem;
+}
+
+.portal-empty-state {
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.portal-timeline {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.portal-timeline-item {
+  position: relative;
+  padding: 0 0 1.5rem 2rem;
+}
+
+.portal-timeline-item:not(:last-child)::before {
+  position: absolute;
+  top: .85rem;
+  bottom: -.25rem;
+  left: .4rem;
+  width: 2px;
+  content: "";
+  background: var(--tblr-border-color);
+}
+
+.portal-timeline-dot,
+.portal-timeline-marker {
+  position: absolute;
+  top: .3rem;
+  left: 0;
+  width: .85rem;
+  height: .85rem;
+  border: 2px solid var(--tblr-bg-surface);
+  border-radius: 50%;
+  background: var(--tblr-primary);
+  box-shadow: 0 0 0 2px var(--tblr-primary);
+}
+
+.empty-icon {
+  display: inline-grid;
+  width: 3.5rem;
+  height: 3.5rem;
+  place-items: center;
+  margin-bottom: 1rem;
+  border-radius: 1rem;
+  font-weight: 700;
+}
+
+.portal-description {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 992px) {
+  .navbar-vertical.navbar-expand-lg {
+    width: 15rem;
+  }
+}
