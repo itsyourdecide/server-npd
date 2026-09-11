@@ -34,6 +34,9 @@
 - внешний SSH-путь через WireGuard и `bastion01`;
 - PostgreSQL 16 работает локально на development VM `portal-dev01`;
 - для первого входа выбраны локальные учётные записи портала и Google OIDC;
+- development web service работает через Nginx, Gunicorn и systemd;
+- реализованы профили, внешние identity, системные роли, проекты и membership;
+- события входа, ошибки входа и выхода записываются в append-only `AuditEvent`;
 - production HTTP endpoint для портала ещё не выбран и не считается
   развёрнутым.
 
