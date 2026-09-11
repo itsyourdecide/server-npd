@@ -1,14 +1,23 @@
-{% load static %}
+{% load i18n static %}
+{% get_current_language as CURRENT_LANGUAGE %}
 <!doctype html>
-<html lang="en">
+<html lang="{{ CURRENT_LANGUAGE }}">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Sign in · NPD Portal{% endblock %}</title>
+    <title>{% block title %}{% translate "Sign in" %} · NPD Portal{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'vendor/tabler/css/tabler.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/portal.css' %}">
   </head>
   <body class="d-flex flex-column bg-surface-secondary">
+    <div class="portal-language-switch">
+      <form action="{% url 'set_language' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <input type="hidden" name="language" value="{% if CURRENT_LANGUAGE == 'uk' %}en{% else %}uk{% endif %}">
+        <button class="btn btn-white btn-sm" type="submit">{% if CURRENT_LANGUAGE == 'uk' %}English{% else %}Українська{% endif %}</button>
+      </form>
+    </div>
     <div class="page page-center">
       <div class="container container-tight py-4">
         <div class="text-center mb-4">
@@ -16,7 +25,7 @@
             <span class="portal-brand-mark portal-brand-mark-lg">N</span>
             <span>NPD Portal</span>
           </a>
-          <div class="text-secondary mt-2">Access to the NPD compute cluster</div>
+          <div class="text-secondary mt-2">{% translate "Access to the NPD compute cluster" %}</div>
         </div>
         {% block content %}{% endblock %}
       </div>

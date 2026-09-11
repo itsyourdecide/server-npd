@@ -1,7 +1,9 @@
+import re
 import uuid
 
 from django.conf import settings
 from django.db import models
+from django.utils.translation import gettext as _
 
 
 class Notification(models.Model):
@@ -39,6 +41,27 @@ class Notification(models.Model):
                 name="notifications_recipient_idx",
             ),
         ]
+
+    @property
+    def localized_title(self):
+        prefix = "Request status: "
+        if self.event == self.Event.REQUEST_STATE_CHANGED and self.title.startswith(
+            prefix
+        ):
+            state = _(self.title.removeprefix(prefix))
+            return _("Request status: %(state)s") % {"state": state}
+        return self.title
+
+    @property
+    def localized_message(self):
+        if self.event == self.Event.REQUEST_STATE_CHANGED:
+            match = re.fullmatch(r'Your request "(.*)" changed to (.*)\.', self.message)
+            if match:
+                title, state = match.groups()
+                return _(
+                    'Your request "%(title)s" changed to %(state)s.'
+                ) % {"title": title, "state": _(state)}
+        return self.message
 
     def __str__(self) -> str:
         return self.title

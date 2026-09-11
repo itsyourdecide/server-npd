@@ -1,7 +1,20 @@
 {% extends "base.html" %}
-{% block title %}Create request · NPD Portal{% endblock %}
-{% block page_pretitle %}<a class="text-secondary" href="{% url 'requests:list' %}">Requests</a>{% endblock %}
-{% block page_title %}Create request{% endblock %}
+{% load i18n %}
+
+{% block title %}{% translate "Create request" %} · NPD Portal{% endblock %}
+{% block page_pretitle %}<a class="text-secondary" href="{% url 'requests:list' %}">{% translate "Requests" %}</a>{% endblock %}
+{% block page_title %}{% translate "Create request" %}{% endblock %}
+
 {% block content %}
-  <div class="row justify-content-center"><div class="col-lg-8"><form class="card" method="post">{% csrf_token %}<div class="card-header"><h3 class="card-title">Request details</h3></div><div class="card-body">{% include "includes/form_fields.html" with form=form %}</div><div class="card-footer d-flex justify-content-end gap-2"><a class="btn" href="{% url 'requests:list' %}">Cancel</a><button class="btn btn-primary" type="submit">Save draft</button></div></form></div></div>
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="alert alert-info portal-intro" role="note"><div><div class="fw-semibold">{% translate "Start with a draft" %}</div><div class="mt-1">{% translate "Saving this form does not send anything for approval yet. You can review the draft first, then submit it from the request page." %}</div></div></div>
+      <form class="card" method="post">
+        {% csrf_token %}
+        <div class="card-header"><div><h3 class="card-title">{% translate "Request details" %}</h3><div class="card-subtitle">{% translate "Fields marked with an asterisk are required" %}</div></div></div>
+        <div class="card-body">{% include "includes/form_fields.html" with form=form %}</div>
+        <div class="card-footer d-flex justify-content-end gap-2"><a class="btn" href="{% url 'requests:list' %}">{% translate "Cancel" %}</a><button class="btn btn-primary" type="submit">{% translate "Save draft" %}</button></div>
+      </form>
+    </div>
+  </div>
 {% endblock %}

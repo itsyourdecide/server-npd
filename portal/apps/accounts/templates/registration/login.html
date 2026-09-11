@@ -1,14 +1,27 @@
 {% extends "auth_base.html" %}
-{% block title %}Sign in · NPD Portal{% endblock %}
+{% load i18n %}
+
+{% block title %}{% translate "Sign in" %} · NPD Portal{% endblock %}
+
 {% block content %}
-  <div class="card card-md"><div class="card-body">
-    <h2 class="h2 text-center mb-4">Sign in</h2>
-    {% if oidc_enabled %}<a class="btn btn-outline-secondary w-100 mb-3" href="{% url 'oidc_authentication_init' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Continue with {{ oidc_provider_name }}</a>{% endif %}
-    {% if local_auth_enabled %}
-      {% if oidc_enabled %}<div class="hr-text mb-3">or use your portal account</div>{% endif %}
-      {% if form.errors %}<div class="alert alert-danger" role="alert">Username or password is incorrect.</div>{% endif %}
-      <form method="post" autocomplete="off">{% csrf_token %}{% include "includes/form_fields.html" with form=form %}{% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}<div class="form-footer"><button class="btn btn-primary w-100" type="submit">Sign in</button></div></form>
-    {% endif %}
-  </div></div>
-  <div class="text-center text-secondary mt-3">NPD compute cluster · Authorized users only</div>
+  <div class="card card-md">
+    <div class="card-body">
+      <h2 class="h2 text-center mb-2">{% translate "Sign in" %}</h2>
+      <p class="text-secondary text-center mb-4">{% translate "Use your portal account to manage access requests and follow their progress." %}</p>
+      {% if oidc_enabled %}
+        <a class="btn btn-outline-secondary w-100 mb-3" href="{% url 'oidc_authentication_init' %}{% if next %}?next={{ next|urlencode }}{% endif %}">{% blocktranslate %}Continue with {{ oidc_provider_name }}{% endblocktranslate %}</a>
+      {% endif %}
+      {% if local_auth_enabled %}
+        {% if oidc_enabled %}<div class="hr-text mb-3">{% translate "or use your portal account" %}</div>{% endif %}
+        {% if form.errors %}<div class="alert alert-danger" role="alert">{% translate "Username or password is incorrect." %}</div>{% endif %}
+        <form method="post" autocomplete="off">
+          {% csrf_token %}
+          {% include "includes/form_fields.html" with form=form %}
+          {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+          <div class="form-footer"><button class="btn btn-primary w-100" type="submit">{% translate "Sign in" %}</button></div>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+  <div class="text-center text-secondary mt-3">{% translate "NPD compute cluster · Authorized users only" %}</div>
 {% endblock %}

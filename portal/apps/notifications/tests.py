@@ -5,6 +5,7 @@ from django.contrib.auth.models import Group
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import override
 
 from apps.accounts.roles import SystemRole
 from apps.projects.services import create_project
@@ -114,6 +115,24 @@ class NotificationTests(TestCase):
 
         self.assertContains(response, own_notification.title)
         self.assertNotContains(response, "Hidden notification")
+
+    def test_request_notification_is_localized_at_render_time(self):
+        notification = Notification.objects.create(
+            recipient=self.author,
+            event=Notification.Event.REQUEST_STATE_CHANGED,
+            title="Request status: Active",
+            message='Your request "Additional memory" changed to Active.',
+            target_type="service_request",
+            target_id=str(self.service_request.pk),
+            deduplication_key="localized-notification",
+        )
+
+        with override("uk"):
+            self.assertEqual(notification.localized_title, "Стан заявки: Активна")
+            self.assertEqual(
+                notification.localized_message,
+                "Стан вашої заявки «Additional memory» змінено на «Активна».",
+            )
 
     def test_recipient_marks_notification_read_through_post(self):
         notification = Notification.objects.create(

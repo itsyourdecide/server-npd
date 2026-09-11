@@ -35,7 +35,8 @@
 - для первого входа выбраны локальные учётные записи портала и Google OIDC;
 - development web service работает через Nginx, Gunicorn и systemd;
 - пользовательские страницы используют единый адаптивный интерфейс на Tabler;
-  frontend-assets хранятся локально и не зависят от CDN;
+  frontend-assets хранятся локально и не зависят от CDN; интерфейс доступен
+  английской и украинской языковыми версиями;
 - реализованы профили, внешние identity, системные роли, проекты и membership;
 - события входа, ошибки входа и выхода записываются в append-only `AuditEvent`;
 - реализованы заявки, append-only transitions и approvals, reviewer/operator

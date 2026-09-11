@@ -1,9 +1,18 @@
 {% extends "base.html" %}
-{% block title %}Notifications · NPD Portal{% endblock %}
-{% block page_title %}Notifications{% endblock %}
+{% load i18n %}
+
+{% block title %}{% translate "Notifications" %} · NPD Portal{% endblock %}
+{% block page_title %}{% translate "Notifications" %}{% endblock %}
+
 {% block content %}
+  <div class="alert alert-info portal-intro" role="note"><div><div class="fw-semibold">{% translate "Request updates appear here" %}</div><div class="mt-1">{% translate "Open a notification to view the related request. Mark it as read when you no longer need the reminder." %}</div></div></div>
   <div class="card">
-    {% if notifications %}<div class="list-group list-group-flush">{% for notification in notifications %}<div class="list-group-item py-3"><div class="row align-items-start"><div class="col-auto pt-1"><span class="status-dot {% if not notification.read_at %}status-dot-animated bg-blue{% else %}bg-secondary{% endif %}"></span></div><div class="col"><div class="d-flex align-items-center gap-2"><span class="fw-semibold">{{ notification.title }}</span>{% if not notification.read_at %}<span class="badge bg-blue-lt">New</span>{% endif %}</div><div class="text-secondary mt-1">{{ notification.message }}</div><div class="text-secondary small mt-2">{{ notification.created_at|date:"Y-m-d H:i" }}</div></div><div class="col-auto d-flex gap-2">{% if notification.target_type == 'service_request' %}<a class="btn btn-sm" href="{% url 'requests:detail' notification.target_id %}">Open request</a>{% endif %}{% if not notification.read_at %}<form method="post" action="{% url 'notifications:mark-read' notification.id %}">{% csrf_token %}<button class="btn btn-sm btn-outline-primary" type="submit">Mark as read</button></form>{% endif %}</div></div></div>{% endfor %}</div>
-    {% else %}<div class="empty"><p class="empty-title">No notifications.</p><p class="empty-subtitle text-secondary">Updates about your requests will appear here.</p></div>{% endif %}
+    {% if notifications %}
+      <div class="list-group list-group-flush">
+        {% for notification in notifications %}<div class="list-group-item py-3"><div class="row align-items-start"><div class="col-auto pt-1"><span class="status-dot {% if not notification.read_at %}status-dot-animated bg-blue{% else %}bg-secondary{% endif %}"></span></div><div class="col"><div class="d-flex align-items-center gap-2"><span class="fw-semibold">{{ notification.localized_title }}</span>{% if not notification.read_at %}<span class="badge bg-blue-lt">{% translate "New" %}</span>{% endif %}</div><div class="text-secondary mt-1">{{ notification.localized_message }}</div><div class="text-secondary small mt-2">{{ notification.created_at|date:"Y-m-d H:i" }}</div></div><div class="col-auto d-flex gap-2">{% if notification.target_type == 'service_request' %}<a class="btn btn-sm" href="{% url 'requests:detail' notification.target_id %}">{% translate "Open request" %}</a>{% endif %}{% if not notification.read_at %}<form method="post" action="{% url 'notifications:mark-read' notification.id %}">{% csrf_token %}<button class="btn btn-sm btn-outline-primary" type="submit">{% translate "Mark as read" %}</button></form>{% endif %}</div></div></div>{% endfor %}
+      </div>
+    {% else %}
+      <div class="empty"><p class="empty-title">{% translate "No notifications." %}</p><p class="empty-subtitle text-secondary">{% translate "Updates about your requests will appear here." %}</p></div>
+    {% endif %}
   </div>
 {% endblock %}

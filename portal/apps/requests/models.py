@@ -3,6 +3,7 @@ import uuid
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.translation import gettext as _
 
 from apps.projects.models import Project
 
@@ -95,6 +96,14 @@ class ServiceRequest(models.Model):
             self.State.FAILED: "red",
         }.get(self.state, "secondary")
 
+    @property
+    def state_label(self):
+        return _(self.get_state_display())
+
+    @property
+    def kind_label(self):
+        return _(self.get_kind_display())
+
     def save(self, *args, **kwargs):
         if not self._state.adding:
             original = ServiceRequest.objects.only(
@@ -156,6 +165,16 @@ class RequestTransition(models.Model):
                 name="requests_transition_time_idx",
             ),
         ]
+
+    @property
+    def from_state_label(self):
+        if not self.from_state:
+            return _("Created")
+        return _(ServiceRequest.State(self.from_state).label)
+
+    @property
+    def to_state_label(self):
+        return _(ServiceRequest.State(self.to_state).label)
 
     def save(self, *args, **kwargs):
         if not self._state.adding:

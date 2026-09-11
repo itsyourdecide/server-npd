@@ -110,6 +110,47 @@
   overflow-wrap: anywhere;
 }
 
+.portal-intro {
+  display: flex;
+  align-items: flex-start;
+  border: 0;
+  border-left: 4px solid var(--tblr-info);
+}
+
+.portal-steps {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.portal-step {
+  display: grid;
+  grid-template-columns: 2.25rem 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.portal-step-number {
+  display: inline-grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--tblr-primary);
+  font-weight: 700;
+  background: var(--tblr-primary-lt);
+}
+
+.portal-language-switch {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+}
+
+.portal-sidebar-help {
+  border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
 @media (min-width: 992px) {
   .navbar-vertical.navbar-expand-lg {
     width: 15rem;

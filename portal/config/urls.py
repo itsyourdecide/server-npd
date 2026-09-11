@@ -27,6 +27,7 @@ urlpatterns = [
     path('', account_views.dashboard, name='dashboard'),
     path('auth/login/', account_views.PortalLoginView.as_view(), name='login'),
     path('auth/logout/', LogoutView.as_view(), name='logout'),
+    path('i18n/', include('django.conf.urls.i18n')),
     path('requests/', include('apps.requests.urls')),
     path('notifications/', include('apps.notifications.urls')),
     path('health/live', health.liveness, name='health-liveness'),

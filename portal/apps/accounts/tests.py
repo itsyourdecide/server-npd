@@ -215,6 +215,31 @@ class LocalAuthenticationTests(TestCase):
         self.assertContains(response, "Continue with Google")
         self.assertContains(response, "use your portal account")
 
+    def test_user_can_switch_login_page_to_ukrainian(self):
+        response = self.client.post(
+            reverse("set_language"),
+            {"language": "uk", "next": reverse("login")},
+        )
+
+        self.assertRedirects(response, reverse("login"), fetch_redirect_response=False)
+        response = self.client.get(reverse("login"))
+        self.assertContains(response, '<html lang="uk">')
+        self.assertContains(response, "Увійти")
+        self.assertContains(response, "Ім’я користувача")
+
+    def test_ukrainian_dashboard_explains_request_workflow(self):
+        user = get_user_model().objects.create_user(username="alice")
+        self.client.force_login(user)
+        self.client.post(
+            reverse("set_language"),
+            {"language": "uk", "next": reverse("dashboard")},
+        )
+
+        response = self.client.get(reverse("dashboard"))
+
+        self.assertContains(response, "Як це працює")
+        self.assertContains(response, "Створіть заявку")
+
     def test_local_user_can_sign_in_with_username_and_password(self):
         get_user_model().objects.create_user(
             username="alice",
