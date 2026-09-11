@@ -37,6 +37,8 @@
 - development web service работает через Nginx, Gunicorn и systemd;
 - реализованы профили, внешние identity, системные роли, проекты и membership;
 - события входа, ошибки входа и выхода записываются в append-only `AuditEvent`;
+- реализованы заявки, append-only transitions и approvals, reviewer/operator
+  queues и ручная фиксация результата исполнения;
 - production HTTP endpoint для портала ещё не выбран и не считается
   развёрнутым.
 

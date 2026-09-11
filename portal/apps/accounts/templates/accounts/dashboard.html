@@ -9,6 +9,7 @@
     <main>
       <h1>NPD Portal</h1>
       <p>Signed in as {{ request.user.get_username }}.</p>
+      <p><a href="{% url 'requests:list' %}">Requests</a></p>
       {% if profile and profile.cluster_login %}
         <p>Cluster login: {{ profile.cluster_login }}</p>
       {% else %}

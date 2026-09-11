@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ service_request.title }} · NPD Portal</title>
+  </head>
+  <body>
+    <main>
+      <p><a href="{% url 'requests:list' %}">Back to requests</a></p>
+      <h1>{{ service_request.title }}</h1>
+      <dl>
+        <dt>Type</dt><dd>{{ service_request.get_kind_display }}</dd>
+        <dt>Project</dt><dd>{{ service_request.project.name }}</dd>
+        <dt>Author</dt><dd>{{ service_request.author.get_username }}</dd>
+        <dt>Status</dt><dd>{{ service_request.get_state_display }}</dd>
+      </dl>
+      <p>{{ service_request.description|linebreaksbr }}</p>
+
+      {% if can_submit %}
+        <form method="post" action="{% url 'requests:submit' service_request.id %}">
+          {% csrf_token %}{{ submit_form.as_p }}
+          <button type="submit">Submit for review</button>
+        </form>
+      {% endif %}
+      {% if can_begin_review %}
+        <form method="post" action="{% url 'requests:begin-review' service_request.id %}">
+          {% csrf_token %}{{ review_form.as_p }}
+          <button type="submit">Start review</button>
+        </form>
+      {% endif %}
+      {% if can_decide %}
+        <h2>Decision</h2>
+        <form method="post" action="{% url 'requests:decide' service_request.id %}">
+          {% csrf_token %}{{ decision_form.as_p }}
+          <button type="submit">Record decision</button>
+        </form>
+      {% endif %}
+      {% if can_begin_execution %}
+        <form method="post" action="{% url 'requests:begin-execution' service_request.id %}">
+          {% csrf_token %}{{ execution_form.as_p }}
+          <button type="submit">Begin manual execution</button>
+        </form>
+      {% endif %}
+      {% if can_finish_execution %}
+        <h2>Execution result</h2>
+        <form method="post" action="{% url 'requests:finish-execution' service_request.id %}">
+          {% csrf_token %}{{ result_form.as_p }}
+          <button type="submit">Record result</button>
+        </form>
+      {% endif %}
+
+      <h2>History</h2>
+      <ol>
+        {% for transition in transitions %}
+          <li>
+            {{ transition.created_at }} —
+            {{ transition.from_state|default:"created" }} → {{ transition.to_state }}
+            by {{ transition.actor.get_username }}
+            {% if transition.comment %}<p>{{ transition.comment|linebreaksbr }}</p>{% endif %}
+          </li>
+        {% endfor %}
+      </ol>
+    </main>
+  </body>
+</html>

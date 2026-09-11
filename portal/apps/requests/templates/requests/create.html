@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Create request · NPD Portal</title>
+  </head>
+  <body>
+    <main>
+      <p><a href="{% url 'requests:list' %}">Back to requests</a></p>
+      <h1>Create request</h1>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save draft</button>
+      </form>
+    </main>
+  </body>
+</html>

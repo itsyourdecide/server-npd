@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Requests · NPD Portal</title>
+  </head>
+  <body>
+    <main>
+      <p><a href="{% url 'dashboard' %}">Dashboard</a></p>
+      <h1>Requests</h1>
+      <p><a href="{% url 'requests:create' %}">Create request</a></p>
+
+      <h2>My requests</h2>
+      <ul>
+        {% for item in own_requests %}
+          <li>
+            <a href="{% url 'requests:detail' item.id %}">{{ item.title }}</a>
+            — {{ item.get_state_display }} — {{ item.project.name }}
+          </li>
+        {% empty %}
+          <li>No requests yet.</li>
+        {% endfor %}
+      </ul>
+
+      {% if review_queue %}
+        <h2>Review queue</h2>
+        <ul>
+          {% for item in review_queue %}
+            <li>
+              <a href="{% url 'requests:detail' item.id %}">{{ item.title }}</a>
+              — {{ item.get_state_display }} — {{ item.author.get_username }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      {% if operator_queue %}
+        <h2>Operator queue</h2>
+        <ul>
+          {% for item in operator_queue %}
+            <li>
+              <a href="{% url 'requests:detail' item.id %}">{{ item.title }}</a>
+              — {{ item.get_state_display }} — {{ item.author.get_username }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </main>
+  </body>
+</html>
