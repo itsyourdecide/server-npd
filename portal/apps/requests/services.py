@@ -7,6 +7,7 @@ from django.utils import timezone
 from apps.accounts.roles import can_execute_operations, can_review_requests
 from apps.audit.models import AuditEvent
 from apps.audit.services import record_event
+from apps.notifications.services import notify_request_transition
 from apps.projects.authorization import can_view_project
 from apps.projects.models import Project
 
@@ -219,6 +220,7 @@ def _change_state(
                 "transition_id": str(transition.pk),
             },
         )
+        notify_request_transition(locked, transition)
         return locked
 
 

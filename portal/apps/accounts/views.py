@@ -4,6 +4,8 @@ from django.contrib.auth.views import LoginView
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import render
 
+from apps.notifications.models import Notification
+
 
 class PortalLoginView(LoginView):
     template_name = "registration/login.html"
@@ -31,5 +33,11 @@ def dashboard(request):
     return render(
         request,
         "accounts/dashboard.html",
-        {"profile": getattr(request.user, "profile", None)},
+        {
+            "profile": getattr(request.user, "profile", None),
+            "unread_notification_count": Notification.objects.filter(
+                recipient=request.user,
+                read_at__isnull=True,
+            ).count(),
+        },
     )

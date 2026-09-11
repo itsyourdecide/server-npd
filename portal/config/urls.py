@@ -28,6 +28,7 @@ urlpatterns = [
     path('auth/login/', account_views.PortalLoginView.as_view(), name='login'),
     path('auth/logout/', LogoutView.as_view(), name='logout'),
     path('requests/', include('apps.requests.urls')),
+    path('notifications/', include('apps.notifications.urls')),
     path('health/live', health.liveness, name='health-liveness'),
     path('health/ready', health.readiness, name='health-readiness'),
     path('health/build', health.build_info, name='health-build-info'),
