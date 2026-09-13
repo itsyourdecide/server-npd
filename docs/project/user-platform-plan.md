@@ -58,7 +58,7 @@ JBOD/NFS намеренно выключены и не являются зави
 
 В MVP входят:
 
-- вход через выбранного OIDC-провайдера;
+- вход через локальную учётную запись портала или Google;
 - профиль пользователя;
 - проекты и членство в проектах;
 - заявки на доступ и ресурсы;
@@ -128,7 +128,7 @@ draft -> submitted -> under_review -> approved -> executing -> active -> closed
 Нужно подтвердить:
 
 - кто является первой группой пользователей;
-- какой OIDC/университетский identity provider используется;
+- нужен ли после Google университетский identity provider;
 - кто может назначать роли `reviewer`, `operator` и `admin`;
 - где размещается портал и как к нему получают доступ;
 - какие типы заявок входят в MVP;
@@ -152,7 +152,7 @@ draft -> submitted -> under_review -> approved -> executing -> active -> closed
 
 - Django-приложение с server-rendered UI и HTMX там, где это полезно;
 - PostgreSQL;
-- вход по OIDC;
+- локальный вход и вход через Google OIDC;
 - базовые роли и deny-by-default authorization;
 - TLS/reverse proxy;
 - health endpoints, структурированные логи и метрики;
@@ -217,7 +217,7 @@ U1 параллельно другим продуктовым работам, е
 
 Состав:
 
-- подтверждённая связь OIDC identity, portal profile, Unix login и numeric UID;
+- подтверждённая связь portal user, способа входа, Unix login и numeric UID;
 - просмотр собственных активных и завершённых заданий;
 - состояние очереди и понятное объяснение hold/error;
 - просмотр разрешённой информации об использованных ресурсах;

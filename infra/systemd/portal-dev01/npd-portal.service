@@ -1,0 +1,34 @@
+[Unit]
+Description=NPD Portal Django application
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dev01
+Group=dev01
+WorkingDirectory=/home/dev01/server-npd/portal
+EnvironmentFile=-/home/dev01/server-npd/portal/.env
+Environment=DJANGO_SETTINGS_MODULE=config.settings.development
+Environment=DJANGO_STATIC_ROOT=/var/lib/npd-portal/static
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/dev01/server-npd/portal/.venv/bin/gunicorn --bind 127.0.0.1:8000 --workers 3 --timeout 60 --no-control-socket --access-logfile - --error-logfile - config.wsgi:application
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=30s
+KillSignal=SIGQUIT
+UMask=0027
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target
