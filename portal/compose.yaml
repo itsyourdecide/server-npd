@@ -36,7 +36,19 @@ services:
       - "127.0.0.1:1025:1025"
       - "127.0.0.1:8025:8025"
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.7.3
+    command: start-dev
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: dev-admin-change-me
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+
 
 volumes:
   postgres_data:
   pgadmin_data:
+  keycloak_data:
