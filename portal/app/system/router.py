@@ -14,7 +14,7 @@ def health() -> dict[str, str]:
 
 
 @router.get("/health/ready")
-def readiness(db: Session = Depends(get_db)) -> dict[str, object]:
+def readiness(db: Session = Depends(get_db)) -> dict[str, object]:  # noqa: B008
     try:
         db.execute(text("SELECT 1"))
         return {"status": "ok", "checks": {"database": "ok"}}
