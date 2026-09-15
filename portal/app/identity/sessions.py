@@ -3,13 +3,14 @@ from datetime import UTC, datetime, timedelta
 from hashlib import sha256
 from uuid import UUID
 
-from fastapi import HTTPException
+from fastapi import Cookie, Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.identity.models import ApplicationSession
 from app.users.models import User
+from app.db.session import get_db
 
 
 def create_application_session(
@@ -56,3 +57,32 @@ async def get_user_by_session_token(
         raise RuntimeError("session references missing user")
 
     return user, session
+
+async def revoke_user_session(
+    db: AsyncSession,
+    session_token: str | None,
+) -> None:
+    if session_token is None:
+        return
+
+    token_hash = sha256(session_token.encode()).hexdigest()
+
+    statement = select(ApplicationSession).where(
+        ApplicationSession.token_hash == token_hash
+    )
+    application_session = await db.scalar(statement)
+
+    if application_session is None:
+        return
+
+    if application_session.revoked_at is not None:
+        return
+
+    application_session.revoked_at = datetime.now(UTC)
+
+
+
+
+    
+
+    
