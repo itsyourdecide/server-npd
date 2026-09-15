@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.core.config import settings
-from app.system.router import router
+from app.identity.router import router as identity_router
+from app.system.router import router as system_router
 
 
 def create_app() -> FastAPI:
@@ -20,7 +21,9 @@ def create_app() -> FastAPI:
         https_only=settings.oidc_cookie_secure,
     )
 
-    app.include_router(router)
+    app.include_router(identity_router)
+    app.include_router(system_router)
+
     return app
 
 
