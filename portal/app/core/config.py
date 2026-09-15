@@ -13,6 +13,8 @@ class Settings(BaseSettings):
 
     oidc_cookie_secure: bool = False
 
+    session_max_age_seconds: int = 7 * 24 * 60 * 60
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
