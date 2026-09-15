@@ -1,0 +1,57 @@
+name: Portal checks
+
+on:
+  pull_request:
+    paths:
+      - "portal/**"
+      - ".github/workflows/portal.yml"
+  push:
+    paths:
+      - "portal/**"
+      - ".github/workflows/portal.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: portal
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: portal/pyproject.toml
+
+      - name: Install portal
+        run: python -m pip install --editable .
+
+      - name: Check Django configuration
+        run: python manage.py check --settings=config.settings.test
+
+      - name: Check production configuration contract
+        env:
+          DJANGO_SECRET_KEY: ci-only-secret-key-with-at-least-fifty-characters-123456789
+          DJANGO_ALLOWED_HOSTS: portal.example.test
+          OIDC_OP_ISSUER: https://accounts.google.com
+          OIDC_OP_AUTHORIZATION_ENDPOINT: https://accounts.google.com/o/oauth2/v2/auth
+          OIDC_OP_TOKEN_ENDPOINT: https://oauth2.googleapis.com/token
+          OIDC_OP_USER_ENDPOINT: https://openidconnect.googleapis.com/v1/userinfo
+          OIDC_OP_JWKS_ENDPOINT: https://www.googleapis.com/oauth2/v3/certs
+          OIDC_RP_CLIENT_ID: portal-ci
+          OIDC_RP_CLIENT_SECRET: ci-only-client-secret
+        run: python manage.py check --settings=config.settings.production
+
+      - name: Check model migrations
+        run: python manage.py makemigrations --check --dry-run --settings=config.settings.test
+
+      - name: Run tests
+        run: python manage.py test --settings=config.settings.test
