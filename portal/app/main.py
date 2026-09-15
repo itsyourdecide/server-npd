@@ -1,5 +1,7 @@
 from fastapi import FastAPI
+from starlette.middleware.sessions import SessionMiddleware
 
+from app.core.config import settings
 from app.system.router import router
 
 
@@ -7,6 +9,15 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="portal",
         version="0.1.0",
+    )
+
+    app.add_middleware(
+        SessionMiddleware,
+        secret_key=settings.oidc_state_secret.get_secret_value(),
+        session_cookie="npd_oidc_state",
+        max_age=600,
+        same_site="lax",
+        https_only=settings.oidc_cookie_secure,
     )
 
     app.include_router(router)
