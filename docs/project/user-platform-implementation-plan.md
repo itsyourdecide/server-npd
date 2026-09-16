@@ -2,7 +2,7 @@
 
 Статус: draft
 Дата создания: 2026-09-07
-Последняя редакция: 2026-09-14
+Последняя редакция: 2026-09-16
 Живая проверка при редакции: не выполнялась; существующий Django-портал ранее
 проверен на `portal-dev01`, новая реализация ещё не развёрнута
 Назначение: разложить реализацию портала на технические пакеты работ и задать
@@ -193,7 +193,7 @@ portal/
     main.py
     core/
     identity/
-    profiles/
+    compute/
     projects/
     requests/
     notifications/
@@ -215,17 +215,20 @@ docs/
     portal-restore.md         # создаётся до production acceptance
 ```
 
-`identity`, `profiles`, `projects`, `requests`, `notifications`, `mail` и
-`audit` составляют Request MVP. `condor` и `virtual_machines` добавляются
-только на соответствующих продуктовых этапах.
+`identity`, `compute`, `notifications`, `mail` и `audit` составляют основу
+Portal. `projects`, `requests`, `condor` и дополнительные resource adapters
+добавляются только на соответствующих продуктовых этапах.
 
 ## Минимальная модель данных
 
 | Модель | Назначение | Ключевые ограничения |
 |---|---|---|
-| `UserProfile` | onboarding, профиль и cluster identity пользователя независимо от способа входа | один на portal user; состояние `incomplete|complete`; login и UID не задаются browser после provisioning |
+| `User` | единый внутренний владелец объектов Portal | UUID не зависит от email и способа входа; без обязательного академического профиля |
 | `ExternalIdentity` | внешний способ входа | уникальная пара issuer+subject; связь с portal user; email не является ключом |
 | `ApplicationSession` | server-side session Portal | hash случайного identifier; expiry, last activity и revoke state; секрет не хранится открытым текстом |
+| `ComputePlan` | именованный набор типовых лимитов | явные лимиты VM, vCPU, RAM и storage; первая версия содержит `starter` |
+| `UserQuota` | назначенная пользователю вычислительная квота | не более одной активной квоты; plan и необязательные overrides; status suspension |
+| `VirtualMachine` | VM, принадлежащая пользователю | `owner_user_id`; requested resources; lifecycle status; provider VMID не задаётся browser |
 | `UserSSHKey` | согласованный публичный ключ пользователя | нормализованный key, fingerprint, владелец, статус и время отзыва |
 | `Project` | учебный или исследовательский проект | стабильный UUID; состояние и владелец |
 | `ProjectMembership` | роль человека в проекте | уникальная пара project+user |
@@ -237,7 +240,7 @@ docs/
 | `Notification` | прикладное событие для пользователя | адресат, event type, target и состояние прочтения |
 | `EmailDelivery` | доставка notification по email | template/version, зафиксированные recipient/language, idempotency key, lease, attempts и status |
 
-Позднее добавляются `Job`, `JobAction`, `VMRequest` и `VMInstance`. Raw secret,
+Позднее добавляются `Job`, `JobAction` и `QuotaIncreaseRequest`. Raw secret,
 SSH private key и полный stdout административных инструментов в PostgreSQL не
 хранятся.
 
@@ -270,7 +273,8 @@ Keycloak подтверждает личность, но object permissions хр
 
 | Действие | Applicant/User | Project lead | Reviewer | Operator | Admin |
 |---|---:|---:|---:|---:|---:|
-| Читать собственный профиль | да | да | да | да | да |
+| Читать собственный аккаунт и квоту | да | да | да | да | да |
+| Управлять собственной VM в пределах квоты | да | да | нет | по политике | да |
 | Читать закрытый проект | только участник | свой проект | по политике | по политике | да |
 | Создать заявку | да | да | да | да | да |
 | Согласовать заявку | нет | только разрешённые типы | да | по политике | да |
@@ -299,8 +303,9 @@ application data и OIDC tokens в cookie не хранятся. Session identif
 ротируется после login и изменения привилегий. Logout отзывает session Portal и
 завершает session Keycloak.
 
-Первый login создаёт `UserProfile` со статусом `incomplete`. До завершения
-обязательного onboarding доступны только анкета, правила, выбор языка и logout.
+Первый login создаёт минимальный `User` и автоматически назначает план
+`starter`. Обязательного академического onboarding нет. Дополнительные данные
+запрашивает только та будущая функция, которой они действительно необходимы.
 
 Связь с кластером хранит:
 
@@ -405,15 +410,21 @@ transfer. Максимальный размер, staging directory и retention 
 
 ## Proxmox adapter
 
-До этапа U6 портал хранит только заявку и введённый оператором VMID. Создание
-VM остаётся ручным.
+Пользователь создаёт VM без заявки, если параметры укладываются в его активную
+квоту и безопасную ёмкость кластера. Portal сначала в одной transaction
+блокирует `UserQuota`, резервирует ресурсы и создаёт `VirtualMachine` со
+статусом `pending`; затем operation worker выполняет инфраструктурную операцию.
+
+Персональная квота не является физической резервацией. Adapter отдельно
+проверяет доступную ёмкость Proxmox. Если квота есть, но кластер временно не
+может разместить VM, операция получает `pending_capacity`, а не обходит лимиты.
 
 Для последующей автоматизации обязательны:
 
 - отдельный API token без `root@pam`;
 - доступ только к выделенному resource pool и утверждённым templates;
 - allowlist VLAN и границы CPU/RAM/disk;
-- deterministic correlation между request UUID и VM;
+- deterministic correlation между Portal VM UUID, operation и Proxmox VM;
 - preflight на quota и конфликт VMID/name;
 - безопасный повтор create/clone;
 - отдельное подтверждение удаления;
@@ -507,9 +518,10 @@ ID, время, outcome и минимальный технический кон�
 
 ### Acceptance
 
-- полный путь заявки от applicant до ручного исполнения;
 - регистрация или Google login через Keycloak без пароля Portal;
-- onboarding, прикладное уведомление и письмо в Mailpit;
+- автоматическое назначение стартовой квоты без onboarding и заявки;
+- невозможность прочитать чужую квоту или VM;
+- прикладное уведомление и письмо в Mailpit;
 - backup и restore PostgreSQL;
 - отказ OIDC, worker и внешнего adapter;
 - одна тестовая HTCondor job реального тестового пользователя перед U5;
@@ -581,24 +593,36 @@ runbook. Обычный CI использует fake adapters.
 Проверка: чистая среда поднимает приложение, применяет migrations и выполняет
 tests; в приложении ещё нет infrastructure credentials.
 
-### T2 — Keycloak identity, sessions и onboarding
+### T2 — Keycloak identity и sessions
 
 Соответствует U1.
 
 - поднять development Keycloak и подключить его SMTP к Mailpit;
 - настроить confidential client `npd-portal` и Authlib OIDC flow;
 - реализовать `ExternalIdentity` по `issuer + subject`;
-- реализовать `UserProfile` со статусами `incomplete|complete`;
 - реализовать PostgreSQL-backed `ApplicationSession`, secure cookie и logout;
-- добавить WTForms, CSRF и обязательную onboarding form;
+- создать минимальный `User` без обязательного академического профиля;
 - добавить прикладные роли и deny-by-default policy helpers;
 - записывать login, logout и security failures в append-only audit.
 
-Проверка: локальный пользователь Keycloak входит без пароля Portal, завершает
-onboarding и не получает доступ к чужим данным; verification email виден в
-Mailpit.
+Проверка: локальный пользователь Keycloak входит без пароля Portal и не
+получает доступ к чужим данным; verification email виден в Mailpit.
 
-### T3 — notifications и надёжная email delivery
+### T3 — стартовая квота и реестр VM
+
+Соответствует U2 и не обращается к Proxmox на запись.
+
+- реализовать `ComputePlan`, `UserQuota` и автоматическое назначение `starter`;
+- реализовать `VirtualMachine` с владельцем `User.id` и lifecycle state machine;
+- показывать пользователю его лимиты, использование и собственные VM;
+- учитывать `pending`, остановленные VM и существующие диски в квоте;
+- резервировать квоту transactionally и защищать параллельные запросы;
+- использовать fake Proxmox adapter до отдельного допуска автоматизации.
+
+Проверка: новый пользователь без заявки получает стартовую квоту, видит только
+свои объекты, а параллельные запросы не могут превысить лимит.
+
+### T4 — notifications и надёжная email delivery
 
 Подготавливает уведомления U2 и является первым законченным mail increment.
 
@@ -614,9 +638,10 @@ Mailpit.
 Проверка: один внутренний event создаёт одно логическое письмо, HTTP request не
 ждёт SMTP, временный сбой повторяется, а Mailpit принимает обе версии письма.
 
-### T4 — проекты, заявки и аудит
+### T5 — проекты, заявки и аудит
 
-Соответствует U2.
+Это будущий workflow для проектов, увеличения квоты и других исключений. Он не
+является условием базовой стартовой квоты.
 
 - перенести поведение существующих моделей Project и ProjectMembership;
 - реализовать request state machine и WTForms;
@@ -630,9 +655,9 @@ Mailpit.
 Проверка: acceptance test проходит полный ручной процесс, доказывает object
 permissions и отсутствие дубликатов transitions/notifications/email.
 
-### T5 — первый deployment Request MVP
+### T6 — первый deployment Portal MVP
 
-Соответствует контрольной точке Request MVP.
+Соответствует контрольным точкам Internal alpha и Quota foundation.
 
 - принять оставшиеся deployment ADR;
 - создать Ansible role и два runbook'а: deploy и restore;
@@ -641,10 +666,10 @@ permissions и отсутствие дубликатов transitions/notificatio
 - выполнить backup/restore test;
 - не выдавать mail worker и web infrastructure credentials.
 
-Проверка: ограниченная пилотная группа проходит регистрацию, onboarding и
-процесс заявки и получает application email.
+Проверка: ограниченная пилотная группа проходит регистрацию без обязательной
+анкеты, видит свою квоту и получает application email.
 
-### T6 — operation queue и assisted provisioning
+### T7 — operation queue и assisted provisioning
 
 Подготавливает U7, но не включает автоматическое исполнение сразу.
 
@@ -656,7 +681,7 @@ permissions и отсутствие дубликатов transitions/notificatio
 
 Проверка: повтор и частичный сбой не создают разные UID или аккаунты-дубликаты.
 
-### T7 — HTCondor read integration
+### T8 — HTCondor read integration
 
 Соответствует U4.
 
@@ -668,7 +693,7 @@ permissions и отсутствие дубликатов transitions/notificatio
 
 Проверка: пользователь видит только собственные job и не получает write path.
 
-### T8 — HTCondor template submission
+### T9 — HTCondor template submission
 
 Соответствует U5.
 
@@ -681,18 +706,20 @@ permissions и отсутствие дубликатов transitions/notificatio
 Проверка: тестовый пользователь создаёт и удаляет только собственную job, а
 повторный HTTP request не создаёт вторую.
 
-### T9 — VM request registry
+### T10 — автоматизация lifecycle VM
 
 Соответствует U6.
 
-- реализовать тип заявки и quota review;
-- хранить operator-entered VMID, owner и expiry;
-- добавить уведомление о сроке;
-- оставить Proxmox mutation ручной.
+- использовать модели и правила квоты из T3;
+- добавить проверку глобальной ёмкости и состояние `pending_capacity`;
+- выполнять Proxmox mutation через отдельный operation worker и ограниченный
+  adapter.
 
-Проверка: каждая учтённая VM связана с одобренной заявкой.
+Проверка: пользователь без заявки создаёт только собственную VM в пределах
+квоты; параллельные запросы не превышают лимит; повтор операции не создаёт
+дубликат в Proxmox.
 
-### T10 — отдельные automation adapters
+### T11 — отдельные automation adapters
 
 Соответствует выбранным операциям U7.
 
@@ -718,16 +745,18 @@ permissions и отсутствие дубликатов transitions/notificatio
 
 ## Ближайший технический результат
 
-Архитектурная исходная точка T0 зафиксирована. Следующий результат — T1:
-минимальный FastAPI Portal с application factory, конфигурацией, PostgreSQL,
-SQLAlchemy, Alembic, Jinja2, health endpoints и базовыми tests.
+Каркас FastAPI, PostgreSQL, Keycloak OIDC и server-side sessions уже являются
+текущей основой разработки. Следующий результат — T3: стартовый `ComputePlan`,
+автоматическое назначение `UserQuota` и реестр `VirtualMachine` без write-доступа
+к живому Proxmox.
 
-T1–T4 реализуются в отдельной ветке локально и не меняют живой кластер.
+T1–T5 реализуются в отдельной ветке локально и не меняют живой кластер.
 Неопределённые production hostname, TLS, SMTP provider и deployment topology
-блокируют T5, но не блокируют создание и тестирование приложения.
+блокируют T6, но не блокируют создание и тестирование приложения.
 
 ## Связанные документы
 
+- [Вычислительные квоты и VM](../architecture/compute-quota-and-vm.md).
 - [Продуктовый план](user-platform-plan.md).
 - [Архитектура Portal, идентификации и электронной почты](../architecture/identity-and-email.md).
 - [План Azure edge и WireGuard](../network/azure-edge-vpn-plan.md).
