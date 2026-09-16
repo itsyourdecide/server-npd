@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,7 +11,6 @@ from app.identity.oidc import oauth
 from app.identity.services import get_or_create_user
 from app.identity.sessions import create_application_session, revoke_user_session
 from app.users.models import User
-from urllib.parse import urlencode
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
@@ -19,6 +20,10 @@ async def login(request: Request) -> RedirectResponse:
     redirect_uri = request.url_for("auth_callback")
     return await oauth.keycloak.authorize_redirect(request, redirect_uri)
 
+@router.get("/register")
+async def register(request: Request) -> RedirectResponse:
+    redirect_uri = request.url_for("auth_callback")
+    return await oauth.keycloak.authorize_redirect(request, redirect_uri, prompt="create")
 
 @router.get("/callback", name="auth_callback")
 async def auth_callback(request: Request, db: AsyncSession = Depends(get_db)) -> JSONResponse:
@@ -114,3 +119,4 @@ async def logout(
 @router.get("/logged-out", name="logged_out")
 async def logged_out() -> dict[str, str]:
     return {"message": "You are logged out"}
+

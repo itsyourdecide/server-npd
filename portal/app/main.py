@@ -4,6 +4,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.core.config import settings
 from app.identity.router import router as identity_router
 from app.system.router import router as system_router
+from app.compute.router import router as compute_router
 
 
 def create_app() -> FastAPI:
@@ -23,6 +24,7 @@ def create_app() -> FastAPI:
 
     app.include_router(identity_router)
     app.include_router(system_router)
+    app.include_router(compute_router)
 
     return app
 

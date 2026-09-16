@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.compute.services import assign_starter_quota
 from app.db.models import ExternalIdentity, User
 
 
@@ -41,5 +42,7 @@ async def get_or_create_user(
         email_verified=True,
     )
     db.add(identity)
+
+    await assign_starter_quota(db, user_id=user.id)
 
     return user

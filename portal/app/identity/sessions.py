@@ -3,14 +3,12 @@ from datetime import UTC, datetime, timedelta
 from hashlib import sha256
 from uuid import UUID
 
-from fastapi import Cookie, Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.identity.models import ApplicationSession
 from app.users.models import User
-from app.db.session import get_db
 
 
 def create_application_session(
