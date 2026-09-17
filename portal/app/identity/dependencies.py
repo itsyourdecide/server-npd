@@ -8,6 +8,7 @@ from app.identity.sessions import get_user_by_session_token
 from app.users.models import User
 
 
+#возвращает юзера после полной проверки
 async def get_current_user(
     session_token: str | None = Cookie(
         default=None,

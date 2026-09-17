@@ -21,7 +21,6 @@ class ComputePlan(Base):
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     code: Mapped[str] = mapped_column(String(50))
     max_vms: Mapped[int] = mapped_column()
-    max_running_vms: Mapped[int] = mapped_column()
     max_total_vcpus: Mapped[int] = mapped_column()
     max_total_memory_mb: Mapped[int] = mapped_column()
     max_total_storage_gb: Mapped[int] = mapped_column()
@@ -37,14 +36,6 @@ class ComputePlan(Base):
         CheckConstraint(
             "max_vms >= 0",
             name="ck_compute_plans_max_vms_non_negative",
-        ),
-        CheckConstraint(
-            "max_running_vms >= 0",
-            name="ck_compute_plans_max_running_vms_non_negative",
-        ),
-        CheckConstraint(
-            "max_running_vms <= max_vms",
-            name="ck_compute_plans_running_vms_limit",
         ),
         CheckConstraint(
             "max_total_vcpus >= 0",

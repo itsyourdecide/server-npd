@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.compute.models import ComputePlan, UserQuota
+from app.compute.services import get_user_compute_usage
 from app.db.session import get_db
 from app.identity.dependencies import get_current_user
 from app.users.models import User
@@ -23,14 +24,38 @@ async def get_quota(
     if cp is None:
         raise RuntimeError("compute plan missing")
 
+    usage = await get_user_compute_usage(db, user.id)
+
+    remaining_vms = cp.max_vms - usage["used_vms"]
+    remaining_vcpus = cp.max_total_vcpus - usage["used_vcpus"]
+    remaining_memory_mb = cp.max_total_memory_mb - usage["used_memory_mb"]
+    remaining_storage_gb = cp.max_total_storage_gb - usage["used_storage_gb"]
+    remaining_shared_storage_gb = cp.max_shared_storage_gb - 0
+
     return {
         "status": uq.status,
         "plan": cp.code,
-        "max_vms": cp.max_vms,
-        "max_running_vms": cp.max_running_vms,
-        "max_total_vcpus": cp.max_total_vcpus,
-        "max_total_memory_mb": cp.max_total_memory_mb,
-        "max_total_storage_gb": cp.max_total_storage_gb,
-        "max_shared_storage_gb": cp.max_shared_storage_gb,
+        "limits": {
+            "vms": cp.max_vms,
+            "vcpus": cp.max_total_vcpus,
+            "memory_mb": cp.max_total_memory_mb,
+            "storage_gb": cp.max_total_storage_gb,
+            "shared_storage_gb": cp.max_shared_storage_gb
+        },
+        "usage": {
+            "vms": usage["used_vms"],
+            "vcpus": usage["used_vcpus"],
+            "memory_mb": usage["used_memory_mb"],
+            "storage_gb": usage["used_storage_gb"],
+            "shared_storage_gb": 0,
+        },
+        "remaining": {
+            "vms": remaining_vms,
+            "vcpus": remaining_vcpus,
+            "memory_mb": remaining_memory_mb,
+            "storage_gb": remaining_storage_gb,
+            "shared_storage_gb": remaining_shared_storage_gb
+        },
+
     }
 
