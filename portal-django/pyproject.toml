@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "npd-portal"
+version = "0.1.0"
+description = "User portal for the NPD compute cluster"
+requires-python = ">=3.12"
+dependencies = [
+    "Django==5.2.17",
+    "psycopg[binary]==3.3.5",
+    "django-environ==0.14.0",
+    "mozilla-django-oidc==5.0.2",
+    "gunicorn==26.2.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["apps*", "config*"]
