@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -35,12 +37,14 @@ async def create_my_vm(
     request_model: VirtualMachineCreate,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
+    idempotency_key: UUID = Header(alias="Idempotency-Key")
 ):
     try:
         vm = await create_vm(
             db,
             user_id=user.id,
             request_model=request_model,
+            idempotency_key=str(idempotency_key),
         )
         await db.commit()
 
