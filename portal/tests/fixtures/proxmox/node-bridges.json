@@ -1,0 +1,19 @@
+{
+  "data": {
+    "pve01": {
+      "bridge": "vmbr2",
+      "bridge_vlan_aware": 1,
+      "bridge_vids": "10,20,30,40,50,80,99"
+    },
+    "pve02": {
+      "bridge": "vmbr0",
+      "bridge_vlan_aware": 1,
+      "bridge_vids": "10,20,30,40,50,80,99"
+    },
+    "pve03": {
+      "bridge": "vmbr0",
+      "bridge_vlan_aware": 1,
+      "bridge_vids": "10,20,30,40,50,80,99"
+    }
+  }
+}

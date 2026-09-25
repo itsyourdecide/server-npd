@@ -1,0 +1,28 @@
+{
+  "data": [
+    {
+      "id": "node/pve01",
+      "maxcpu": 32,
+      "maxmem": 540922875904,
+      "node": "pve01",
+      "status": "online",
+      "type": "node"
+    },
+    {
+      "id": "node/pve02",
+      "maxcpu": 32,
+      "maxmem": 540921741312,
+      "node": "pve02",
+      "status": "online",
+      "type": "node"
+    },
+    {
+      "id": "node/pve03",
+      "maxcpu": 32,
+      "maxmem": 540921782272,
+      "node": "pve03",
+      "status": "online",
+      "type": "node"
+    }
+  ]
+}

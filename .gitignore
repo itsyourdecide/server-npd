@@ -1,3 +1,16 @@
 *.swp
 .DS_Store
+.vscode/
 ansible/inventory/group_vars/all/vault.yml
+portal/.venv/
+portal/.env
+portal/db.sqlite3
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+portal/build/
+portal/dist/
+portal/staticfiles/

@@ -2,9 +2,9 @@
 
 Статус: draft
 Дата создания: 2026-09-07
-Последняя редакция: 2026-09-07
-Живая проверка при подготовке: не выполнялась; существующие интерфейсы сверены
-с документацией и кодом репозитория
+Последняя редакция: 2026-09-16
+Живая проверка при редакции: не выполнялась; существующий Django-портал ранее
+проверен на `portal-dev01`, новая реализация ещё не развёрнута
 Назначение: разложить реализацию портала на технические пакеты работ и задать
 безопасные границы интеграций
 Источник истины для: предлагаемой структуры реализации; не является runbook и
@@ -32,8 +32,20 @@
 - Ansible inventory и роли для execute nodes;
 - Prometheus и node exporter;
 - внешний SSH-путь через WireGuard и `bastion01`;
-- PostgreSQL, OIDC-провайдер и HTTP endpoint для портала ещё не выбраны и не
-  считаются развёрнутыми.
+- PostgreSQL 16 работает локально на development VM `portal-dev01`;
+- для регистрации, локальных credentials и Google OIDC выбран Keycloak;
+- существующий Django development service работает через Nginx, Gunicorn и
+  systemd и остаётся эталоном поведения на время новой реализации;
+- пользовательские страницы используют единый адаптивный интерфейс на Tabler;
+  frontend-assets хранятся локально и не зависят от CDN; интерфейс доступен
+  английской и украинской языковыми версиями;
+- реализованы профили, внешние identity, системные роли, проекты и membership;
+- события входа, ошибки входа и выхода записываются в append-only `AuditEvent`;
+- реализованы заявки, append-only transitions и approvals, reviewer/operator
+  queues и ручная фиксация результата исполнения;
+- изменения состояния заявки создают дедуплицированные in-app уведомления;
+- production HTTP endpoint для портала ещё не выбран и не считается
+  развёрнутым.
 
 JBOD/NFS намеренно выключены. Реализация до этапа шаблонной отправки jobs не
 должна зависеть от `/data`; восстановление storage не входит в этот план.
@@ -45,41 +57,47 @@ JBOD/NFS намеренно выключены. Реализация до эта
 1. Размещение: VM или LXC, узел, имя, адрес и ресурсные лимиты.
 2. Контур доступа: внутренний pilot, VPN или публичный HTTPS endpoint.
 3. DNS-имя, источник TLS-сертификата и процедура продления.
-4. OIDC provider: университетский IdP, Keycloak как broker или собственный
-   realm.
+4. Нужен ли университетский IdP и когда подключать его к Keycloak как ещё один
+   внешний identity provider.
 5. Кто назначает операторские роли и может ли человек согласовать собственную
    заявку.
-6. Канал уведомлений и минимально допустимый fallback.
+6. Production SMTP relay, sender domains и минимально допустимый fallback.
 7. Retention профилей, заявок, аудита и технических результатов.
 8. Допустимые job templates, лимиты и способ передачи небольших файлов.
 9. Модель HTCondor credentials и сохранения реального владельца job.
 10. Какие операции worker имеет право выполнять автоматически.
 
-В плане ниже используются placeholder'ы `portal`, `OIDC provider` и
+В плане ниже используются placeholder'ы `portal`, `Keycloak` и
 `portal deployment`. Они не резервируют hostname, IP или VMID.
 
 ## Базовый технологический профиль
 
-Предлагаемая стартовая реализация:
+Целевая стартовая реализация:
 
-- Python и Django как единое server-side приложение;
-- Django templates и HTMX для интерактивных фрагментов;
-- PostgreSQL как источник истины заявок и операций;
-- стандартный OIDC authorization-code flow;
+- Python и FastAPI как server-rendered модульный монолит;
+- Jinja2, локальный Tabler и HTMX для интерфейса;
+- WTForms для HTML forms и CSRF, Pydantic для typed schemas;
+- SQLAlchemy и Alembic для persistence и migrations;
+- PostgreSQL как источник истины прикладных данных, server-side sessions,
+  operation queue и transactional email outbox;
+- Keycloak как единственный публичный Identity Provider;
+- Authlib как OIDC client Portal;
+- Babel, gettext и Jinja2 i18n для локализации;
+- SQLAdmin только для ограниченного технического admin UI;
 - Nginx как reverse proxy и TLS endpoint;
-- отдельный worker-процесс, использующий ту же кодовую базу;
-- systemd для web/worker на production deployment;
+- отдельные mail и operation worker processes из той же codebase;
+- systemd для web/workers на production deployment;
 - Prometheus metrics и структурированные журналы.
 
-Keycloak является возможным OIDC-компонентом, но не обязательным. Если
-университетский IdP удовлетворяет требованиям, портал должен подключаться к
-нему без развёртывания лишнего identity-сервиса.
+Keycloak хранит локальные credentials, подтверждает email, восстанавливает
+пароль и подключает Google как внешний OIDC provider. Portal не реализует и не
+хранит пользовательские пароли.
 
-Для первой версии не нужны SPA, Kubernetes, микросервисы и отдельный message
-broker. При низком потоке заявок очередь операций можно хранить в PostgreSQL,
-а worker запускать как отдельную Django management command. Решение о broker
-пересматривается только после появления измеренной нагрузки или требований,
-которые PostgreSQL-очередь не покрывает.
+Для первой версии не нужны SPA, Kubernetes, прикладные микросервисы, Redis и
+отдельный message broker. Очереди операций и писем используют PostgreSQL с
+locking, lease, idempotency и recovery. Решение о broker пересматривается
+только после измеренной нагрузки или появления требований, которые
+PostgreSQL-очередь не покрывает.
 
 ## Целевая схема компонентов
 
@@ -91,21 +109,26 @@ Browser
 Nginx
   |
   v
-Django web --------------------> OIDC provider
-  |
-  +----> PostgreSQL <---- Django worker
-                            |
-                            +--> identity adapter
-                            +--> HTCondor adapter
-                            +--> Proxmox adapter (поздний этап)
+FastAPI web ---- OIDC ----> Keycloak ----> Google
+  |                            |
+  |                            +---- SMTP ----+
+  v                                         |
+PostgreSQL <---- mail worker ---- SMTP -----+--> SMTP relay
+     |
+     +-------- operation worker
+                    |
+                    +--> identity adapter
+                    +--> HTCondor adapter
+                    +--> Proxmox adapter (поздний этап)
 
-Prometheus <---- web / worker metrics
+Prometheus <---- web / workers metrics
 ```
 
-Web и worker используют разные Unix service accounts и разные credentials.
-Web может создавать только записи-запросы в PostgreSQL. Доступ к ОС,
-HTCondor write API, Ansible и Proxmox получает только соответствующий adapter
-worker'а после отдельного допуска.
+Web, mail worker и operation worker используют разные Unix service accounts и
+разные credentials. Web может создавать только записи-запросы в PostgreSQL.
+Mail worker получает только SMTP credential и доступ к email queue. Доступ к
+ОС, HTCondor write API, Ansible и Proxmox получает только соответствующий
+operation adapter после отдельного допуска.
 
 ## Границы процессов
 
@@ -113,11 +136,11 @@ worker'а после отдельного допуска.
 
 Web-процесс отвечает за:
 
-- OIDC login и локальную session;
+- OIDC redirect/callback с Keycloak и server-side application session;
 - HTML/UI и серверную проверку форм;
 - authorization для каждого объекта;
 - создание заявок и разрешённых переходов;
-- постановку типизированной операции в очередь;
+- атомарную постановку типизированных операций и писем в PostgreSQL queues;
 - показ результата с удалением чувствительных деталей.
 
 Web-процессу запрещены:
@@ -128,9 +151,23 @@ Web-процессу запрещены:
 - запуск shell-команд и Ansible;
 - прямое изменение infrastructure state.
 
-### Worker
+### Mail worker
 
-Worker:
+Mail worker:
+
+- выбирает `EmailDelivery` с блокировкой и ограниченным lease;
+- строит письмо только из разрешённого versioned template;
+- отправляет `text/plain` и `text/html` через SMTP relay;
+- классифицирует временные и постоянные ошибки;
+- выполняет bounded retry с exponential backoff;
+- сохраняет нормализованный результат без чувствительного содержимого.
+
+Mail worker не принимает произвольный sender, subject, template или body из
+browser. Он не имеет infrastructure credentials.
+
+### Operation worker
+
+Operation worker:
 
 - выбирает одну разрешённую операцию с блокировкой строки;
 - проверяет, что заявка одобрена и ещё актуальна;
@@ -140,8 +177,8 @@ Worker:
 - повторяет только операции с явно безопасной retry policy;
 - останавливается при расхождении ожидаемого и фактического состояния.
 
-Worker не является универсальным remote-shell executor. Имя команды, playbook,
-host, API method и произвольные аргументы не принимаются из браузера.
+Operation worker не является универсальным remote-shell executor. Имя команды,
+playbook, host, API method и произвольные аргументы не принимаются из browser.
 
 ## Структура кода
 
@@ -149,23 +186,23 @@ host, API method и произвольные аргументы не прини�
 
 ```text
 portal/
-  manage.py
   pyproject.toml
-  config/
-    settings/
-      base.py
-      development.py
-      test.py
-      production.py
-    urls.py
-  apps/
-    accounts/
+  alembic.ini
+  alembic/
+  app/
+    main.py
+    core/
+    identity/
+    compute/
     projects/
     requests/
+    notifications/
+    mail/
     audit/
     operations/
     condor/
     virtual_machines/
+    workers/
   templates/
   static/
   tests/
@@ -178,14 +215,20 @@ docs/
     portal-restore.md         # создаётся до production acceptance
 ```
 
-`accounts`, `projects`, `requests` и `audit` составляют MVP. `condor` и
-`virtual_machines` добавляются только на соответствующих продуктовых этапах.
+`identity`, `compute`, `notifications`, `mail` и `audit` составляют основу
+Portal. `projects`, `requests`, `condor` и дополнительные resource adapters
+добавляются только на соответствующих продуктовых этапах.
 
 ## Минимальная модель данных
 
 | Модель | Назначение | Ключевые ограничения |
 |---|---|---|
-| `UserProfile` | связь OIDC subject с профилем и cluster identity | уникальный issuer+subject; login и UID не задаются браузером после provisioning |
+| `User` | единый внутренний владелец объектов Portal | UUID не зависит от email и способа входа; без обязательного академического профиля |
+| `ExternalIdentity` | внешний способ входа | уникальная пара issuer+subject; связь с portal user; email не является ключом |
+| `ApplicationSession` | server-side session Portal | hash случайного identifier; expiry, last activity и revoke state; секрет не хранится открытым текстом |
+| `ComputePlan` | именованный набор типовых лимитов | явные лимиты VM, vCPU, RAM и storage; первая версия содержит `starter` |
+| `UserQuota` | назначенная пользователю вычислительная квота | не более одной активной квоты; plan и необязательные overrides; status suspension |
+| `VirtualMachine` | VM, принадлежащая пользователю | `owner_user_id`; requested resources; lifecycle status; provider VMID не задаётся browser |
 | `UserSSHKey` | согласованный публичный ключ пользователя | нормализованный key, fingerprint, владелец, статус и время отзыва |
 | `Project` | учебный или исследовательский проект | стабильный UUID; состояние и владелец |
 | `ProjectMembership` | роль человека в проекте | уникальная пара project+user |
@@ -194,9 +237,10 @@ docs/
 | `Approval` | решение reviewer | нельзя редактировать задним числом; новое решение создаёт новую запись |
 | `Operation` | единица исполнения worker | type, typed payload, idempotency key, attempts, result |
 | `AuditEvent` | значимое действие | append-only; actor, object, action, request id |
-| `Notification` | состояние доставки | канал, адресат, событие, attempts |
+| `Notification` | прикладное событие для пользователя | адресат, event type, target и состояние прочтения |
+| `EmailDelivery` | доставка notification по email | template/version, зафиксированные recipient/language, idempotency key, lease, attempts и status |
 
-Позднее добавляются `Job`, `JobAction`, `VMRequest` и `VMInstance`. Raw secret,
+Позднее добавляются `Job`, `JobAction` и `QuotaIncreaseRequest`. Raw secret,
 SSH private key и полный stdout административных инструментов в PostgreSQL не
 хранятся.
 
@@ -225,11 +269,12 @@ unique constraint.
 
 ## Авторизация
 
-OIDC подтверждает личность, но object permissions хранит портал.
+Keycloak подтверждает личность, но object permissions хранит Portal.
 
 | Действие | Applicant/User | Project lead | Reviewer | Operator | Admin |
 |---|---:|---:|---:|---:|---:|
-| Читать собственный профиль | да | да | да | да | да |
+| Читать собственный аккаунт и квоту | да | да | да | да | да |
+| Управлять собственной VM в пределах квоты | да | да | нет | по политике | да |
 | Читать закрытый проект | только участник | свой проект | по политике | по политике | да |
 | Создать заявку | да | да | да | да | да |
 | Согласовать заявку | нет | только разрешённые типы | да | по политике | да |
@@ -240,10 +285,27 @@ OIDC подтверждает личность, но object permissions хран
 считается проверкой прав. На критические действия добавляется повторное
 подтверждение; CSRF и secure session cookies обязательны.
 
-## OIDC и cluster identity
+## OIDC, sessions и cluster identity
 
-`issuer + subject` — неизменяемый внешний идентификатор. Email и display name
-не используются как первичный ключ пользователя.
+Локальная регистрация, password login, email verification, password recovery и
+Google login выполняются в Keycloak. Пользователь, вошедший через Google, не
+создаёт отдельный пароль Portal. Keycloak связывает способы входа только после
+подтверждённой процедуры account linking.
+
+Для Portal пара `issuer + subject` является постоянным внешним идентификатором.
+Email и display name не являются ключами пользователя. Portal синхронизирует
+только разрешённые verified claims и связывает external identity с внутренним
+UUID.
+
+После OIDC callback Portal создаёт server-side `ApplicationSession`. В cookie
+`__Host-npd_session` хранится только непрозрачный случайный identifier;
+application data и OIDC tokens в cookie не хранятся. Session identifier
+ротируется после login и изменения привилегий. Logout отзывает session Portal и
+завершает session Keycloak.
+
+Первый login создаёт минимальный `User` и автоматически назначает план
+`starter`. Обязательного академического onboarding нет. Дополнительные данные
+запрашивает только та будущая функция, которой они действительно необходимы.
 
 Связь с кластером хранит:
 
@@ -268,7 +330,19 @@ OIDC подтверждает личность, но object permissions хран
 - интеграционные тесты на конфликт login/UID;
 - runbook частичного сбоя между узлами.
 
-## Очередь операций
+## PostgreSQL queues и transactional outbox
+
+При доменном событии Portal в одной PostgreSQL transaction изменяет объект,
+создаёт append-only audit event, in-app `Notification` и связанную
+`EmailDelivery`. HTTP request не подключается к SMTP. Rollback основной
+операции также откатывает notification и email job.
+
+Mail worker выбирает готовые задания через row locking, фиксирует lease и
+восстанавливает оставленные `sending` jobs после истечения lease. Стабильный
+idempotency key не позволяет повтору browser request создать второе логическое
+письмо. Redis и отдельный сетевой Email API в MVP отсутствуют.
+
+## Очередь инфраструктурных операций
 
 Для MVP используется таблица `Operation` и PostgreSQL locking. Состояния:
 
@@ -336,15 +410,21 @@ transfer. Максимальный размер, staging directory и retention 
 
 ## Proxmox adapter
 
-До этапа U6 портал хранит только заявку и введённый оператором VMID. Создание
-VM остаётся ручным.
+Пользователь создаёт VM без заявки, если параметры укладываются в его активную
+квоту и безопасную ёмкость кластера. Portal сначала в одной transaction
+блокирует `UserQuota`, резервирует ресурсы и создаёт `VirtualMachine` со
+статусом `pending`; затем operation worker выполняет инфраструктурную операцию.
+
+Персональная квота не является физической резервацией. Adapter отдельно
+проверяет доступную ёмкость Proxmox. Если квота есть, но кластер временно не
+может разместить VM, операция получает `pending_capacity`, а не обходит лимиты.
 
 Для последующей автоматизации обязательны:
 
 - отдельный API token без `root@pam`;
 - доступ только к выделенному resource pool и утверждённым templates;
 - allowlist VLAN и границы CPU/RAM/disk;
-- deterministic correlation между request UUID и VM;
+- deterministic correlation между Portal VM UUID, operation и Proxmox VM;
 - preflight на quota и конфликт VMID/name;
 - безопасный повтор create/clone;
 - отдельное подтверждение удаления;
@@ -357,7 +437,7 @@ cloud-init fragment.
 
 - Секреты не коммитятся в Git и не хранятся открытым текстом в PostgreSQL.
 - Development secrets отделены от production.
-- Web и worker получают разные credentials.
+- Web, mail worker и operation worker получают разные credentials.
 - Runtime secret доступен только нужному Unix service account.
 - OIDC client secret, database password и adapter credentials ротируются
   независимо.
@@ -374,8 +454,11 @@ cloud-init fragment.
 Минимальный baseline:
 
 - HTTPS, HSTS после подтверждения endpoint и certificate renewal;
-- secure, HTTP-only, SameSite session cookie;
+- host-only cookie `__Host-npd_session` с `Secure`, `HttpOnly`, `SameSite=Lax`
+  и ограниченным сроком жизни;
 - CSRF protection для всех state-changing requests;
+- rotation session identifier после login и изменения privileges;
+- проверка OIDC `iss`, `aud`, `exp`, подписи, `state` и `nonce`;
 - короткая operator/admin session и повторная аутентификация для критических
   действий;
 - rate limit для login callback, заявок и uploads;
@@ -393,7 +476,8 @@ cloud-init fragment.
 
 - liveness — процесс отвечает;
 - readiness — доступны обязательные локальные зависимости;
-- metrics — request latency/error rate, DB pool, queue depth, operation status;
+- metrics — request latency/error rate, DB pool, mail/operation queue depth и
+  delivery/operation status;
 - build info — версия приложения и миграции без секретов.
 
 Потеря HTCondor или Proxmox не должна делать login и просмотр заявок unready.
@@ -416,9 +500,12 @@ ID, время, outcome и минимальный технический кон�
 ### Integration
 
 - PostgreSQL constraints и migrations;
-- OIDC callback с тестовым provider;
+- OIDC callback с test double и development Keycloak;
+- server-side session create, rotate, revoke и expiry;
 - concurrent approval и повторный submit формы;
-- worker locking и recovery после остановки;
+- mail/operation worker locking и recovery после остановки;
+- SMTP success, temporary failure, permanent failure и повторная доставка;
+- transactional создание Notification и EmailDelivery;
 - adapters через fake endpoints.
 
 ### Security
@@ -431,7 +518,10 @@ ID, время, outcome и минимальный технический кон�
 
 ### Acceptance
 
-- полный путь заявки от applicant до ручного исполнения;
+- регистрация или Google login через Keycloak без пароля Portal;
+- автоматическое назначение стартовой квоты без onboarding и заявки;
+- невозможность прочитать чужую квоту или VM;
+- прикладное уведомление и письмо в Mailpit;
 - backup и restore PostgreSQL;
 - отказ OIDC, worker и внешнего adapter;
 - одна тестовая HTCondor job реального тестового пользователя перед U5;
@@ -460,7 +550,8 @@ runbook. Обычный CI использует fake adapters.
 
 До первого production deployment должны существовать:
 
-- Ansible role с web, worker, Nginx и PostgreSQL client configuration;
+- Ansible role с web, mail worker, operation worker, Nginx, Keycloak и
+  PostgreSQL client configuration;
 - root-owned runtime configuration;
 - отдельные service accounts и filesystem permissions;
 - миграция БД как отдельный контролируемый шаг;
@@ -474,77 +565,123 @@ runbook. Обычный CI использует fake adapters.
 
 ## Технические пакеты работ
 
-### T0 — решения и threat model
+### T0 — архитектурная исходная точка
 
 Соответствует U0.
 
-- оформить ADR из списка открытых решений;
+- зафиксировать модульный монолит, process boundaries и ownership данных;
+- сохранить существующий Django Portal как эталон поведения на отдельной ветке;
+- сохранить отдельный email prototype без развития его внешнего API;
 - описать trust boundaries и злоупотребления ролями;
-- утвердить MVP data model и retention;
-- определить deployment target без создания ресурса.
+- определить, какие production-решения блокируют только deployment, а не
+  локальную разработку.
 
-Проверка: владелец явно принял решения, необходимые для T1.
+Проверка: архитектура и implementation plan не противоречат друг другу;
+локальная разработка не изменяет живой кластер.
 
-### T1 — каркас приложения
+### T1 — каркас FastAPI Portal
 
-Соответствует U1.
+Соответствует технической основе U1.
 
-- создать `portal/`, settings и локальную PostgreSQL-среду;
+- создать новый `portal/` на отдельной ветке с FastAPI application factory;
+- добавить settings, SQLAlchemy, Alembic и локальную PostgreSQL-среду;
+- подключить Jinja2, локальные Tabler assets и базовый layout;
 - добавить базовый CI;
-- реализовать liveness/readiness/build info;
-- добавить OIDC test double и production interface;
-- зафиксировать application configuration schema.
+- реализовать liveness, readiness и build info;
+- зафиксировать application configuration schema и module boundaries.
 
-Проверка: чистая среда поднимает приложение и выполняет tests/migrations.
+Проверка: чистая среда поднимает приложение, применяет migrations и выполняет
+tests; в приложении ещё нет infrastructure credentials.
 
-### T2 — identity и authorization
+### T2 — Keycloak identity и sessions
 
 Соответствует U1.
 
-- реализовать `UserProfile` и связь issuer+subject;
-- добавить роли и object-permission helpers;
-- покрыть deny-by-default тестами;
-- реализовать session security и audit login events.
+- поднять development Keycloak и подключить его SMTP к Mailpit;
+- настроить confidential client `npd-portal` и Authlib OIDC flow;
+- реализовать `ExternalIdentity` по `issuer + subject`;
+- реализовать PostgreSQL-backed `ApplicationSession`, secure cookie и logout;
+- создать минимальный `User` без обязательного академического профиля;
+- добавить прикладные роли и deny-by-default policy helpers;
+- записывать login, logout и security failures в append-only audit.
 
-Проверка: тесты доказывают изоляцию пользователей и проектов.
+Проверка: локальный пользователь Keycloak входит без пароля Portal и не
+получает доступ к чужим данным; verification email виден в Mailpit.
 
-### T3 — проекты, заявки и аудит
+### T3 — стартовая квота и реестр VM
 
-Соответствует U2.
+Соответствует U2 и не обращается к Proxmox на запись.
 
-- реализовать модели, state machine и forms;
+- реализовать `ComputePlan`, `UserQuota` и автоматическое назначение `starter`;
+- реализовать `VirtualMachine` с владельцем `User.id` и lifecycle state machine;
+- показывать пользователю его лимиты, использование и собственные VM;
+- учитывать `pending`, остановленные VM и существующие диски в квоте;
+- резервировать квоту transactionally и защищать параллельные запросы;
+- использовать fake Proxmox adapter до отдельного допуска автоматизации.
+
+Проверка: новый пользователь без заявки получает стартовую квоту, видит только
+свои объекты, а параллельные запросы не могут превысить лимит.
+
+### T4 — notifications и надёжная email delivery
+
+Подготавливает уведомления U2 и является первым законченным mail increment.
+
+- реализовать `Notification` и `EmailDelivery`;
+- создавать их в одной transaction с доменным событием;
+- добавить registry разрешённых versioned templates и typed context;
+- рендерить `text/plain` и `text/html` с учётом preferred language;
+- перенести из email prototype SMTP adapter и полезные правила idempotency;
+- реализовать PostgreSQL locking, lease recovery и exponential backoff;
+- разделять temporary и permanent SMTP errors;
+- запустить mail worker отдельным процессом без публичного `POST /emails`.
+
+Проверка: один внутренний event создаёт одно логическое письмо, HTTP request не
+ждёт SMTP, временный сбой повторяется, а Mailpit принимает обе версии письма.
+
+### T5 — проекты, заявки и аудит
+
+Это будущий workflow для проектов, увеличения квоты и других исключений. Он не
+является условием базовой стартовой квоты.
+
+- перенести поведение существующих моделей Project и ProjectMembership;
+- реализовать request state machine и WTForms;
 - добавить reviewer/operator queues;
 - добавить transitions, approvals и comments;
 - реализовать ручную фиксацию исполнения;
-- добавить минимальные уведомления.
+- связать переходы с audit, in-app notification и email outbox;
+- добавить SQLAdmin для диагностики и отдельный operator UI для business
+  transitions.
 
-Проверка: acceptance test полного ручного процесса и отсутствия дубликатов.
+Проверка: acceptance test проходит полный ручной процесс, доказывает object
+permissions и отсутствие дубликатов transitions/notifications/email.
 
-### T4 — первый deployment MVP
+### T6 — первый deployment Portal MVP
 
-Соответствует контрольной точке Request MVP.
+Соответствует контрольным точкам Internal alpha и Quota foundation.
 
+- принять оставшиеся deployment ADR;
 - создать Ansible role и два runbook'а: deploy и restore;
-- развернуть портал в утверждённом контуре;
-- подключить OIDC и TLS;
-- подключить Prometheus и alerts;
+- развернуть Nginx, Portal web, mail worker, Keycloak и PostgreSQL integration;
+- подключить TLS, production SMTP, Prometheus и alerts;
 - выполнить backup/restore test;
-- не выдавать worker инфраструктурные credentials.
+- не выдавать mail worker и web infrastructure credentials.
 
-Проверка: ограниченная пилотная группа проходит процесс заявки.
+Проверка: ограниченная пилотная группа проходит регистрацию без обязательной
+анкеты, видит свою квоту и получает application email.
 
-### T5 — operation queue и assisted provisioning
+### T7 — operation queue и assisted provisioning
 
 Подготавливает U7, но не включает автоматическое исполнение сразу.
 
 - реализовать `Operation`, locking, idempotency и reconciliation;
+- запустить operation worker с отдельным service account;
 - добавить read-only identity preflight;
 - связать ручной runbook с technical result;
 - только после проверки добавить allowlisted provisioning adapter.
 
 Проверка: повтор и частичный сбой не создают разные UID или аккаунты-дубликаты.
 
-### T6 — HTCondor read integration
+### T8 — HTCondor read integration
 
 Соответствует U4.
 
@@ -556,7 +693,7 @@ runbook. Обычный CI использует fake adapters.
 
 Проверка: пользователь видит только собственные job и не получает write path.
 
-### T7 — HTCondor template submission
+### T9 — HTCondor template submission
 
 Соответствует U5.
 
@@ -569,18 +706,20 @@ runbook. Обычный CI использует fake adapters.
 Проверка: тестовый пользователь создаёт и удаляет только собственную job, а
 повторный HTTP request не создаёт вторую.
 
-### T8 — VM request registry
+### T10 — автоматизация lifecycle VM
 
 Соответствует U6.
 
-- реализовать тип заявки и quota review;
-- хранить operator-entered VMID, owner и expiry;
-- добавить уведомление о сроке;
-- оставить Proxmox mutation ручной.
+- использовать модели и правила квоты из T3;
+- добавить проверку глобальной ёмкости и состояние `pending_capacity`;
+- выполнять Proxmox mutation через отдельный operation worker и ограниченный
+  adapter.
 
-Проверка: каждая учтённая VM связана с одобренной заявкой.
+Проверка: пользователь без заявки создаёт только собственную VM в пределах
+квоты; параллельные запросы не превышают лимит; повтор операции не создаёт
+дубликат в Proxmox.
 
-### T9 — отдельные automation adapters
+### T11 — отдельные automation adapters
 
 Соответствует выбранным операциям U7.
 
@@ -606,13 +745,20 @@ runbook. Обычный CI использует fake adapters.
 
 ## Ближайший технический результат
 
-До написания production-кода результатом T0 должен стать короткий набор ADR и
-утверждённая карточка Request MVP. После этого T1–T3 можно реализовать локально
-с fake OIDC и fake infrastructure adapters, не меняя живой кластер.
+Каркас FastAPI, PostgreSQL, Keycloak OIDC и server-side sessions уже являются
+текущей основой разработки. Следующий результат — T3: стартовый `ComputePlan`,
+автоматическое назначение `UserQuota` и реестр `VirtualMachine` без write-доступа
+к живому Proxmox.
+
+T1–T5 реализуются в отдельной ветке локально и не меняют живой кластер.
+Неопределённые production hostname, TLS, SMTP provider и deployment topology
+блокируют T6, но не блокируют создание и тестирование приложения.
 
 ## Связанные документы
 
+- [Вычислительные квоты и VM](../architecture/compute-quota-and-vm.md).
 - [Продуктовый план](user-platform-plan.md).
+- [Архитектура Portal, идентификации и электронной почты](../architecture/identity-and-email.md).
 - [План Azure edge и WireGuard](../network/azure-edge-vpn-plan.md).
 - [Пользовательский доступ](../services/user-access.md).
 - [HTCondor](../services/htcondor.md).

@@ -1,0 +1,14 @@
+{
+  "data": {
+    "exitstatus": "no such logical volume pve/data",
+    "id": "104",
+    "node": "pve02",
+    "pid": 4097,
+    "pstart": 8193,
+    "starttime": 1790000100,
+    "status": "stopped",
+    "type": "qmdestroy",
+    "upid": "UPID:pve02:00001001:00002001:6AB14001:qmdestroy:104:portal-worker@pve!portal:",
+    "user": "portal-worker@pve"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "data": {
+    "exitstatus": "OK",
+    "id": "9001",
+    "node": "pve02",
+    "pid": 2780,
+    "pstart": 2127,
+    "starttime": 1789994236,
+    "status": "stopped",
+    "type": "qmstart",
+    "upid": "UPID:pve02:00000ADC:0000084F:6AB124FC:qmstart:9001:portal-worker@pve:",
+    "user": "portal-worker@pve"
+  }
+}
