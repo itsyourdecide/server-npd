@@ -1,0 +1,17 @@
+{
+  "data": {
+    "cpu": 0,
+    "cpus": 2,
+    "disk": 0,
+    "maxdisk": 32212254720,
+    "maxmem": 4294967296,
+    "mem": 0,
+    "name": "fixture-vm",
+    "netin": 0,
+    "netout": 0,
+    "qmpstatus": "stopped",
+    "status": "stopped",
+    "uptime": 0,
+    "vmid": 9001
+  }
+}

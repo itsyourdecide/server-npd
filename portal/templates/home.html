@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Главная · NPD Portal{% endblock %}
+
+{% block content %}
+  <div class="page-heading">
+    <p class="eyebrow">NPD Portal</p>
+    <h1>Работа с вычислительным кластером</h1>
+    <p class="lede">Войдите, чтобы посмотреть свою квоту, виртуальные машины, SSH-ключи и состояние операций.</p>
+  </div>
+
+  <div class="actions">
+    <a class="button button-primary" href="/auth/login">Войти через Keycloak</a>
+    <a class="button" href="/auth/register">Создать аккаунт</a>
+  </div>
+
+  <section class="panel intro-panel" aria-labelledby="available-heading">
+    <h2 id="available-heading">Что уже доступно</h2>
+    <ul class="feature-list">
+      <li>Стартовая вычислительная квота после первого входа</li>
+      <li>Просмотр своих VM и истории операций</li>
+      <li>Управление публичными SSH-ключами через API</li>
+    </ul>
+    <p class="muted">Создание и управление VM пока проверяются в ходе разработки. Пользователю не нужен прямой доступ к Proxmox.</p>
+  </section>
+{% endblock %}

@@ -1,11 +1,12 @@
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.db.session import get_db
+from app.identity.csrf import verify_csrf
 from app.identity.dependencies import get_current_user
 from app.identity.oidc import oauth
 from app.identity.services import get_or_create_user
@@ -26,7 +27,7 @@ async def register(request: Request) -> RedirectResponse:
     return await oauth.keycloak.authorize_redirect(request, redirect_uri, prompt="create")
 
 @router.get("/callback", name="auth_callback")
-async def auth_callback(request: Request, db: AsyncSession = Depends(get_db)) -> JSONResponse:
+async def auth_callback(request: Request, db: AsyncSession = Depends(get_db)) -> RedirectResponse:
     token = await oauth.keycloak.authorize_access_token(request)
     userinfo = token["userinfo"]
 
@@ -53,10 +54,10 @@ async def auth_callback(request: Request, db: AsyncSession = Depends(get_db)) ->
             db,
             user_id=user.id,
         )
-        user_id = user.id
 
-    response = JSONResponse(
-        content={"user_id": str(user_id)}
+    response = RedirectResponse(
+        url=str(request.url_for("dashboard")),
+        status_code=303,
     )
 
     response.set_cookie(
@@ -75,7 +76,7 @@ async def auth_callback(request: Request, db: AsyncSession = Depends(get_db)) ->
 async def me(user: User = Depends(get_current_user)) -> dict[str, str]:
     return {"user_id": str(user.id)}
 
-@router.post("/logout")
+@router.post("/logout", dependencies=[Depends(verify_csrf)])
 async def logout(
     request: Request,
     session_token: str | None = Cookie(
@@ -117,6 +118,5 @@ async def logout(
     return response
 
 @router.get("/logged-out", name="logged_out")
-async def logged_out() -> dict[str, str]:
-    return {"message": "You are logged out"}
-
+async def logged_out() -> RedirectResponse:
+    return RedirectResponse(url="/", status_code=303)

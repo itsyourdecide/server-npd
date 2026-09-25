@@ -1,0 +1,20 @@
+{
+  "data": [
+    {
+      "active": 1,
+      "content": "images,rootdir",
+      "enabled": 1,
+      "shared": 0,
+      "storage": "local-zfs",
+      "type": "zfspool"
+    },
+    {
+      "active": 1,
+      "content": "import,backup,vztmpl,iso",
+      "enabled": 1,
+      "shared": 0,
+      "storage": "local",
+      "type": "dir"
+    }
+  ]
+}

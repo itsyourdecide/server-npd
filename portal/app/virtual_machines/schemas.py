@@ -14,6 +14,7 @@ class VirtualMachineRead(BaseModel):
     requested_memory_mb: int
     requested_storage_gb: int
     image_id: str
+    ssh_public_key_id: UUID | None
     created_at: datetime
     updated_at: datetime
 
@@ -32,3 +33,4 @@ class VirtualMachineCreate(BaseModel):
         max_length=100,
         pattern=r"^[a-z0-9][a-z0-9._-]*$",
     )
+    ssh_public_key_id: UUID

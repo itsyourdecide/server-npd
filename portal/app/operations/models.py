@@ -19,8 +19,9 @@ class Operation(Base):
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     virtual_machine_id: Mapped[UUID] = mapped_column(ForeignKey("virtual_machines.id"), index=True)
-    operation_type: Mapped[str] = mapped_column(String(50))
-    status: Mapped[str] = mapped_column(String(32), default="pending", server_default="pending", index=True)
+    operation_type: Mapped[str] = mapped_column(String(50)) # Что попросил пользователь?
+    status: Mapped[str] = mapped_column(String(32), default="pending", server_default="pending", index=True) # Этот шаг ещё ждёт запуска или уже выполняется?
+    phase: Mapped[str | None] = mapped_column(String(32)) # Какой шаг операции выполняем?
     idempotency_key: Mapped[str] = mapped_column(String(128))
     attempts: Mapped[int] = mapped_column(default=0, server_default="0")
     last_error_code: Mapped[str | None] = mapped_column(String(100))
@@ -29,8 +30,17 @@ class Operation(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     __table_args__ = (
-        CheckConstraint (
-            "operation_type IN ('vm.create', 'vm.start', 'vm.stop', 'vm.delete')",
+        CheckConstraint(
+            """
+            operation_type IN (
+                'vm.create',
+                'vm.start',
+                'vm.shutdown',
+                'vm.stop',
+                'vm.reboot',
+                'vm.delete'
+            )
+            """,
             name="operation_type_list",
         ),
         CheckConstraint (

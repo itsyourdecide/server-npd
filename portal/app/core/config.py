@@ -15,6 +15,8 @@ class Settings(BaseSettings):
 
     session_max_age_seconds: int = 7 * 24 * 60 * 60
 
+    csrf_secret: SecretStr
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

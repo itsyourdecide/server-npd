@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Обзор · NPD Portal{% endblock %}
+
+{% block content %}
+  <div class="page-heading">
+    <p class="eyebrow">Личный кабинет</p>
+    <h1>Обзор ресурсов</h1>
+    <p class="muted">Внутренний ID пользователя: <code>{{ user_id }}</code></p>
+  </div>
+
+  <div class="summary-grid" aria-label="Сводка">
+    <div class="panel summary"><span>Виртуальные машины</span><strong>{{ vms|length }}</strong></div>
+    <div class="panel summary"><span>SSH-ключи</span><strong>{{ ssh_keys|length }}</strong></div>
+    <div class="panel summary"><span>Последние операции</span><strong>{{ operations|length }}</strong></div>
+  </div>
+
+  <section class="panel" id="quota" aria-labelledby="quota-heading">
+    <div class="section-heading">
+      <div><p class="eyebrow">Ресурсы</p><h2 id="quota-heading">Моя квота</h2></div>
+      <a href="/compute/quota">JSON-ответ</a>
+    </div>
+    {% if quota and plan and usage %}
+      <p>План <strong>{{ plan.code }}</strong> · состояние <span class="status">{{ quota.status }}</span></p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ресурс</th><th>Использовано</th><th>Лимит</th></tr></thead>
+          <tbody>
+            <tr><th>VM</th><td>{{ usage.used_vms }}</td><td>{{ plan.max_vms }}</td></tr>
+            <tr><th>vCPU</th><td>{{ usage.used_vcpus }}</td><td>{{ plan.max_total_vcpus }}</td></tr>
+            <tr><th>RAM, МБ</th><td>{{ usage.used_memory_mb }}</td><td>{{ plan.max_total_memory_mb }}</td></tr>
+            <tr><th>Диск, ГБ</th><td>{{ usage.used_storage_gb }}</td><td>{{ plan.max_total_storage_gb }}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">Квота или план пока не найдены. Проверьте настройки стартового плана.</p>
+    {% endif %}
+  </section>
+
+  <section class="panel" id="vms" aria-labelledby="vms-heading">
+    <div class="section-heading">
+      <div><p class="eyebrow">Compute</p><h2 id="vms-heading">Мои виртуальные машины</h2></div>
+      <a href="/compute/vms">JSON-ответ</a>
+    </div>
+    {% if vms %}
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Образ</th><th>Конфигурация</th><th>Состояние</th></tr></thead>
+          <tbody>
+            {% for vm in vms %}
+              <tr>
+                <td><code>{{ vm.id }}</code></td>
+                <td>{{ vm.image_id }}</td>
+                <td>{{ vm.requested_vcpus }} vCPU · {{ vm.requested_memory_mb }} МБ · {{ vm.requested_storage_gb }} ГБ</td>
+                <td><span class="status">{{ vm.status }}</span></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">Пока нет виртуальных машин.</p>
+    {% endif %}
+    <p class="section-note">Создание и действия с VM пока доступны через <a href="/docs">API-документацию</a>; формы добавим позже.</p>
+  </section>
+
+  <section class="panel" id="ssh-keys" aria-labelledby="ssh-heading">
+    <div class="section-heading"><div><p class="eyebrow">Доступ</p><h2 id="ssh-heading">SSH-ключи</h2></div></div>
+    {% if ssh_keys %}
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Название</th><th>Тип</th><th>Fingerprint</th></tr></thead>
+          <tbody>
+            {% for key in ssh_keys %}
+              <tr><td>{{ key.name }}</td><td>{{ key.key_type }}</td><td><code>{{ key.fingerprint }}</code></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">Публичных SSH-ключей пока нет.</p>
+    {% endif %}
+  </section>
+
+  <section class="panel" id="operations" aria-labelledby="operations-heading">
+    <div class="section-heading"><div><p class="eyebrow">История</p><h2 id="operations-heading">Последние операции</h2></div></div>
+    {% if operations %}
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Операция</th><th>VM</th><th>Состояние</th><th>Этап</th></tr></thead>
+          <tbody>
+            {% for operation in operations %}
+              <tr>
+                <td><a href="{{ url_for('operation_status', vm_id=operation.virtual_machine_id, operation_id=operation.id) }}">{{ operation.operation_type }}</a></td>
+                <td><code>{{ operation.virtual_machine_id }}</code></td>
+                <td><span class="status">{{ operation.status }}</span></td>
+                <td>{{ operation.phase or '—' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">Операций пока нет.</p>
+    {% endif %}
+  </section>
+{% endblock %}

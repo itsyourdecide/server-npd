@@ -1,0 +1,14 @@
+{
+  "data": {
+    "exitstatus": "OK",
+    "id": "9000",
+    "node": "pve02",
+    "pid": 4096,
+    "pstart": 8192,
+    "starttime": 1790000000,
+    "status": "stopped",
+    "type": "qmclone",
+    "upid": "UPID:pve02:00001000:00002000:6AB14000:qmclone:9000:portal-worker@pve!portal:",
+    "user": "portal-worker@pve"
+  }
+}

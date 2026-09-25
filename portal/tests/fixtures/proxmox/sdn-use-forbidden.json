@@ -1,0 +1,6 @@
+{
+  "errors": {
+    "net0": "permission check failed (/sdn/zones/localnetwork/vmbr0/40, SDN.Use)"
+  },
+  "message": "Permission check failed (403)"
+}
