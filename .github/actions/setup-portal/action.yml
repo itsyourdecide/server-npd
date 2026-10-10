@@ -5,11 +5,6 @@ runs:
   using: composite
 
   steps:
-    - name: Checkout repo
-      uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
-      with:
-        persist-credentials: false
-            
     - name: Install Nix
       uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
       with:
@@ -29,18 +24,7 @@ runs:
       shell: devenv shell -- bash -e {0}
       run: uv sync --locked
 
-    - name: Set up Homebrew
-      shell: devenv shell -- bash -e {0}
-      run: |
-        /bin/bash -c "$(curl -fsSL https://githubusercontent.com)"
-        echo "/home/linuxbrew/.linuxbrew/bin" >> $GITHUB_PATH
-        echo "/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
-
-    - name: Install pinact
-      shell: devenv shell -- bash -e {0}
-      run: brew install pinact
-
-    - name: 
+    - name: Copy environment file
       working-directory: portal
       shell: devenv shell -- bash -e {0}
       run: cp .env.example .env

@@ -1,10 +1,11 @@
 name: Portal CI
 on:
-    push: 
-    pull_request: 
-        types: [opened, synchronize, reopened]
-        branches: 
-            - main
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 permissions: 
     contents: read
 jobs:
@@ -23,5 +24,5 @@ jobs:
               shell: devenv shell -- bash -e {0}
               run: |
                 cd portal
-                uv run --locked pytest
+                uv run --locked python -m pytest
             

@@ -11,6 +11,7 @@
 
     actionlint
     zizmor
+    pinact
     shellcheck
     nixfmt-rfc-style
   ];
@@ -37,6 +38,8 @@
     set -e
 
     echo "Checking GitHub workflows..."
+    # TODO: drop the ignore once actionlint supports the $/ self-repository
+    # syntax that zizmor requires (GitHub runner >= 2.336)
     actionlint \
       -ignore 'specifying action "\$/.+" in invalid format because ref is missing'
 
@@ -49,9 +52,6 @@
     echo "Checking Python dependencies..."
     cd portal
     uv lock --check
-
-    echo "Pinact run..."
-    pinact run
 
     echo "Pinact check..."
     pinact run --check
