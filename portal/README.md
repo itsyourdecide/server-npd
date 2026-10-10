@@ -12,9 +12,6 @@ templates/  HTML-шаблоны
 static/     CSS, JavaScript и локальные frontend assets
 ```
 
-Существующая Django-реализация временно сохранена в соседнем каталоге
-`../portal-django/` как эталон поведения.
-
 ## Локальный запуск
 
 ```bash

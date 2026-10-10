@@ -15,3 +15,14 @@ portal/build/
 portal/dist/
 portal/staticfiles/
 portal/.env.worker
+
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml

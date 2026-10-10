@@ -1,0 +1,27 @@
+name: Portal CI
+on:
+    push: 
+    pull_request: 
+        types: [opened, synchronize, reopened]
+        branches: 
+            - main
+permissions: 
+    contents: read
+jobs:
+    tests:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                persist-credentials: false
+
+            - name: Portal setup
+              uses: $/.github/actions/setup-portal
+            
+            - name: Run pytest
+              shell: devenv shell -- bash -e {0}
+              run: |
+                cd portal
+                uv run --locked pytest
+            

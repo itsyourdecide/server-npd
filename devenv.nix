@@ -7,7 +7,12 @@
     jq
     docker
     ansible
-    postgresql
+    docker-compose
+
+    actionlint
+    zizmor
+    shellcheck
+    nixfmt-rfc-style
   ];
 
   languages.python = {
@@ -19,13 +24,36 @@
     venv.enable = true;
 
     uv = {
-        enable = true;
+      enable = true;
 
-        sync = {
+      sync = {
         enable = true;
         arguments = [ "--locked" ];
-        };
+      };
     };
-};
+  };
 
+  enterTest = ''
+    set -e
+
+    echo "Checking GitHub workflows..."
+    actionlint \
+      -ignore 'specifying action "\$/.+" in invalid format because ref is missing'
+
+    echo "Checking GitHub Actions security..."
+    zizmor .
+
+    echo "Checking Nix formatting..."
+    nixfmt --check devenv.nix
+
+    echo "Checking Python dependencies..."
+    cd portal
+    uv lock --check
+
+    echo "Pinact run..."
+    pinact run
+
+    echo "Pinact check..."
+    pinact run --check
+  '';
 }

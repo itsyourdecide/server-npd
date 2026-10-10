@@ -1,0 +1,39 @@
+name: Setup Portal
+description: Prepare development environment for NPD Portal
+
+runs:
+  using: composite
+
+  steps:
+    - name: Checkout repo
+      uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      with:
+        persist-credentials: false
+            
+    - name: Install Nix
+      uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
+      with:
+        github_access_token: ${{ github.token }}
+            
+    - name: Install Cachix
+      uses: cachix/cachix-action@18cf96c7c98e048e10a83abd92116114cd8504be # v14
+      with:
+        name: devenv
+            
+    - name: Install devenv
+      shell: bash
+      run: nix profile add nixpkgs#devenv
+
+    - name: Install dependencies
+      working-directory: portal
+      shell: devenv shell -- bash -e {0}
+      run: uv sync --locked
+
+    - name: 
+      working-directory: portal
+      shell: devenv shell -- bash -e {0}
+      run: cp .env.example .env
+
+    - name: devenv tests
+      shell: devenv shell -- bash -e {0}
+      run: devenv test
