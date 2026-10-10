@@ -1,7 +1,7 @@
 # Текущее документированное состояние кластера
 
 Статус: current
-Последняя редакция: 2026-09-09
+Последняя редакция: 2026-09-21
 Живая проверка при редакции: частично выполнена для Proxmox, HTCondor,
 monitoring, LACP, PSU sensors, локальных ZFS pool и нового WireGuard tunnel
 `vpn-npd` ↔ `fw01`; физические ограничения после переезда подтверждены
@@ -28,6 +28,7 @@ monitoring, LACP, PSU sensors, локальных ZFS pool и нового WireG
 | Компонент | Последнее документированное состояние | Статус | Последняя проверка |
 |---|---|---|---|
 | Proxmox | Кластер `npd`, узлы `pve01`–`pve03`, quorum 3/3 | Verified | 2026-09-07 |
+| Portal → Proxmox API | Ограниченный token, pool `npd-portal`, template 9000; полный clone/configure/resize/start/shutdown/delete smoke test успешен | Verified | 2026-09-21 |
 | Firewall/router | `fw01`, VM 100; после migration test возвращена на `pve02` | Last documented | 2026-08-13 |
 | HTCondor | `condor01` manager+submit и 4 ASUS execute-ноды | Verified | 2026-09-07 |
 | PXE | `pxe01`, LXC 110 на `pve02`, HTTP/TFTP/iPXE | Verified | 2026-08-07 |
@@ -59,6 +60,18 @@ monitoring, LACP, PSU sensors, локальных ZFS pool и нового WireG
   2026-07-08;
 - автоматический HA/fencing и настоящий replica failover не подтверждены;
 - LAN2/bonding для трёх PVE-узлов не настроен.
+
+Для operation worker Portal 2026-09-21 настроены service account
+`portal-worker@pve`, отделённый token `portal-worker@pve!portal`, resource pool
+`npd-portal`, роль `NPDPortalWorker` на этом pool и `PVEDatastoreUser` на
+`local-zfs`. Общий cluster scope остаётся read-only через `PVEAuditor`.
+Проверка с cluster CA через Portal `ProxmoxClient` получила PVE `9.2.3` и три
+узла со статусом `online`. На `pve02` подготовлен защищённый AlmaLinux 9.8
+Generic Cloud template `9000`; token имеет отдельные права clone на template и
+`SDN.Use` только для VLAN 40. Полный API smoke test подтвердил full clone,
+Cloud-Init/SSH, resize до 30 GiB, start, shutdown и delete без остаточных
+томов. Production `HttpProxmoxAdapter` ещё не реализован. Подробности и точные
+границы доступа находятся в [описании Proxmox](services/proxmox.md).
 
 `pve04` и `pve05` по состоянию на 2026-08-11 были физически подключены к
 Force10 на уровне LAN/IPMI, но не были введены в Proxmox-кластер. `pve06`–

@@ -77,3 +77,84 @@ application и admin rules после определения upstream port и с
 
 Evidence: live CLI results подтверждены владельцем; private keys и raw configs
 в Git не добавлялись.
+
+### 2026-09-21 — Proxmox/Portal — создан ограниченный API service account
+
+Причина: подготовить operation worker Portal к управлению пользовательскими
+VM без использования root credentials или глобальной administrative role.
+
+Изменено:
+
+- создан `portal-worker@pve`;
+- создан token `portal-worker@pve!portal` с `privsep=1`;
+- создан resource pool `npd-portal`;
+- создана ограниченная роль `NPDPortalWorker`;
+- user и token получили эту роль только на `/pool/npd-portal`;
+- user и token получили `PVEDatastoreUser` только на
+  `/storage/local-zfs`;
+- на `/` оставлен только общий read-only доступ `PVEAuditor`;
+- Portal настроен на HTTPS API `pve01:8006` с проверкой cluster CA;
+- token secret сохранён вне Git в локальном `.env.worker` и в документацию не
+  добавлялся.
+
+Проверка:
+
+- effective permissions token содержат `NPDPortalWorker` на pool и только
+  `Datastore.AllocateSpace`/`Datastore.Audit` на `local-zfs`;
+- `ProxmoxClient` получил version `9.2.3`;
+- API вернул `pve01`, `pve02`, `pve03` со статусом `online`;
+- TLS verification выполнена через `/etc/pve/pve-root-ca.pem`, скопированный
+  по доверенному SSH-каналу;
+- существующие VM не изменялись.
+
+Результат: authentication, TLS и read-only API path подтверждены; write scope
+ограничен pool Portal и выделением места на `local-zfs`. Реальное создание VM
+ещё не включено: AlmaLinux cloud template и ACL исходного template не готовы.
+
+Evidence: live `pveum` output и read-only API response проверены во время
+операции; token secret и raw credential artifacts в Git не сохранялись.
+
+### 2026-09-21 — Proxmox/Portal — создан template и проверен полный API lifecycle
+
+Причина: собрать и проверить всё сервер-зависимое до разработки production
+`HttpProxmoxAdapter` без постоянного доступа к кластеру.
+
+Изменено:
+
+- официальный AlmaLinux 9.8 Generic Cloud image проверен по GPG и SHA-256;
+- на `pve02` создан защищённый template `9000`
+  (`npd-almalinux-9-template`) на `local-zfs`;
+- template настроен на Cloud-Init, qemu guest agent, VLAN 40 и явный DNS
+  `10.10.40.1`/`internal`;
+- user и token получили `PVETemplateUser` на `/vms/9000`;
+- user и token получили `PVESDNUser` только на
+  `/sdn/zones/localnetwork/vmbr0/40`;
+- вне Git сохранены offline-документация PVE 9.2 и исходный подписанный образ;
+- в Git добавлены обезличенные реальные API fixtures.
+
+Проверка:
+
+- token выполнил full clone, config update, disk resize, start и shutdown;
+- UPID polling различил `running` и успешный `stopped`/`OK`;
+- guest agent вернул адрес VLAN 40, SSH по Cloud-Init key прошёл;
+- root XFS вырос до 30 GiB, интернет и DNS работали;
+- чистый первый boot использовал только `10.10.40.1` и `search internal`;
+- Cloud-Init выполнил обновление пакетов примерно за пять минут;
+- delete с `purge=1` удалил VM и все её тома, pool снова стал пустым.
+
+Выявлено:
+
+- без точечного `SDN.Use` изменение tagged NIC возвращает `403`;
+- `sshkeys` требует предварительного URL encoding в form body;
+- resize возвращает отдельный UPID и требует polling;
+- `qmstart` подтверждает запуск QEMU, но не готовность гостевой ОС;
+- `destroy-unreferenced-disks=1` дал `no such logical volume pve/data`, поэтому
+  в проверенном delete path используется только `purge=1`.
+
+Результат: серверная сторона для первой версии `HttpProxmoxAdapter` проверена;
+в resource pool не оставлено временных VM.
+
+После завершения проверки API token был ротирован из-за появления прежнего
+secret в локальном диагностическом выводе. Новый secret записан только в
+игнорируемый `.env.worker`; все token ACL назначены заново и effective
+permissions повторно проверены.

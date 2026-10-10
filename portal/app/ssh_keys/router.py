@@ -3,17 +3,21 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
+from app.identity.csrf import verify_csrf
 from app.identity.dependencies import get_current_user
 from app.ssh_keys.exceptions import (
     InvalidSshPublicKeyError,
     SshPublicKeyConflictError,
 )
 from app.ssh_keys.models import SshPublicKey
-from app.ssh_keys.schemas import SshPublicKeyCreate, SshPublicKeyRead
-from app.ssh_keys.services import import_ssh_public_key
+from app.ssh_keys.schemas import (
+    GeneratedSshKeyPairRead,
+    SshKeyPairGenerate,
+    SshPublicKeyCreate,
+    SshPublicKeyRead,
+)
+from app.ssh_keys.services import generate_ssh_key_pair, import_ssh_public_key
 from app.users.models import User
-from app.ssh_keys.services import generate_ssh_key_pair
-from app.ssh_keys.schemas import GeneratedSshKeyPairRead, SshKeyPairGenerate
 
 router = APIRouter(
     prefix="/compute/ssh-keys",
@@ -25,6 +29,7 @@ router = APIRouter(
     "/import",
     response_model=SshPublicKeyRead,
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(verify_csrf)]
 )
 async def import_ssh_key(
     request_model: SshPublicKeyCreate,
@@ -83,6 +88,7 @@ async def get_list_keys(
     "/generate",
     response_model=GeneratedSshKeyPairRead,
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(verify_csrf)]
 )
 async def generate_ssh_key_pair_endpoint(
     request_model: SshKeyPairGenerate,

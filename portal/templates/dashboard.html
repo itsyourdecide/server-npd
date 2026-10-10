@@ -46,7 +46,7 @@
     {% if vms %}
       <div class="table-wrap">
         <table>
-          <thead><tr><th>ID</th><th>Образ</th><th>Конфигурация</th><th>Состояние</th></tr></thead>
+          <thead><tr><th>ID</th><th>Образ</th><th>Конфигурация</th><th>Состояние</th><th>Действия</th></tr></thead>
           <tbody>
             {% for vm in vms %}
               <tr>
@@ -54,6 +54,17 @@
                 <td>{{ vm.image_id }}</td>
                 <td>{{ vm.requested_vcpus }} vCPU · {{ vm.requested_memory_mb }} МБ · {{ vm.requested_storage_gb }} ГБ</td>
                 <td><span class="status">{{ vm.status }}</span></td>
+                <td>
+                  {% if vm.status == "stopped" %}
+                    <form action="/dashboard/vms/{{ vm.id }}/start" method="post" class="inline-form">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                      <input type="hidden" name="idempotency_key" value="{{ vm_start_idempotency_keys[vm.id] }}">
+                      <button class="button button-quiet" type="submit">Запустить</button>
+                    </form>
+                  {% else %}
+                    <span class="muted">—</span>
+                  {% endif %}
+                </td>
               </tr>
             {% endfor %}
           </tbody>
@@ -62,7 +73,53 @@
     {% else %}
       <p class="muted">Пока нет виртуальных машин.</p>
     {% endif %}
-    <p class="section-note">Создание и действия с VM пока доступны через <a href="/docs">API-документацию</a>; формы добавим позже.</p>
+
+    <div class="form-panel" aria-labelledby="create-vm-heading">
+      <h3 id="create-vm-heading">Создать виртуальную машину</h3>
+      <p class="muted">Выбери конфигурацию и SSH-ключ для входа. Лимиты плана показаны выше.</p>
+      <form action="/dashboard/vms" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="idempotency_key" value="{{ create_vm_idempotency_key }}">
+
+        <div class="form-grid">
+          <label class="form-field">
+            <span>Образ системы</span>
+            <select name="image_id" required>
+              <option value="almalinux-9">AlmaLinux 9</option>
+            </select>
+          </label>
+          <label class="form-field">
+            <span>SSH-ключ</span>
+            <select name="ssh_public_key_id" required {% if not ssh_keys %}disabled{% endif %}>
+              <option value="" selected>Выбери ключ</option>
+              {% for key in ssh_keys %}
+                <option value="{{ key.id }}">{{ key.name }} · {{ key.fingerprint }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label class="form-field">
+            <span>vCPU</span>
+            <input type="number" name="requested_vcpus" min="1" step="1" value="2" required>
+          </label>
+          <label class="form-field">
+            <span>RAM, МБ</span>
+            <input type="number" name="requested_memory_mb" min="1" step="1" value="4096" required>
+          </label>
+          <label class="form-field">
+            <span>Диск, ГБ</span>
+            <input type="number" name="requested_storage_gb" min="10" step="1" value="30" required>
+          </label>
+        </div>
+
+        {% if not ssh_keys %}
+          <p class="form-hint">Сначала добавь SSH-ключ — без него создать VM нельзя.</p>
+        {% endif %}
+        <div class="form-actions">
+          <button class="button button-primary" type="submit">Создать VM</button>
+        </div>
+      </form>
+    </div>
+    <p class="section-note">Остальные действия с VM пока доступны через <a href="/docs">API-документацию</a>.</p>
   </section>
 
   <section class="panel" id="ssh-keys" aria-labelledby="ssh-heading">

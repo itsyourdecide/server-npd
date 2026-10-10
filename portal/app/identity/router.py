@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.db.session import get_db
-from app.identity.csrf import verify_csrf
+from app.identity.csrf import make_csrf_token, verify_csrf
 from app.identity.dependencies import get_current_user
 from app.identity.oidc import oauth
 from app.identity.services import get_or_create_user
@@ -120,3 +120,16 @@ async def logout(
 @router.get("/logged-out", name="logged_out")
 async def logged_out() -> RedirectResponse:
     return RedirectResponse(url="/", status_code=303)
+
+@router.get("/csrf", dependencies=[Depends(get_current_user)])
+async def get_csrf_token(
+    response: Response,
+    session_token: str | None = Cookie(
+        default=None,
+        alias="npd_session",
+    )
+) -> dict[str, str]:
+
+    csrf_token = make_csrf_token(session_token)
+    response.headers["Cache-Control"] = "no-store"
+    return {"csrf_token": csrf_token,}

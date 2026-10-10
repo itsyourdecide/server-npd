@@ -52,6 +52,17 @@ thead th { color: #647287; font-size: .82rem; }
 tbody th { font-weight: 550; }
 code { font-size: .84em; overflow-wrap: anywhere; }
 .status { display: inline-block; padding: .2rem .45rem; border-radius: .3rem; background: #edf2f7; }
+.form-panel { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid #e8ebef; }
+.form-panel h3 { margin: 0 0 .4rem; font-size: 1.1rem; }
+.form-panel > .muted { margin: 0 0 1.2rem; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.form-field { display: grid; gap: .4rem; color: #344255; font-size: .9rem; font-weight: 600; }
+.form-field input, .form-field select { width: 100%; min-height: 42px; padding: .55rem .7rem; border: 1px solid #c9d1da; border-radius: .4rem; background: #fff; color: #18212f; font: inherit; }
+.form-field input:focus-visible, .form-field select:focus-visible { outline: 2px solid #1759a6; outline-offset: 2px; }
+.form-hint { margin: 1rem 0 0; color: #8a4b14; }
+.form-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem; margin-top: 1.2rem; font-size: .9rem; }
+.inline-form { display: inline; margin: 0; }
+.button:disabled { opacity: .55; cursor: not-allowed; }
 
 @media (max-width: 800px) {
   .shell { display: block; }
@@ -61,4 +72,5 @@ code { font-size: .84em; overflow-wrap: anywhere; }
   .content { padding: 1rem; }
   .topbar { padding: .75rem 1rem; }
   .summary-grid { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
 }

@@ -6,6 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
+from app.identity.csrf import verify_csrf
 from app.identity.dependencies import get_current_user
 from app.operations.models import Operation
 from app.operations.schemas import OperationRead
@@ -35,6 +36,7 @@ async def my_vms(
     "",
     response_model=VirtualMachineRead,
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(verify_csrf)]
 )
 async def create_my_vm(
     request_model: VirtualMachineCreate,
@@ -68,7 +70,9 @@ async def create_my_vm(
 @router.post(
         "/{vm_id}/start",
         response_model=OperationRead,
-        status_code=status.HTTP_202_ACCEPTED,)
+        status_code=status.HTTP_202_ACCEPTED,
+        dependencies=[Depends(verify_csrf)]
+)
 async def start_vm(
     vm_id: UUID,
     db: AsyncSession = Depends(get_db),
@@ -117,6 +121,7 @@ async def _enqueue_lifecycle_operation(
     "/{vm_id}/shutdown",
     response_model=OperationRead,
     status_code=status.HTTP_202_ACCEPTED,
+    dependencies=[Depends(verify_csrf)]
 )
 async def shutdown_vm(
     vm_id: UUID,
@@ -133,6 +138,7 @@ async def shutdown_vm(
     "/{vm_id}/stop",
     response_model=OperationRead,
     status_code=status.HTTP_202_ACCEPTED,
+    dependencies=[Depends(verify_csrf)]
 )
 async def stop_vm(
     vm_id: UUID,
@@ -149,6 +155,7 @@ async def stop_vm(
     "/{vm_id}/reboot",
     response_model=OperationRead,
     status_code=status.HTTP_202_ACCEPTED,
+    dependencies=[Depends(verify_csrf)]
 )
 async def reboot_vm(
     vm_id: UUID,
@@ -165,6 +172,7 @@ async def reboot_vm(
     "/{vm_id}/delete",
     response_model=OperationRead,
     status_code=status.HTTP_202_ACCEPTED,
+    dependencies=[Depends(verify_csrf)]
 )
 async def delete_vm(
     vm_id: UUID,
