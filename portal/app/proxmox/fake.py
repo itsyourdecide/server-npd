@@ -2,13 +2,13 @@ from uuid import UUID
 
 from app.proxmox.contracts import (
     CreateVmRequest,
+    ProviderCloneResult,
+    ProviderDeleteResult,
     ProviderPlacement,
     ProviderTask,
     ProviderTaskStatus,
-    ProviderDeleteResult,
     ProviderVmState,
 )
-from app.proxmox.contracts import ProviderCloneResult
 
 
 class FakeProxmoxAdapter:
