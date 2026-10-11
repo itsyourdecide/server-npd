@@ -11,6 +11,20 @@ permissions:
 jobs:
     tests:
         runs-on: ubuntu-latest
+        services:
+            postgres:
+                image: postgres:16
+                env:
+                    POSTGRES_USER: portal
+                    POSTGRES_PASSWORD: portal
+                    POSTGRES_DB: portal
+                ports:
+                    - 5433:5432
+                options: >-
+                    --health-cmd "pg_isready -U portal -d portal"
+                    --health-interval 5s
+                    --health-timeout 3s
+                    --health-retries 10
         steps:
             - name: Checkout
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -25,4 +39,11 @@ jobs:
               run: |
                 cd portal
                 uv run --locked python -m pytest
+
+            - name: Run alembic migrations against fresh Postgres
+              shell: devenv shell -- bash -e {0}
+              run: |
+                cd portal
+                uv run --locked alembic upgrade head
+                uv run --locked alembic check
             
