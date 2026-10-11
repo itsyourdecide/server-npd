@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
   packages = with pkgs; [
@@ -37,6 +37,10 @@
   enterTest = ''
     set -e
 
+    # Проверки привязаны к корню репозитория; devenv test может быть
+    # запущен из подкаталога, например portal/.
+    cd "${config.devenv.root}"
+
     echo "Checking GitHub workflows..."
     # TODO: drop the ignore once actionlint supports the $/ self-repository
     # syntax that zizmor requires (GitHub runner >= 2.336)
@@ -49,11 +53,11 @@
     echo "Checking Nix formatting..."
     nixfmt --check devenv.nix
 
+    echo "Pinact check..."
+    pinact run --check
+
     echo "Checking Python dependencies..."
     cd portal
     uv lock --check
-
-    echo "Pinact check..."
-    pinact run --check
   '';
 }
