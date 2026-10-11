@@ -1,11 +1,10 @@
 from uuid import UUID
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.compute.models import ComputePlan, UserQuota
 from app.virtual_machines.models import VirtualMachine
-
 
 QUOTA_CONSUMING_STATUSES = (
     "pending",

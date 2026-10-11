@@ -2,6 +2,7 @@ from urllib.parse import urlencode
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response
 from fastapi.responses import RedirectResponse
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -10,7 +11,11 @@ from app.identity.csrf import make_csrf_token, verify_csrf
 from app.identity.dependencies import get_current_user
 from app.identity.oidc import oauth
 from app.identity.services import get_or_create_user
-from app.identity.sessions import create_application_session, revoke_user_session
+from app.identity.sessions import (
+    _login_and_create_session,
+    create_application_session,
+    revoke_user_session,
+)
 from app.users.models import User
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
@@ -36,23 +41,20 @@ async def auth_callback(request: Request, db: AsyncSession = Depends(get_db)) ->
 
     if not email or email_verified is not True:
         raise HTTPException(status_code=403, detail="Email not verified")
-    async with db.begin():
-        user = await get_or_create_user(
-            db,
-            issuer=userinfo["iss"],
-            subject=userinfo["sub"],
-            email=email,
+
+    try:
+        session_token = await _login_and_create_session(
+            db, 
+            issuer=userinfo["iss"], 
+            subject=userinfo["sub"], 
+            email=email
         )
-
-        if user.is_active is False:
-            raise HTTPException(
-                status_code=403,
-                detail="User is inactive"
-            )
-
-        session_token = create_application_session(
-            db,
-            user_id=user.id,
+    except IntegrityError:
+        session_token = await _login_and_create_session(
+            db, 
+            issuer=userinfo["iss"], 
+            subject=userinfo["sub"], 
+            email=email
         )
 
     response = RedirectResponse(

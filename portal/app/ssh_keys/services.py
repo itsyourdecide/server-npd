@@ -1,11 +1,6 @@
 from dataclasses import dataclass, field
 from uuid import UUID
 
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import ed25519
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.ssh_keys.exceptions import (
     InvalidSshPublicKeyError,
     SshPublicKeyConflictError,
@@ -13,6 +8,11 @@ from app.ssh_keys.exceptions import (
 from app.ssh_keys.models import SshPublicKey
 from app.ssh_keys.parsing import parse_ssh_public_key
 from app.ssh_keys.schemas import SshKeyPairGenerate, SshPublicKeyCreate
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import ed25519
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 async def import_ssh_public_key(
@@ -33,37 +33,48 @@ async def import_ssh_public_key(
     public_key = parsed_key.public_key
     fingerprint = parsed_key.fingerprint
 
-    existing_name = await db.scalar(
-        select(SshPublicKey).where(
-            SshPublicKey.owner_user_id == user_id,
-            SshPublicKey.name == name
+    try:
+        existing_name = await db.scalar(
+            select(SshPublicKey).where(
+                SshPublicKey.owner_user_id == user_id,
+                SshPublicKey.name == name
+            )
         )
-    )
 
-    if existing_name is not None:
-        raise SshPublicKeyConflictError("SSH key name already exists")
+        if existing_name is not None:
+            raise SshPublicKeyConflictError("SSH key name already exists")
 
-    existing_key = await db.scalar(
-        select(SshPublicKey).where(
-            SshPublicKey.fingerprint == fingerprint
+        existing_key = await db.scalar(
+            select(SshPublicKey).where(
+                SshPublicKey.fingerprint == fingerprint
+            )
         )
-    )
 
-    if existing_key is not None:
-        raise SshPublicKeyConflictError("SSH public key already exists")
+        if existing_key is not None:
+            raise SshPublicKeyConflictError("SSH public key already exists")
 
-    pubkey = SshPublicKey(
-        owner_user_id=user_id,
-        name=name,
-        key_type=key_type,
-        public_key=public_key,
-        fingerprint=fingerprint,
-    )
-    db.add(pubkey)
-    await db.flush()
+        pubkey = SshPublicKey(
+            owner_user_id=user_id,
+            name=name,
+            key_type=key_type,
+            public_key=public_key,
+            fingerprint=fingerprint,
+        )
+        db.add(pubkey)
+        await db.flush()
 
-    return pubkey
-
+        return pubkey
+    except IntegrityError:
+        await db.rollback()
+        existing_name = await db.scalar(
+            select(SshPublicKey).where(
+                SshPublicKey.owner_user_id == user_id,
+                SshPublicKey.name == name
+                )
+            )
+        if existing_name is not None:
+            raise SshPublicKeyConflictError("SSH key name already exists") from None
+        raise SshPublicKeyConflictError("SSH public key already exists") from None
 
 @dataclass(frozen=True, slots=True)
 class GeneratedSshKeyPair:

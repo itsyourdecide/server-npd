@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.compute.models import ComputePlan, UserQuota
@@ -39,65 +40,75 @@ async def create_vm(
 
     if quota is None:
             raise RuntimeError("user quota is missing")
-    
-    existing_vm = await _get_existing_vm_for_create_request(
-        db,
-        idempotency_key=idempotency_key,
-        user_id=user_id,
-        request_model=request_model,
-    )
 
-    if existing_vm is not None:
-        return existing_vm
-
-    
-    if quota.status != "active":
-        raise PermissionError("user quota is suspended")
-
-    minimum_storage_gb = IMAGE_MIN_STORAGE_GB.get(request_model.image_id)
-
-    if minimum_storage_gb is None:
-        raise ValueError("image is not allowed")
-
-    if request_model.requested_storage_gb < minimum_storage_gb:
-        raise ValueError(
-            f"storage must be at least {minimum_storage_gb} GB for this image"
+    try:
+        existing_vm = await _get_existing_vm_for_create_request(
+            db,
+            idempotency_key=idempotency_key,
+            user_id=user_id,
+            request_model=request_model,
         )
 
-    plan = await db.get(ComputePlan, quota.compute_plan_id)
+        if existing_vm is not None:
+            return existing_vm
 
-    if plan is None:
-        raise RuntimeError("compute plan is missing")
+        
+        if quota.status != "active":
+            raise PermissionError("user quota is suspended")
 
+        minimum_storage_gb = IMAGE_MIN_STORAGE_GB.get(request_model.image_id)
+
+        if minimum_storage_gb is None:
+            raise ValueError("image is not allowed")
+
+        if request_model.requested_storage_gb < minimum_storage_gb:
+            raise ValueError(
+                f"storage must be at least {minimum_storage_gb} GB for this image"
+            )
+
+        plan = await db.get(ComputePlan, quota.compute_plan_id)
+
+        if plan is None:
+            raise RuntimeError("compute plan is missing")
+
+        
+        usage = await get_user_compute_usage(db, user_id)
+
+        _validate_vm_quota(plan=plan, usage=usage, request_model=request_model)
+
+        vm = VirtualMachine(
+            owner_user_id=user_id,
+            status="pending",
+            requested_vcpus=request_model.requested_vcpus,
+            requested_memory_mb=request_model.requested_memory_mb,
+            requested_storage_gb=request_model.requested_storage_gb,
+            image_id=request_model.image_id,
+            ssh_public_key_id=request_model.ssh_public_key_id,
+        )
+
+        db.add(vm)
+        await db.flush()
+
+        operation = Operation(
+            virtual_machine_id=vm.id,
+            operation_type="vm.create",
+            status="pending",
+            phase="clone",
+            idempotency_key=idempotency_key,
+        )
+
+        db.add(operation)   
+        await db.flush()
+    except IntegrityError:
+        await db.rollback()
+        existing_vm = await _get_existing_vm_for_create_request(
+            db, idempotency_key=idempotency_key,
+            user_id=user_id, request_model=request_model,
+        )
+        if existing_vm is not None:
+            return existing_vm
+        raise ValueError("idempotency key already used") from None
     
-    usage = await get_user_compute_usage(db, user_id)
-
-    _validate_vm_quota(plan=plan, usage=usage, request_model=request_model)
-
-    vm = VirtualMachine(
-        owner_user_id=user_id,
-        status="pending",
-        requested_vcpus=request_model.requested_vcpus,
-        requested_memory_mb=request_model.requested_memory_mb,
-        requested_storage_gb=request_model.requested_storage_gb,
-        image_id=request_model.image_id,
-        ssh_public_key_id=request_model.ssh_public_key_id,
-    )
-
-    db.add(vm)
-    await db.flush()
-
-    operation = Operation(
-        virtual_machine_id=vm.id,
-        operation_type="vm.create",
-        status="pending",
-        phase="clone",
-        idempotency_key=idempotency_key,
-    )
-
-    db.add(operation)
-    await db.flush()
-
     return vm
 
 
@@ -193,44 +204,59 @@ async def enqueue_vm_operation(
     if vm is None:
         raise LookupError("virtual machine not found")
 
-
-    existing = await db.scalar(
-        select(Operation).where(
-            Operation.idempotency_key == idempotency_key
+    try:
+        existing = await db.scalar(
+            select(Operation).where(
+                Operation.idempotency_key == idempotency_key
+            )
         )
-    )
 
-    if existing is not None:
-        if (
-            existing.virtual_machine_id != vm.id
-            or existing.operation_type != operation_type
+        if existing is not None:
+            if (
+                existing.virtual_machine_id != vm.id
+                or existing.operation_type != operation_type
+            ):
+                raise ValueError("idempotency key already used")
+
+            return existing
+
+
+        active_operation = await db.scalar(
+            select(Operation).where(
+                Operation.virtual_machine_id == vm_id,
+                Operation.status.in_(("pending", "processing")),
+            ).limit(1)
+        )
+
+        if active_operation is not None:
+            raise ValueError("virtual machine already has an active operation")
+
+        if vm.status not in allowed_statuses[operation_type]:
+            raise ValueError(f"cannot perform {operation_type} while VM is {vm.status}")
+
+        new_operation = Operation(
+            virtual_machine_id=vm.id,
+            operation_type=operation_type,
+            status="pending",
+            phase="shutdown" if operation_type == "vm.reboot" else None,
+            idempotency_key=idempotency_key,
+        )
+
+        db.add(new_operation)
+        await db.flush()
+        return new_operation
+    
+    except IntegrityError:
+        await db.rollback()
+        existing = await db.scalar(
+            select(Operation).where(
+                Operation.idempotency_key == idempotency_key
+            )
+        )
+
+        if (existing is not None
+                and existing.virtual_machine_id == vm.id
+                and existing.operation_type == operation_type
         ):
-            raise ValueError("idempotency key already used")
-
-        return existing
-
-
-    active_operation = await db.scalar(
-        select(Operation).where(
-            Operation.virtual_machine_id == vm_id,
-            Operation.status.in_(("pending", "processing")),
-        ).limit(1)
-    )
-
-    if active_operation is not None:
-        raise ValueError("virtual machine already has an active operation")
-
-    if vm.status not in allowed_statuses[operation_type]:
-        raise ValueError(f"cannot perform {operation_type} while VM is {vm.status}")
-
-    new_operation = Operation(
-        virtual_machine_id=vm.id,
-        operation_type=operation_type,
-        status="pending",
-        phase="shutdown" if operation_type == "vm.reboot" else None,
-        idempotency_key=idempotency_key,
-    )
-
-    db.add(new_operation)
-    await db.flush()
-    return new_operation
+                return existing
+        raise ValueError("idempotency key already used") from None

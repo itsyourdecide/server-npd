@@ -3,11 +3,13 @@ from datetime import UTC, datetime, timedelta
 from hashlib import sha256
 from uuid import UUID
 
+from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.identity.models import ApplicationSession
+from app.identity.services import get_or_create_user
 from app.users.models import User
 
 
@@ -78,7 +80,23 @@ async def revoke_user_session(
 
     application_session.revoked_at = datetime.now(UTC)
 
-
+async def _login_and_create_session(
+    db: AsyncSession, 
+    *, 
+    issuer: str, 
+    subject: str, 
+    email: str,
+) -> str:
+    async with db.begin():
+        user = await get_or_create_user(
+            db, 
+            issuer=issuer, 
+            subject=subject, 
+            email=email
+        )
+        if user.is_active is False:
+            raise HTTPException(status_code=403, detail="User is inactive")
+        return create_application_session(db, user_id=user.id)
 
 
     
