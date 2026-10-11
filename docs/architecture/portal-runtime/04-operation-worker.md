@@ -1,5 +1,10 @@
 # Поток 4. Operation worker и стадии исполнения
 
+Статус: current
+Последняя проверка: 2026-10-10
+Назначение: карта кода очереди операций и operation worker
+Источник истины для: не является источником истины; первичен код в portal/app/
+
 [Карта всех потоков](../portal-runtime-walkthrough.md) · Код:
 [`workers/operation_worker.py`](../../../portal/app/workers/operation_worker.py),
 [`operations/services.py`](../../../portal/app/operations/services.py),

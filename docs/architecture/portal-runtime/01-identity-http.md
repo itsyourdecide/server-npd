@@ -1,5 +1,10 @@
 # Поток 1. HTTP, вход, сессия, CSRF и выход
 
+Статус: current
+Последняя проверка: 2026-10-10
+Назначение: карта кода входа через OIDC, application-сессий, CSRF и выхода
+Источник истины для: не является источником истины; первичен код в portal/app/
+
 [Карта всех потоков](../portal-runtime-walkthrough.md) · Код:
 [`app/main.py`](../../../portal/app/main.py),
 [`app/identity/`](../../../portal/app/identity/),
@@ -47,8 +52,9 @@ GET /auth/login или /auth/register
 
 В `auth_callback()` Authlib обрабатывает OIDC-ответ и отдаёт `userinfo`. Код
 Portal затем отдельно требует непустой `email` и **ровно**
-`email_verified is True`; иначе 403. Далее `async with db.begin()` создаёт
-границу транзакции. Внутри неё:
+`email_verified is True`; иначе 403. Далее `_login_and_create_session()`
+оборачивает всю последовательность в одну транзакцию `db.begin()`. Внутри
+неё:
 
 1. `get_or_create_user(db, issuer=userinfo["iss"],
    subject=userinfo["sub"], email=email)` ищет `ExternalIdentity` по паре
@@ -70,6 +76,14 @@ Portal затем отдельно требует непустой `email` и **
    `npd_session` со свойствами `HttpOnly`, `SameSite=Lax`, `path=/`, `max_age`
    из настроек; `Secure` зависит от `oidc_cookie_secure` (локальный HTTP
    использует `False`, production HTTPS должен использовать `True`).
+
+Если два параллельных входа одной identity одновременно проходят путь
+создания, проигравший ловит `IntegrityError` на
+`uq_external_identities_issuer_subject` при commit. Callback откатывает
+транзакцию и повторяет её целиком один раз: повтор уже видит
+закоммиченную identity победителя и завершается обычным входом. Каждый
+запрос получает собственную `ApplicationSession` — двойной логин того же
+пользователя не конфликт, а два нормальных входа.
 
 Почему `User.id` отдельный: email может измениться, а Keycloak может
 подключить иной способ входа. Владение квотой, ключами и VM не должно

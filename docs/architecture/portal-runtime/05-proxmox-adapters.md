@@ -1,5 +1,10 @@
 # Поток 5. От worker до Proxmox API
 
+Статус: current
+Последняя проверка: 2026-10-10
+Назначение: карта кода адаптеров Proxmox: протокол, fake и HTTP-адаптер
+Источник истины для: не является источником истины; первичен код в portal/app/
+
 [Карта всех потоков](../portal-runtime-walkthrough.md) · Код:
 [`proxmox/contracts.py`](../../../portal/app/proxmox/contracts.py),
 [`proxmox/fake.py`](../../../portal/app/proxmox/fake.py),
