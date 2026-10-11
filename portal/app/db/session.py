@@ -10,7 +10,7 @@ from app.core.config import settings
 
 engine = create_async_engine(settings.database_url, pool_pre_ping=True)
 
-SessionLocal = async_sessionmaker(bind=engine)
+SessionLocal = async_sessionmaker(bind=engine, expire_on_commit=False)
 
 
 async def get_db() -> AsyncGenerator[AsyncSession]:

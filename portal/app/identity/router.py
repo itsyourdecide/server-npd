@@ -10,10 +10,8 @@ from app.db.session import get_db
 from app.identity.csrf import make_csrf_token, verify_csrf
 from app.identity.dependencies import get_current_user
 from app.identity.oidc import oauth
-from app.identity.services import get_or_create_user
 from app.identity.sessions import (
     _login_and_create_session,
-    create_application_session,
     revoke_user_session,
 )
 from app.users.models import User

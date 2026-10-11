@@ -7,20 +7,20 @@ from sqlalchemy import and_, or_, select
 from app.db.models import Operation
 from app.db.session import SessionLocal
 from app.operations.services import (
-    process_create_vm_operation,
     finish_create_vm_dispatch,
+    finish_lifecycle_dispatch,
+    finish_start_vm_dispatch,
     prepare_create_vm_dispatch,
-    reconcile_create_vm_operation,
+    prepare_lifecycle_dispatch,
+    prepare_start_vm_dispatch,
+    process_create_vm_operation,
     process_delete_vm_operation,
     process_power_off_vm_operation,
     process_reboot_vm_operation,
     process_start_vm_operation,
-    finish_start_vm_dispatch,
-    finish_lifecycle_dispatch,
-    prepare_start_vm_dispatch,
-    prepare_lifecycle_dispatch,
-    reconcile_start_vm_operation,
+    reconcile_create_vm_operation,
     reconcile_lifecycle_operation,
+    reconcile_start_vm_operation,
 )
 from app.proxmox.contracts import ProxmoxAdapter
 from app.virtual_machines.models import VirtualMachine

@@ -24,8 +24,7 @@ def create_application_session(
     app_session = ApplicationSession(
         user_id = user_id,
         token_hash = token_hash,
-        expires_at = datetime.now(UTC) + timedelta(seconds=settings.session_max_age_seconds),
-
+        expires_at = datetime.now(UTC) + timedelta(seconds=settings.session_max_age_seconds)
     )
 
     db.add(app_session)
