@@ -44,7 +44,7 @@ async def get_user_by_session_token(
 
     if session is None:
         return None
-    
+
     user_id = session.user_id
 
     statement = select(User).where(
@@ -80,17 +80,17 @@ async def revoke_user_session(
     application_session.revoked_at = datetime.now(UTC)
 
 async def _login_and_create_session(
-    db: AsyncSession, 
-    *, 
-    issuer: str, 
-    subject: str, 
+    db: AsyncSession,
+    *,
+    issuer: str,
+    subject: str,
     email: str,
 ) -> str:
     async with db.begin():
         user = await get_or_create_user(
-            db, 
-            issuer=issuer, 
-            subject=subject, 
+            db,
+            issuer=issuer,
+            subject=subject,
             email=email
         )
         if user.is_active is False:
@@ -98,6 +98,6 @@ async def _login_and_create_session(
         return create_application_session(db, user_id=user.id)
 
 
-    
 
-    
+
+

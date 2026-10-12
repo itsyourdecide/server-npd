@@ -10,7 +10,7 @@ from app.identity.sessions import get_user_by_session_token
 from app.users.models import User
 
 LAST_SEEN_UPDATE_INTERVAL = timedelta(minutes=5)
-    
+
 
 #возвращает юзера после полной проверки
 async def get_current_user(
@@ -49,7 +49,7 @@ async def get_current_user(
             .where(ApplicationSession.id == application_session.id)
             .values(last_seen_at=now)
         )
-        
+
         await db.commit()
-        
+
     return user
