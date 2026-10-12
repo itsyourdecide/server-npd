@@ -11,6 +11,7 @@ import pytest_asyncio
 from alembic import command
 from alembic.config import Config
 from app.db.session import SessionLocal
+from app.identity.services import get_or_create_user
 from sqlalchemy import text
 
 TRUNCATE_TABLES = (
@@ -18,10 +19,11 @@ TRUNCATE_TABLES = (
     "virtual_machines",
     "ssh_public_keys",
     "user_quota",
-    "compute_plans",
     "application_sessions",
     "external_identities",
     "users",
+    # compute_plans НЕ трогаем: план starter сеет миграция
+    # 903299d0b202 — это базовые данные системы, а не тестовый мусор.
 )
 
 def _ensure_test_database() -> None:
@@ -50,3 +52,14 @@ async def db():
             + " RESTART IDENTITY CASCADE"
         ))
         await session.commit()
+
+@pytest_asyncio.fixture
+async def user(db):
+    # TODO: нужен отдельный тест для проверки функции get_or_create_user
+    user = await get_or_create_user(
+        db=db,
+        issuer="issuer",
+        subject="subject",
+        email="email@example.com",
+    )
+    return user
