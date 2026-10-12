@@ -63,3 +63,18 @@ async def user(db):
         email="email@example.com",
     )
     return user
+
+@pytest_asyncio.fixture
+async def client():
+    # Приложение ходит в portal_test через собственные сессии get_db,
+    # поэтому данные, которые должны быть ему видны, тесты обязаны коммитить.
+    from app.main import create_app
+
+    import httpx2
+
+    app = create_app()
+    async with httpx2.AsyncClient(
+        transport=httpx2.ASGITransport(app=app),
+        base_url="http://testserver",
+    ) as http_client:
+        yield http_client
