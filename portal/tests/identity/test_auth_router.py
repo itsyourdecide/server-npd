@@ -1,20 +1,17 @@
 from hashlib import sha256
 from urllib.parse import parse_qs, urlparse
 
-import pytest
-from fastapi import HTTPException  # noqa: F401  (см. мутации веток 401)
-from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
-
 import app.identity.router as identity_router
+import pytest
 from app.core.config import settings
 from app.db.session import SessionLocal
 from app.identity.csrf import make_csrf_token
 from app.identity.models import ApplicationSession
 from app.identity.oidc import oauth
 from app.identity.sessions import create_application_session, get_or_create_user
-from app.identity.services import get_or_create_user  # noqa: F401
-
+from fastapi import HTTPException  # noqa: F401  (см. мутации веток 401)
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
 END_SESSION_ENDPOINT = "https://keycloak.test/protocol/openid-connect/logout"
 

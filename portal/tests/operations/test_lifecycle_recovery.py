@@ -2,12 +2,11 @@ import asyncio
 from unittest.mock import AsyncMock
 from uuid import uuid4
 
+import app.workers.operation_worker as worker
 import pytest
-
 from app.operations.models import Operation
 from app.proxmox.fake import FakeProxmoxAdapter
 from app.virtual_machines.models import VirtualMachine
-import app.workers.operation_worker as worker
 
 
 def make_worker_state(operation_type: str, *, phase: str | None = None):

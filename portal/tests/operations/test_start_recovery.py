@@ -2,6 +2,7 @@ import asyncio
 from unittest.mock import AsyncMock
 from uuid import uuid4
 
+import app.workers.operation_worker as worker
 from app.operations.models import Operation
 from app.operations.services import (
     finish_start_vm_dispatch,
@@ -11,7 +12,6 @@ from app.operations.services import (
 )
 from app.proxmox.fake import FakeProxmoxAdapter
 from app.virtual_machines.models import VirtualMachine
-import app.workers.operation_worker as worker
 
 
 def make_start():

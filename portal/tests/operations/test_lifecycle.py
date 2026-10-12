@@ -3,7 +3,6 @@ from unittest.mock import AsyncMock
 from uuid import uuid4
 
 import pytest
-
 from app.operations.models import Operation
 from app.operations.services import (
     process_delete_vm_operation,
