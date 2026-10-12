@@ -254,8 +254,11 @@ async def enqueue_vm_operation(
             )
         )
 
+        # Сравнение идёт с параметром vm_id, а не с vm.id: rollback выше
+        # экспирит ORM-объекты сессии, и чтение vm.id вызвало бы ленивый
+        # SELECT в асинхронном контексте (MissingGreenlet).
         if (existing is not None
-                and existing.virtual_machine_id == vm.id
+                and existing.virtual_machine_id == vm_id
                 and existing.operation_type == operation_type
         ):
                 return existing
